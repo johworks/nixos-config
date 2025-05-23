@@ -62,6 +62,7 @@
 	userEmail = "jworks2507@gmail.com";
 	extraConfig = {
 		init.defaultBranch = "main";
+		core.editor = "nvim";
 	};
   };
 
