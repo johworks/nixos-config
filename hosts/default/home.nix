@@ -18,6 +18,12 @@
     vimAlias = true;
     vimdiffAlias = true;
 
+    # Load options first
+    extraLuaConfig = ''
+        ${builtins.readFile ./nvim/options.lua}
+        ${builtins.readFile ./nvim/keymaps.lua}
+    '';
+
     # Package dependencies
     extraPackages = with pkgs; [
 		# Clipboards
@@ -45,7 +51,6 @@
 			plugin = comment-nvim;
 			config = toLua "require(\"Comment\").setup()";
 		}
-
 
 		{
 			plugin = gruvbox-nvim;
@@ -93,11 +98,11 @@
 
     ];
 
-
-
+    /*
     extraLuaConfig = ''
-		${builtins.readFile ./nvim/options.lua}
+        ${builtins.readFile ./nvim/options.lua}
     '';
+    */
 
   };  # End nvim configuations
 
@@ -124,6 +129,7 @@
 		};
 	};
 	/*
+    # Haven't figured this bit out yet
 	knownHosts = {
 		"github.com" = {
 			hostNames = [ "github.com" ];
