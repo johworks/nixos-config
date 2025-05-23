@@ -21,6 +21,10 @@
 
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
 
+
+
+
+
   # Configure network proxy if necessary
   # networking.proxy.default = "http://user:password@proxy:port/";
   # networking.proxy.noProxy = "127.0.0.1,localhost,internal.domain";
@@ -45,6 +49,7 @@
     LC_TELEPHONE = "en_US.UTF-8";
     LC_TIME = "en_US.UTF-8";
   };
+
 
   # Enable the X11 windowing system.
   # You can disable this if you're only using the Wayland session.
@@ -101,7 +106,8 @@
     };
   };
 
-
+  # Make the VM experience better
+  services.spice-vdagentd.enable = true;
 
   # Enable automatic login for the user.
   services.displayManager.autoLogin.enable = true;
@@ -116,8 +122,12 @@
   # List packages installed in system profile. To search, run:
   # $ nix search wget
   environment.systemPackages = with pkgs; [
-    vim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
+    vim
     wget
+
+    # VM stuff
+    spice-vdagent     # res and clipboard
+    xorg.xrandr       # let x11 dynamically adjust res
   ];
 
   # Some programs need SUID wrappers, can be configured further or are

@@ -27,6 +27,9 @@
 		# LSPs
 		lua-language-server
 		nixd
+
+        # For telescope
+        ripgrep
     ];
 
     plugins = with pkgs.vimPlugins; [
