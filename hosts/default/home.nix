@@ -66,16 +66,16 @@
   };
 
   # Setup SSH to work with GitHub
-  /*
   programs.ssh = {
   	enable = true;
 	matchBlocks = {
 		"github.com" = {
 			user = "git";
 			hostname = "github.com";
-			identityFile = "~/.ssh/github/id_ed25519";
+			identityFile = "~/.ssh/github_id_ed25519";
 		};
 	};
+	/*
 	knownHosts = {
 		"github.com" = {
 			hostNames = [ "github.com" ];
@@ -85,8 +85,8 @@
 
 		};
 	};
+	*/
   };
-  */
 
 
 
