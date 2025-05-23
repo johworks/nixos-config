@@ -21,53 +21,83 @@
 
     # Package dependencies
     extraPackages = with pkgs; [
-    	
-	# Clipboards
-	xclip    # x11
-	wl-clipboard   # wayland
+		# Clipboards
+		xclip    # x11
+		wl-clipboard   # wayland
 
-	# LSPs
-	#luajitPackages.lua-lsp
-	#rnix-lsp
+		# LSPs
+		luajitPackages.lua-lsp
+		rnix-lsp
     ];
 
     plugins = with pkgs.vimPlugins; [
 
+		# Add LSP support
+		{
+			plugin = nvim-lspconfig;
+			config = toLuaFile ./nvim/plugin/lsp.lua;
+		}
 
-	# Nice plugin to make comments better
-	{
-	    plugin = comment-nvim;
-	    config = toLua "require(\"Comment\").setup()";
-	}
+		# Nice plugin to make comments better
+		{
+			plugin = comment-nvim;
+			config = toLua "require(\"Comment\").setup()";
+		}
 
-	{
-		plugin = (nvim-treesitter.withPlugins (p: [
-			p.tree-sitter-nix
-			p.tree-sitter-vim
-			p.tree-sitter-bash
-			p.tree-sitter-lua
-			p.tree-sitter-python
-		]));
-		config = toLuaFile ./nvim/plugin/treesitter.lua;
-	}
 
-	# More plugins
+		{
+			plugin = gruvbox-nvim;
+			config = "colorscheme gruvbox";
+		}
 
+		neodev-nvim
+
+		nvim-cmp
+		{
+			plugin = nvim-cmp;
+			config = toLuaFile ./nvim/plugin/cmp.lua;
+		}
+
+		{
+			plugin = telescope-nvim;
+			config = toLuaFile ./nvim/plugin/telescope.lua;
+		}
+
+		# I believe this is meant to help with performance
+		# in large code bases
+		telescope-fzf-native-nvim
+
+		cmp_luasnip
+		cmp-nvim-lsp
+
+		luasnip
+		friendly-snippets
+
+		lualine-nvim
+		nvim-web-devicons
+
+		{
+			plugin = (nvim-treesitter.withPlugins (p: [
+				p.tree-sitter-nix
+				p.tree-sitter-vim
+				p.tree-sitter-bash
+				p.tree-sitter-lua
+				p.tree-sitter-python
+			]));
+			config = toLuaFile ./nvim/plugin/treesitter.lua;
+		}
+
+		vim-nix
 
     ];
 
 
 
     extraLuaConfig = ''
-        -- Write lua code here
-
-	-- or string interpolate files like this:
-
-	${builtins.readFile ./nvim/options.lua}
-
+		${builtins.readFile ./nvim/options.lua}
     '';
 
-  };
+  };  # End nvim configuations
 
 	
   # Enable git 
