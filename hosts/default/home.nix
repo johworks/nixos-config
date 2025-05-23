@@ -6,7 +6,6 @@
   home.username = "john";
   home.homeDirectory = "/home/john";
 
-
   programs.neovim = 
   let
     toLua = str: "lua << EOF\n${str}\nEOF\n";
@@ -26,8 +25,8 @@
 		wl-clipboard   # wayland
 
 		# LSPs
-		luajitPackages.lua-lsp
-		rnix-lsp
+		lua-language-server
+		nixd
     ];
 
     plugins = with pkgs.vimPlugins; [
