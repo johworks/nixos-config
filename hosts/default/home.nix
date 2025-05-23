@@ -33,10 +33,12 @@
 
     plugins = with pkgs.vimPlugins; [
 
-	#{
-	#    plugin = comment-nvim;
-	#    config = toLua "require(\"Commment\").setup()";
-	#}
+
+	# Nice plugin to make comments better
+	{
+	    plugin = comment-nvim;
+	    config = toLua "require(\"Commment\").setup()";
+	}
 
 	{
 		plugin = (nvim-treesitter.withPlugins (p: [
