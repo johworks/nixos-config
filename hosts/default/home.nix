@@ -38,6 +38,19 @@
 	#    config = toLua "require(\"Commment\").setup()";
 	#}
 
+	{
+		plugin = (nvim-treesitter.withPlugins (p: [
+			p.tree-sitter-nix
+			p.tree-sitter-vim
+			p.tree-sitter-bash
+			p.tree-sitter-lua
+			p.tree-sitter-python
+		]));
+		config = toLuaFile ./nvim/plugin/treesitter.lua;
+	}
+
+	# More plugins
+
 
     ];
 
