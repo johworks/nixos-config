@@ -37,7 +37,7 @@
 	# Nice plugin to make comments better
 	{
 	    plugin = comment-nvim;
-	    config = toLua "require(\"Commment\").setup()";
+	    config = toLua "require(\"Comment\").setup()";
 	}
 
 	{
