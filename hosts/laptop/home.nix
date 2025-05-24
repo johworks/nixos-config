@@ -127,19 +127,18 @@
 			hostname = "github.com";
 			identityFile = "~/.ssh/github_id_ed25519";
 		};
-	};
-	/*
+    };
+	
     # Haven't figured this bit out yet
-	knownHosts = {
-		"github.com" = {
-			hostNames = [ "github.com" ];
-			publicKey = ''
-				github.com ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOMqqnkVzrm0SdG6UOoqKLsabgH5C9okWi0dh2l9GKJl
-			'';
-
-		};
-	};
-	*/
+    # Put this in home.file
+    #knownHosts = {
+	#	"github.com" = {
+	#		hostNames = [ "github.com" ];
+	#		publicKey = ''
+	#			github.com ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOMqqnkVzrm0SdG6UOoqKLsabgH5C9okWi0dh2l9GKJl
+	#		'';
+	#	};
+	#};
   };
 
 
@@ -194,6 +193,11 @@
     #   org.gradle.console=verbose
     #   org.gradle.daemon.idletimeout=3600000
     # '';
+
+    "./ssh/known_hosts".text = ''
+	    github.com ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOMqqnkVzrm0SdG6UOoqKLsabgH5C9okWi0dh2l9GKJl
+      '';
+
   };
 
   # Home Manager can also manage your environment variables through
