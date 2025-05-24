@@ -1,5 +1,5 @@
 {
-  description = "Nixos config flake";
+  description = "Nixos and Home Manager flake";
 
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
@@ -10,34 +10,35 @@
     };
   };
 
-  outputs = { self, nixpkgs, ... }@inputs: {
-    # use "nixos", or your hostname as the name of the configuration
-    # it's a better practice than "default" shown in the video
-    nixosConfigurations.nixos = nixpkgs.lib.nixosSystem {
-      specialArgs = {inherit inputs;};
-      modules = [
-        ./hosts/default/configuration.nix
-        inputs.home-manager.nixosModules.default
-      ];
+  outputs = { nixpkgs, home-manager, ... }:
+
+    let
+        system = "x86_64-linux";
+	pkgs = nixpkgs.legacyPackages.${system};
+    in {
+
+	# For NixOS rebuild
+	nixosConfigurations = {
+
+		default = nixpkgs.lib.nixosSystem {
+			inherit system;
+			modules = [ ./hosts/default/configuration.nix ];
+		};
+
+
+		laptop = nixpkgs.lib.nixosSystem {
+			inherit system;
+			modules = [ ./hosts/laptop/configuration.nix ];
+		};
+	};
+
+
+	homeConfigurations = {
+		john = home-manager.lib.homeManagerConfiguration {
+			inherit pkgs;
+			modules = [ ./hosts/laptop/home.nix ];
+		};
+	};
     };
-
-    nixosConfigurations = {
-      default = nixpkgs.lib.nixosSystem {
-        extraSpecialArgs = {inherit inputs;};
-        modules = [
-          ./hosts/default/configuration.nix
-        ];
-      };
-
-
-      # You can add extra configurations here
-      #workmachine = nixpkgs.lib.nixosSystem {
-      #  extraSpecialArgs = {inherit inputs;};
-      #  modules = [
-      #    ./hosts/workmachine/configuration.nix
-      #  ];
-      #};
-
-     };
-  };
 }
+
