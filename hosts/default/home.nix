@@ -155,7 +155,12 @@
 
   # The home.packages option allows you to install Nix packages into your
   # environment.
-  home.packages = [
+  home.packages = with pkgs; [
+
+    # Proton GE used for Steam
+    # Probably won't work on my VM without extra configuration
+    #protonup
+
     # # Adds the 'hello' command to your environment. It prints a friendly
     # # "Hello, world!" when run.
     # pkgs.hello
@@ -207,6 +212,8 @@
   #
   home.sessionVariables = {
     EDITOR = "nvim";
+
+    #STEAM_EXTRA_COMPAT_TOOLS_PATHS = "${config.home.homeDirectory}/.steam/root/compatibilitytools.d";
   };
 
   # Let Home Manager install and manage itself.

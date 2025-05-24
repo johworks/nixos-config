@@ -11,6 +11,21 @@
       inputs.home-manager.nixosModules.default
     ];
 
+  # Enable OpenGL
+  #  hardware.opengl = {
+  #    enable = true;
+  #    driSupport = true;
+  #    driSupport32Bit = true;
+  #  };
+
+  # Enable GPU drivers (both X11 and Wayland)
+  services.xserver.videoDrivers = ["amdgpu"];
+
+  # Steam / Gaming
+  programs.steam.enable = true;
+  programs.steam.gamescopeSession.enable = true;
+  programs.gamemode.enable = true;
+
   # Bootloader.
   boot.loader.grub.enable = true;
   boot.loader.grub.device = "/dev/vda";
@@ -124,6 +139,9 @@
     # VM stuff
     spice-vdagent     # res and clipboard
     xorg.xrandr       # let x11 dynamically adjust res
+
+    # Montior FPS
+    mangohud
   ];
 
   # Some programs need SUID wrappers, can be configured further or are
