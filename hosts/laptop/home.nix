@@ -6,6 +6,31 @@
   home.username = "john";
   home.homeDirectory = "/home/john";
 
+  # This manages the ~/.config/hypr/hyprland.config file
+  wayland.windowManager.hyprland = {
+    enable = true;
+    settings = {
+      input = {
+        naturual_scroll = true;  
+      };
+      bind = [
+        # App launcher 
+        "SUPER, S, exec, rofi -show drun -show-icons"
+      ];
+      exec-once = [
+        # Wallpaper engine
+        "swww init && swww img ~/.Wallpapers/gruvbox-mountain-village.png"
+        # Network manager
+        "nm-applet --indicator"
+        # Top bar
+        "wayland"
+        # Notifications (requires libnotify)
+        "dunst"
+      ];
+    };
+  };
+
+
   # Enable and configure neovim
   programs.neovim = 
   let
@@ -206,11 +231,13 @@
       '';
 
     # Manage Hyprland configuration files
-    ".config/hypr/hyprland.conf".source = ./hypr/hyprland.conf;
-    ".config/hypr/start.sh" = {
-      source = ./hypr/start.sh;
-      executable = true;
-    };
+    # Use the wayland.windowManager.hyprland = {}
+    # Cannot use both ways, they conflict
+    #".config/hypr/hyprland.conf".source = ./hypr/hyprland.conf;
+    #".config/hypr/start.sh" = {
+    #  source = ./hypr/start.sh;
+    #  executable = true;
+    #};
 
   };
 

@@ -11,5 +11,5 @@ nm-applet --indicator &
 # the top bar
 waybar &
 
-# I forget what this does
+# notifications (requires libnotify)
 dunst
