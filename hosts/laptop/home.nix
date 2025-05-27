@@ -158,7 +158,18 @@
   # environment.
   home.packages = with pkgs; [
 
+    # Password manager
+    # Not configured yet
     keepassxc
+
+    # Hyprland packages
+    waybar  # if workspaces don't work properly add the -Dexperimental=true flag
+    dunst   # notification manager
+    libnotify
+    swww    # wallpaper daemon (a bunch of others)
+    kitty   # default (others: alacritty, wezterm, ...)
+    rofi-wayland # app launcher (others: wofi, bemenu, fuzzel, tofi)
+
 
     # Proton GE used for Steam
     # Probably won't work on my VM without extra configuration
