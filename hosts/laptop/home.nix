@@ -207,7 +207,7 @@
 
     # Manage Hyprland configuration files
     ".config/hypr/hyprland.conf".source = ./hypr/hyprland.conf;
-    ".config/hpyr/start.sh" = {
+    ".config/hypr/start.sh" = {
       source = ./hypr/start.sh;
       executable = true;
     };
