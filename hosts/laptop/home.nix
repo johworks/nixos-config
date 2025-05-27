@@ -11,7 +11,7 @@
     enable = true;
     settings = {
       input = {
-        naturual_scroll = true;  
+        natural_scroll = true;  
       };
       bind = [
         # App launcher 
