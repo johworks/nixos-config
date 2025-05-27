@@ -189,9 +189,28 @@
     # '')
   ];
 
+# Have a default wallpaper
+  #let
+  #  wallpaper = builtins.fetchurl {
+  #    url = "https://gruvbox-wallpapers.pages.dev/wallpapers/irl/forest-3.jpg";
+  #    sha256 = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"; # Replace with real hash
+  #  };
+  #in
+  #{
+  #  # Place this wallap
+  #  home.file."Pictures/Wallpapers/forest-3.jpg" = {
+  #    source = wallpaper;
+  #  };
+
   # Home Manager is pretty good at managing dotfiles. The primary way to manage
   # plain files is through 'home.file'.
-  home.file = {
+  home.file = 
+  let 
+    wallpaper = builtins.fetchurl {
+      url = "https://gruvbox-wallpapers.pages.dev/wallpapers/irl/forest-3.jpg";
+      sha256 = "14l56mlia6ncpc8aj15z1cdpm38f8hn14c1p1js67d3b7k6rhbnz";
+    };
+  in {
     # # Building this configuration will create a copy of 'dotfiles/screenrc' in
     # # the Nix store. Activating the configuration will then make '~/.screenrc' a
     # # symlink to the Nix store copy.
@@ -202,6 +221,9 @@
     #   org.gradle.console=verbose
     #   org.gradle.daemon.idletimeout=3600000
     # '';
+
+    # Default wallpaper
+    "Pictures/Wallpapers/forest-3.jpg".source = wallpaper;
 
     # Manage who we trust
     ".ssh/known_hosts".text = ''

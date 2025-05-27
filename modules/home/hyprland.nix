@@ -1,5 +1,7 @@
 { config, pkgs, ... }: {
 
+
+
   # This manages the ~/.config/hypr/hyprland.config file
   wayland.windowManager.hyprland = {
     enable = true;
@@ -133,8 +135,8 @@
 
       # https://wiki.hyprland.org/Configuring/Variables/#misc
       misc = {
-        force_default_wallpaper = -1; # Set to 0 or 1 to disable the anime mascot wallpapers
-        disable_hyprland_logo = false; # If true disables the random hyprland logo / anime girl background. :(
+        force_default_wallpaper = 0; # Set to 0 or 1 to disable the anime mascot wallpapers
+        disable_hyprland_logo = true; # If true disables the random hyprland logo / anime girl background. :(
       };
 
       #############
@@ -276,12 +278,13 @@
       ### AUTOSTART ###
       #################
       exec-once = [
-        # Wallpaper engine
-        "swww init && swww img ~/.Wallpapers/gruvbox-mountain-village.png"
         # Network manager
-        "nm-applet --indicator &"
+        "nm-applet --indicator"
+        # Wallpaper engine
+        "swww img ~/Pictures/Wallpapers/forest-3.jpg"
+        "swww restore"
         # Top bar
-        "wayland &"
+        "wayland"
         # Notifications (requires libnotify)
         "dunst"
       ];
