@@ -6,6 +6,13 @@
   home.username = "john";
   home.homeDirectory = "/home/john";
 
+  # Enable Hyprland desktop compositor
+  programs.hyprland = {
+    enable = true;
+    xwayland.enable = true;  # support X11 apps too :)
+  };
+
+  # Enable and configure neovim
   programs.neovim = 
   let
     toLua = str: "lua << EOF\n${str}\nEOF\n";
@@ -138,7 +145,6 @@
   };
 
 
-
   # This value determines the Home Manager release that your configuration is
   # compatible with. This helps avoid breakage when a new Home Manager release
   # introduces backwards incompatible changes.
@@ -157,10 +163,6 @@
     # Proton GE used for Steam
     # Probably won't work on my VM without extra configuration
     #protonup
-
-    # # Adds the 'hello' command to your environment. It prints a friendly
-    # # "Hello, world!" when run.
-    # pkgs.hello
 
     # # It is sometimes useful to fine-tune packages, for example, by applying
     # # overrides. You can do that directly here, just don't forget the
