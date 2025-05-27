@@ -6,12 +6,6 @@
   home.username = "john";
   home.homeDirectory = "/home/john";
 
-  # Enable Hyprland desktop compositor
-  programs.hyprland = {
-    enable = true;
-    xwayland.enable = true;  # support X11 apps too :)
-  };
-
   # Enable and configure neovim
   programs.neovim = 
   let
@@ -169,6 +163,7 @@
     swww    # wallpaper daemon (a bunch of others)
     kitty   # default (others: alacritty, wezterm, ...)
     rofi-wayland # app launcher (others: wofi, bemenu, fuzzel, tofi)
+    networkmanagerapplet # should give me a nice looking network manager
 
 
     # Proton GE used for Steam
@@ -203,11 +198,19 @@
     #   org.gradle.daemon.idletimeout=3600000
     # '';
 
+    # Manage who we trust
     ".ssh/known_hosts".text = ''
         github.com ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOMqqnkVzrm0SdG6UOoqKLsabgH5C9okWi0dh2l9GKJl
         github.com ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCj7ndNxQowgcQnjshcLrqPEiiphnt+VTTvDP6mHBL9j1aNUkY4Ue1gvwnGLVlOhGeYrnZaMgRK6+PKCUXaDbC7qtbW8gIkhL7aGCsOr/C56SJMy/BCZfxd1nWzAOxSDPgVsmerOBYfNqltV9/hWCqBywINIR+5dIg6JTJ72pcEpEjcYgXkE2YEFXV1JHnsKgbLWNlhScqb2UmyRkQyytRLtL+38TGxkxCflmO+5Z8CSSNY7GidjMIZ7Q4zMjA2n1nGrlTDkzwDCsw+wqFPGQA179cnfGWOWRVruj16z6XyvxvjJwbz0wQZ75XK5tKSb7FNyeIEs4TT4jk+S4dhPeAUC5y+bDYirYgM4GC7uEnztnZyaVWQ7B381AK4Qdrwt51ZqExKbQpTUNn+EjqoTwvqNj4kqx5QUCI0ThS/YkOxJCXmPUWZbhjpCg56i+2aB6CmK2JGhn57K5mj0MNdBXA4/WnwH6XoPWJzK5Nyu2zB3nAZp+S5hpQs+p1vN1/wsjk=
         github.com ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBEmKSENjQEezOmxkZMy7opKgwFB9nkt5YRrYMjNuG5N87uRgg6CLrbo5wAdT/y6v0mKV0U2w0WZ2YB/++Tpockg=
       '';
+
+    # Manage Hyprland configuration files
+    ".config/hypr/hyprland.conf".source = ./hypr/hyprland.conf;
+    ".config/hpyr/start.sh" = {
+      source = ./hypr/start.sh;
+      executable = true;
+    };
 
   };
 
