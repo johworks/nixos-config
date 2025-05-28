@@ -1,6 +1,6 @@
 { config, pkgs, ... }: {
 
-  imports = [ ./waybar/waybar.nix ];
+  imports = [ ./waybar.nix ];
 
   # This manages the ~/.config/hypr/hyprland.config file
   wayland.windowManager.hyprland = {
@@ -284,7 +284,7 @@
         "swww img ~/Pictures/Wallpapers/forest-3.jpg"
         #"swww restore"
         # Top bar
-        "waybar"
+        #"waybar"
         # Notifications (requires libnotify)
         "dunst"
       ];
@@ -294,7 +294,7 @@
 
   # Hyprland packages
   home.packages = with pkgs; [
-    waybar  # if workspaces don't work properly add the -Dexperimental=true flag
+    #waybar  # if workspaces don't work properly add the -Dexperimental=true flag
     dunst   # notification manager
     libnotify
     swww    # wallpaper daemon (a bunch of others)

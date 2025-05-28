@@ -13,30 +13,36 @@
   outputs = { nixpkgs, home-manager, ... }:
 
     let
-        system = "x86_64-linux";
-	pkgs = nixpkgs.legacyPackages.${system};
+      system = "x86_64-linux";
+	  pkgs = nixpkgs.legacyPackages.${system};
     in {
 
 	# For NixOS rebuild
 	nixosConfigurations = {
 
 		default = nixpkgs.lib.nixosSystem {
-			inherit system;
-			modules = [ ./hosts/default/configuration.nix ];
+          inherit system;
+          specialArgs = {
+            hostId = "default";
+          };
+          modules = [ ./hosts/default/configuration.nix ];
 		};
 
 
 		laptop = nixpkgs.lib.nixosSystem {
-			inherit system;
-			modules = [ ./hosts/laptop/configuration.nix ];
+          inherit system;
+          specialArgs = {
+            hostId = "laptop";
+          };
+          modules = [ ./hosts/laptop/configuration.nix ];
 		};
 	};
 
 
 	homeConfigurations = {
 		john = home-manager.lib.homeManagerConfiguration {
-			inherit pkgs;
-			modules = [ ./hosts/laptop/home.nix ];
+          inherit pkgs;
+          modules = [ ./hosts/laptop/home.nix ];
 		};
 	};
     };

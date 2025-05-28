@@ -292,7 +292,7 @@ let
     /* workspace window block */
     #workspaces {
         border-radius: 9px 9px 9px 9px;
-        background: mix(@theme_unfocused_base_color,black,0.1);
+        background: mix(@theme_unfocused_base_color,white,0.1);
     }
 
     #window {
