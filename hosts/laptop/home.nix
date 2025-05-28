@@ -161,6 +161,13 @@
     # Not configured yet
     keepassxc
 
+    #nerd-fonts.jetbrains-mono
+
+    # Nerd Font :)
+    #(nerdfonts.override { 
+    #  fonts = [ "JetBrainsMono" ]; 
+    #})
+
     # Hyprland packages
     #waybar  # if workspaces don't work properly add the -Dexperimental=true flag
     #dunst   # notification manager
@@ -188,19 +195,6 @@
     #   echo "Hello, ${config.home.username}!"
     # '')
   ];
-
-# Have a default wallpaper
-  #let
-  #  wallpaper = builtins.fetchurl {
-  #    url = "https://gruvbox-wallpapers.pages.dev/wallpapers/irl/forest-3.jpg";
-  #    sha256 = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"; # Replace with real hash
-  #  };
-  #in
-  #{
-  #  # Place this wallap
-  #  home.file."Pictures/Wallpapers/forest-3.jpg" = {
-  #    source = wallpaper;
-  #  };
 
   # Home Manager is pretty good at managing dotfiles. The primary way to manage
   # plain files is through 'home.file'.

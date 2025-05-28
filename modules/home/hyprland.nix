@@ -1,6 +1,6 @@
 { config, pkgs, ... }: {
 
-
+  imports = [ ./waybar/waybar.nix ];
 
   # This manages the ~/.config/hypr/hyprland.config file
   wayland.windowManager.hyprland = {
@@ -279,12 +279,12 @@
       #################
       exec-once = [
         # Network manager
-        "nm-applet --indicator &"
+        "nm-applet --indicator"
         # Wallpaper engine
-        "swww img ~/Pictures/Wallpapers/forest-3.jpg &"
+        "swww img ~/Pictures/Wallpapers/forest-3.jpg"
         #"swww restore"
         # Top bar
-        "waybar &"
+        "waybar"
         # Notifications (requires libnotify)
         "dunst"
       ];
@@ -302,4 +302,5 @@
     rofi-wayland # app launcher (others: wofi, bemenu, fuzzel, tofi)
     networkmanagerapplet # should give me a nice looking network manager
   ];
+
 }

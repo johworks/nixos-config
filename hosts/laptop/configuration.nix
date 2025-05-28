@@ -127,9 +127,16 @@
 
     home-manager
 
+    nerd-fonts.jetbrains-mono
+
     # Montior FPS
     #mangohud
   ];
+
+  fonts = {
+    enableDefaultPackages = true;
+    fontconfig.enable = true;
+  };
 
   # Some programs need SUID wrappers, can be configured further or are
   # started in user sessions.
@@ -143,7 +150,7 @@
 
   # Enable the OpenSSH daemon.
   services.openssh = {
-    enable = true;
+    enable = false;
     settings.PasswordAuthentication = true;  # key only access (set to true rn though)
     settings.PermitRootLogin = "no";
   };
