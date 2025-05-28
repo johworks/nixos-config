@@ -40,7 +40,7 @@ let
       "mpris"
     ];
 
-    "wlr/workspaces" = workspaces;
+    #"wlr/workspaces" = workspaces;
     "hyprland/workspaces" = workspaces;
 
     bluetooth = {
@@ -106,11 +106,11 @@ let
       interval = 10;
     };
 
-    "custom/gpu-usage" = {
-      exec = "nvidia-smi --query-gpu=temperature.gpu --format=csv,noheader,nounits";
-      format = "{}";
-      interval = 10;
-    };
+    #"custom/gpu-usage" = {
+    #  exec = "nvidia-smi --query-gpu=temperature.gpu --format=csv,noheader,nounits";
+    #  format = "{}";
+    #  interval = 10;
+    #};
 
     "custom/logo" = {
       exec = "echo ' '";
@@ -200,6 +200,8 @@ let
     }
 
     window#waybar {
+      background-color: #1e1e2e;
+      color: #cdd6f4;
     }
 
     tooltip {
@@ -290,7 +292,7 @@ let
     /* workspace window block */
     #workspaces {
         border-radius: 9px 9px 9px 9px;
-        background: mix(@theme_unfocused_base_color,white,0.1);
+        background: mix(@theme_unfocused_base_color,black,0.1);
     }
 
     #window {
@@ -362,9 +364,9 @@ let
 in {
   programs.waybar = {
     enable = true;
-    package = pkgs.waybar.overrideAttrs (oldAttrs: {
-      mesonFlags = oldAttrs.mesonFlags ++ ["-Dexperimental=true"];
-    });
+    #package = pkgs.waybar.overrideAttrs (oldAttrs: {
+    #  mesonFlags = oldAttrs.mesonFlags ++ ["-Dexperimental=true"];
+    #});
     style = css;
     settings = {mainBar = mainWaybarConfig;};
   };
