@@ -19,8 +19,7 @@
       # See https://wiki.hyprland.org/Configuring/Keywords/
       "$terminal" = "kitty";
       "$fileManager" = "dolphin";
-      # Using rofi-wayland
-      #"$menu" = "wofi --show drun";
+      "$menu" = "wofi --show drun";
 
       #############################
       ### ENVIRONMENT VARIABLES ###
@@ -183,7 +182,7 @@
 
       bind = [
         # Open to rofi launcher to launch apps
-        "SUPER, S, exec, rofi -show drun -show-icons"
+        #"SUPER, S, exec, rofi -show drun -show-icons -normal-window"
         
         # Example binds, see https://wiki.hyprland.org/Configuring/Binds/ for more
         "SUPER, Q, exec, $terminal"
@@ -191,7 +190,7 @@
         "SUPER, M, exit"
         "SUPER, E, exec, $fileManager"
         "SUPER, V, togglefloating"
-        #"SUPER, R, exec, $menu"
+        "SUPER, R, exec, $menu"
         "SUPER, P, pseudo, # dwindle"
         "SUPER, J, togglesplit, # dwindle"
         
@@ -294,14 +293,15 @@
 
   # Hyprland packages
   home.packages = with pkgs; [
-    waybar  # if workspaces don't work properly add the -Dexperimental=true flag
-    dunst   # notification manager
-    libnotify
-    swww    # wallpaper daemon (a bunch of others)
-    kitty   # default (others: alacritty, wezterm, ...)
-    rofi-wayland # app launcher (others: wofi, bemenu, fuzzel, tofi)
+    waybar     # if workspaces don't work properly add the -Dexperimental=true flag
+    dunst      # notification manager
+    libnotify  # needed for libnotify
+    swww       # wallpaper daemon (a bunch of others)
+    kitty      # default (others: alacritty, wezterm, ...)
+    #rofi-wayland         # app launcher (others: wofi, bemenu, fuzzel, tofi)
+    wofi                  # native wayland rofi
     networkmanagerapplet # should give me a nice looking network manager
-    brightnessctl  # control the brightness
+    brightnessctl        # control the brightness
   ];
 
 }
