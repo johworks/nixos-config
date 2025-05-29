@@ -1,4 +1,4 @@
-{ config, pkgs, ... }:
+{ config, pkgs, inputs, ... }:
 
 {
 
@@ -137,6 +137,53 @@
 	
   };
 
+  # Setup firefox; Move to it's own file soon
+  programs.firefox = {
+    enable = true;
+    profiles.default = {
+
+      # Have been refactored into a sub-module or something idk
+      #bookmarks = [
+      #  {
+      #    name = "nixpkgs-search";
+      #    tags = [ "nix" ];
+      #    keyword = "nix";
+      #    url = "https://search.nixos.org/packages";
+      #  }
+      #];
+
+      settings = {
+        "dom.security.https_only_mode" = true;  # This might break self-hosted apps
+        "browser.download.panel.shown" = true;
+        "identity.fxaccounts.enabled" = false;
+        "signon.remeberSignons" = false;
+      };
+
+      search.engines = {
+        "Nix Packages" = {
+          urls = [{
+            template = "https://search.nixos.org/packages";
+            params = [
+              { name = "type"; value = "packages"; }
+              { name = "query"; value = "{searchTerms}"; }
+            ];
+          }];
+          icon = "${pkgs.nixos-icons}/share/icons/hicolor/scalable/apps/nix-snowflake.svg";
+          definedAliases = [ "@np" ];
+        };
+      };
+      search.force = true;
+
+      extensions.packages = with inputs.firefox-addons.packages."x86_64-linux"; [
+        ublock-origin
+        darkreader
+        youtube-shorts-block
+        sponsorblock
+        keepassxc-browser
+      ];
+    };
+  };
+
 
   # This value determines the Home Manager release that your configuration is
   # compatible with. This helps avoid breakage when a new Home Manager release
@@ -150,6 +197,9 @@
   # The home.packages option allows you to install Nix packages into your
   # environment.
   home.packages = with pkgs; [
+
+    # Look for a new browser that doesn't steal data
+    firefox
 
     # Password manager
     # Not configured yet

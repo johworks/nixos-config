@@ -113,15 +113,15 @@
     home-manager
 
     nerd-fonts.jetbrains-mono
-
-    firefox
   ];
 
   home-manager = {
-    #specialArgs = { inherit inputs; };
+    extraSpecialArgs = { inherit inputs; };
     users = {
       "john" = import ./home.nix;
     };
+    # Let home-manger save existing configs as backup
+    backupFileExtension = "backup";
   };
 
   # Enable the OpenSSH daemon.
