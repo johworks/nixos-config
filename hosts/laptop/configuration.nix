@@ -54,6 +54,7 @@
     sddm.enable = true;
     sddm.wayland.enable = true;
     defaultSession = "hyprland";
+    sddm.theme = "sddm-astronaut";
   };
 
   # Enable hyprland
@@ -113,6 +114,8 @@
     home-manager
 
     nerd-fonts.jetbrains-mono
+
+    sddm-astronaut
   ];
 
   home-manager = {
