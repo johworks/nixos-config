@@ -40,7 +40,7 @@ let
       "mpris"
     ];
 
-    #"wlr/workspaces" = workspaces;
+    "wlr/workspaces" = workspaces;
     "hyprland/workspaces" = workspaces;
 
     bluetooth = {

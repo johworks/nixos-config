@@ -1,6 +1,6 @@
 { config, pkgs, ... }: {
 
-  imports = [ ./waybar.nix ];
+  imports = [ ./waybar/waybar.nix ];
 
   # This manages the ~/.config/hypr/hyprland.config file
   wayland.windowManager.hyprland = {
@@ -19,7 +19,8 @@
       # See https://wiki.hyprland.org/Configuring/Keywords/
       "$terminal" = "kitty";
       "$fileManager" = "dolphin";
-      "$menu" = "wofi --show drun";
+      # Using rofi-wayland
+      #"$menu" = "wofi --show drun";
 
       #############################
       ### ENVIRONMENT VARIABLES ###
@@ -135,8 +136,8 @@
 
       # https://wiki.hyprland.org/Configuring/Variables/#misc
       misc = {
-        force_default_wallpaper = -1; # Set to 0 or 1 to disable the anime mascot wallpapers
-        disable_hyprland_logo = false; # If true disables the random hyprland logo / anime girl background. :(
+        force_default_wallpaper = 1; # Set to 0 or 1 to disable the anime mascot wallpapers
+        disable_hyprland_logo = true; # If true disables the random hyprland logo / anime girl background. :(
       };
 
       #############
@@ -146,10 +147,10 @@
       # https://wiki.hyprland.org/Configuring/Variables/#input
       input = {
         kb_layout = "us";
-        #kb_variant =;
-        #kb_model =;
-        #kb_options =;
-        #kb_rules =;
+        "kb_variant" ="";
+        "kb_model" ="";
+        "kb_options" ="";
+        "kb_rules" ="";
 
         follow_mouse = 1;
 
@@ -190,7 +191,7 @@
         "SUPER, M, exit"
         "SUPER, E, exec, $fileManager"
         "SUPER, V, togglefloating"
-        "SUPER, R, exec, $menu"
+        #"SUPER, R, exec, $menu"
         "SUPER, P, pseudo, # dwindle"
         "SUPER, J, togglesplit, # dwindle"
         
@@ -281,10 +282,9 @@
         # Network manager
         "nm-applet --indicator"
         # Wallpaper engine
-        "swww img ~/Pictures/Wallpapers/forest-3.jpg"
-        #"swww restore"
+        "swww daemon && swww img /home/john/Pictures/Wallpapers/forest-3.jpg"
         # Top bar
-        #"waybar"
+        "waybar"
         # Notifications (requires libnotify)
         "dunst"
       ];
@@ -294,13 +294,14 @@
 
   # Hyprland packages
   home.packages = with pkgs; [
-    #waybar  # if workspaces don't work properly add the -Dexperimental=true flag
+    waybar  # if workspaces don't work properly add the -Dexperimental=true flag
     dunst   # notification manager
     libnotify
     swww    # wallpaper daemon (a bunch of others)
     kitty   # default (others: alacritty, wezterm, ...)
     rofi-wayland # app launcher (others: wofi, bemenu, fuzzel, tofi)
     networkmanagerapplet # should give me a nice looking network manager
+    brightnessctl  # control the brightness
   ];
 
 }

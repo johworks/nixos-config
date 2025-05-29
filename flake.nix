@@ -10,41 +10,24 @@
     };
   };
 
-  outputs = { nixpkgs, home-manager, ... }:
-
-    let
-      system = "x86_64-linux";
-	  pkgs = nixpkgs.legacyPackages.${system};
-    in {
-
-	# For NixOS rebuild
-	nixosConfigurations = {
-
-		default = nixpkgs.lib.nixosSystem {
-          inherit system;
-          specialArgs = {
-            hostId = "default";
-          };
-          modules = [ ./hosts/default/configuration.nix ];
-		};
+  outputs = { self, nixpkgs, home-manager, ... }@inputs:
+  {
+    # For NixOS rebuild
+    nixosConfigurations = {
+      laptop = nixpkgs.lib.nixosSystem {
+        system = "x86_64-linux";
+        specialArgs = { inherit inputs; };
+        modules = [ 
+          ./hosts/laptop/configuration.nix 
+          inputs.home-manager.nixosModules.home-manager
+        ];
+      };
 
 
-		laptop = nixpkgs.lib.nixosSystem {
-          inherit system;
-          specialArgs = {
-            hostId = "laptop";
-          };
-          modules = [ ./hosts/laptop/configuration.nix ];
-		};
-	};
 
-
-	homeConfigurations = {
-		john = home-manager.lib.homeManagerConfiguration {
-          inherit pkgs;
-          modules = [ ./hosts/laptop/home.nix ];
-		};
-	};
     };
+  };
+
+
 }
 

@@ -2,19 +2,20 @@
 # your system.  Help is available in the configuration.nix(5) man page
 # and in the NixOS manual (accessible by running ‘nixos-help’).
 
-{ config, pkgs, ... }:
+{ config, pkgs, inputs, ... }:
 
 {
   imports =
     [ # Include the results of the hardware scan.
       ./hardware-configuration.nix
+      inputs.home-manager.nixosModules.home-manager
     ];
 
   # Bootloader.
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
 
-  networking.hostName = "laptop"; # Define your hostname.
+  networking.hostName = "john-laptop"; # Define your hostname.
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
 
   # Enable networking
@@ -69,12 +70,6 @@
     pkgs.xdg-desktop-portal-hyprland
   ];
 
-  # Configure keymap in X11
-  #services.xserver.xkb = {
-  #  layout = "us";
-  #  variant = "";
-  #};
-
   # Enable CUPS to print documents.
   services.printing.enable = true;
 
@@ -93,29 +88,18 @@
     #media-session.enable = true;
   };
 
-  # Enable touchpad support (enabled default in most desktopManager).
-  # services.xserver.libinput.enable = true;
-
   # Define a user account. Don't forget to set a password with ‘passwd’.
   users.users.john = {
     isNormalUser = true;
     description = "john";
     extraGroups = [ "networkmanager" "wheel" ];
-    packages = with pkgs; [
-      kdePackages.kate
-    #  thunderbird
-    ];
+    #packages = with pkgs; [
+    #];
   };
-
-  # Make the VM experience better
-  #services.spice-vdagentd.enable = true;
 
   # Enable automatic login for the user.
   services.displayManager.autoLogin.enable = true;
   services.displayManager.autoLogin.user = "john";
-
-  # Install firefox.
-  programs.firefox.enable = true;
 
   # Allow unfree packages (Like Discord)
   nixpkgs.config.allowUnfree = true;
@@ -130,13 +114,21 @@
 
     nerd-fonts.jetbrains-mono
 
-    # Montior FPS
-    #mangohud
+    firefox
   ];
 
-  fonts = {
-    enableDefaultPackages = true;
-    fontconfig.enable = true;
+  home-manager = {
+    #specialArgs = { inherit inputs; };
+    users = {
+      "john" = import ./home.nix;
+    };
+  };
+
+  # Enable the OpenSSH daemon.
+  services.openssh = {
+    enable = false;
+    settings.PasswordAuthentication = true;  # key only access (set to true rn though)
+    settings.PermitRootLogin = "no";
   };
 
   # Some programs need SUID wrappers, can be configured further or are
@@ -148,13 +140,6 @@
   # };
 
   # List services that you want to enable:
-
-  # Enable the OpenSSH daemon.
-  services.openssh = {
-    enable = false;
-    settings.PasswordAuthentication = true;  # key only access (set to true rn though)
-    settings.PermitRootLogin = "no";
-  };
 
   # Open ports in the firewall.
   # networking.firewall.allowedTCPPorts = [ ... ];
