@@ -182,6 +182,8 @@
 
       bind = [
         # Open to rofi launcher to launch apps
+        # This only broke because there's another SUPER, S keybind :(
+        # I'm an IDIOT
         #"SUPER, S, exec, rofi -show drun -show-icons -normal-window"
         
         # Example binds, see https://wiki.hyprland.org/Configuring/Binds/ for more

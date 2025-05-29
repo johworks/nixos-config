@@ -48,14 +48,18 @@
   #services.desktopManager.plasma6.enable = true;
 
   # Login graphically
-  #services.displayManager.sddm.wayland.enable = true;
-  #services.displayManager.defaultSession = "hyprland";
   services.displayManager = {
-    sddm.enable = true;
-    sddm.wayland.enable = true;
+    sddm = {
+      enable = true;
+      wayland.enable = true;
+      theme = "catppuccin-mocha";
+      package = pkgs.kdePackages.sddm;
+    };
     defaultSession = "hyprland";
-    sddm.theme = "sddm-astronaut";
   };
+
+  # Enable gnome-keyring-daemon
+  services.gnome3.gnome-keyring.enable = true;
 
   # Enable hyprland
   programs.hyprland = {
@@ -99,8 +103,8 @@
   };
 
   # Enable automatic login for the user.
-  services.displayManager.autoLogin.enable = true;
-  services.displayManager.autoLogin.user = "john";
+  #services.displayManager.autoLogin.enable = true;
+  #services.displayManager.autoLogin.user = "john";
 
   # Allow unfree packages (Like Discord)
   nixpkgs.config.allowUnfree = true;
@@ -115,7 +119,17 @@
 
     nerd-fonts.jetbrains-mono
 
-    sddm-astronaut
+    #sddm-astronaut
+    
+    (catppuccin-sddm.override {
+      flavor = "mocha";
+      font  = "Noto Sans";
+      fontSize = "9";
+      #background = "${./wallpaper.png}";
+      #loginBackground = true;
+    })
+
+    gnome.keyring
   ];
 
   home-manager = {
