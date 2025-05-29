@@ -19,7 +19,7 @@
       # See https://wiki.hyprland.org/Configuring/Keywords/
       "$terminal" = "kitty";
       "$fileManager" = "dolphin";
-      "$menu" = "wofi --show drun";
+      "$menu" = "wofi --show drun --allow-images";
 
       #############################
       ### ENVIRONMENT VARIABLES ###

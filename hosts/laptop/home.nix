@@ -157,7 +157,7 @@
 
     # Icons that GTK apps (like wofi) use
     #papirus-icon-theme
-    breeze-icons  # default used by gtk
+    kdePackages.breeze-icons  # default used by gtk
 
     # # You can also create simple shell scripts directly inside your
     # # configuration. For example, this adds a command 'my-hello' to your
