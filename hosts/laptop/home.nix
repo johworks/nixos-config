@@ -13,14 +13,20 @@ in
   home.username = "john";
   home.homeDirectory = "/home/john";
 
+  home.pointerCursor = {
+    gtk.enable = true;
+    package = pkgs.bibata-cursors;
+    name = "Bibata-Modern-Ice";
+    size = 16;
+  };
 
   # Enable gtk (GNOME)
   gtk = {
     enable = true;
-    cursorTheme = {
-      package = pkgs.bibata-cursors;
-      name = "Bibata-Modern-Ice";
-    };
+      #cursorTheme = {
+      #  package = pkgs.bibata-cursors;
+      #  name = "Bibata-Modern-Ice";
+      #};
     theme = {
       package = pkgs.adw-gtk3;
       name = "adw-gtk3";
@@ -28,6 +34,10 @@ in
     iconTheme = {
       package = gruvboxPlus;
       name = "GruvboxPlus";
+    };
+    font = {
+      name = "JetBrainsMono Nerd Font";
+      size = 14;
     };
   };
 
