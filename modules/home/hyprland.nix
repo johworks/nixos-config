@@ -295,6 +295,7 @@
 
   # Hyprland packages
   home.packages = with pkgs; [
+    dolphin    # file manager
     waybar     # if workspaces don't work properly add the -Dexperimental=true flag
     dunst      # notification manager
     libnotify  # needed for libnotify
