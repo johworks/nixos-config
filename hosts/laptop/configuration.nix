@@ -58,8 +58,12 @@
     defaultSession = "hyprland";
   };
 
-  # Enable gnome-keyring-daemon
-  services.gnome3.gnome-keyring.enable = true;
+  # Enable the gnome-keyring daemon for your user
+  #systemd.user.services.gnome-keyring-daemon = {
+  #  description = "GNOME Keyring Daemon";
+  #  serviceConfig.ExecStart = "${pkgs.gnome-keyring}/bin/gnome-keyring-daemon --start --foreground --components=secrets";
+  #  wantedBy = [ "default.target" ];
+  #};
 
   # Enable hyprland
   programs.hyprland = {
@@ -129,7 +133,7 @@
       #loginBackground = true;
     })
 
-    gnome.keyring
+    #gnome-keyring
   ];
 
   home-manager = {
