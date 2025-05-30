@@ -1,5 +1,7 @@
 { config, pkgs, inputs, ... }:
-
+let
+  gruvboxPlus = import ../../modules/home/gruvbox-plus.nix { inherit pkgs; };
+in 
 {
 
   imports = [ 
@@ -10,6 +12,28 @@
   # manage.
   home.username = "john";
   home.homeDirectory = "/home/john";
+
+
+  # Enable gtk (GNOME)
+  gtk = {
+    enable = true;
+    cursorTheme = {
+      package = pkgs.bibata-cursors;
+      name = "Bibata-Modern-Ice";
+    };
+    theme = {
+      package = pkgs.adw-gtk3;
+      name = "adw-gtk3";
+    };
+    iconTheme = {
+      package = gruvboxPlus;
+      name = "GruvboxPlus";
+    };
+  };
+
+  # Enable qt (KDE)
+  #qt.enable = true;
+
 
   # Enable and configure neovim
   programs.neovim = 

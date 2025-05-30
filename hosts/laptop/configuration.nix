@@ -47,6 +47,10 @@
   # Enable the KDE Plasma Desktop Environment.
   #services.desktopManager.plasma6.enable = true;
 
+  # Enable automatic login for the user.
+  #services.displayManager.autoLogin.enable = true;
+  #services.displayManager.autoLogin.user = "john";
+
   # Login graphically
   services.displayManager = {
     sddm = {
@@ -102,13 +106,7 @@
     isNormalUser = true;
     description = "john";
     extraGroups = [ "networkmanager" "wheel" ];
-    #packages = with pkgs; [
-    #];
   };
-
-  # Enable automatic login for the user.
-  #services.displayManager.autoLogin.enable = true;
-  #services.displayManager.autoLogin.user = "john";
 
   # Allow unfree packages (Like Discord)
   nixpkgs.config.allowUnfree = true;
@@ -133,7 +131,6 @@
       #loginBackground = true;
     })
 
-    #gnome-keyring
   ];
 
   home-manager = {
