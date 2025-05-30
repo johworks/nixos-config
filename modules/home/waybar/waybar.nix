@@ -200,8 +200,6 @@ let
     }
 
     window#waybar {
-      background-color: #1e1e2e;
-      color: #cdd6f4;
     }
 
     tooltip {

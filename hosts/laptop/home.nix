@@ -32,7 +32,9 @@ in
   };
 
   # Enable qt (KDE)
-  #qt.enable = true;
+  qt.enable = true;
+  qt.platformTheme = "gtk";
+  qt.style.name = "adwaita-dark";
 
 
   # Enable and configure neovim
@@ -233,6 +235,10 @@ in
     #papirus-icon-theme
     kdePackages.breeze-icons  # default used by gtk
 
+    # Make Qt applications integrate with GNOME stylings
+    adwaita-qt
+
+
     # # You can also create simple shell scripts directly inside your
     # # configuration. For example, this adds a command 'my-hello' to your
     # # environment:
@@ -279,6 +285,8 @@ in
   #
   home.sessionVariables = {
     EDITOR = "nvim";
+
+    QT_STYLE_OVERRIDE = "adwaita-dark";
 
     #STEAM_EXTRA_COMPAT_TOOLS_PATHS = "${config.home.homeDirectory}/.steam/root/compatibilitytools.d";
   };
