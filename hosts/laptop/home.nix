@@ -17,7 +17,7 @@ in
     gtk.enable = true;
     package = pkgs.bibata-cursors;
     name = "Bibata-Modern-Ice";
-    size = 16;
+    size = 14;
   };
 
   # Enable gtk (GNOME)
@@ -75,6 +75,8 @@ in
 		# LSPs
 		lua-language-server
 		nixd
+        pyright
+
 
         # For telescope
         ripgrep
@@ -247,6 +249,9 @@ in
 
     # Make Qt applications integrate with GNOME stylings
     adwaita-qt
+
+    # Just some random version of python idk
+    python311
 
 
     # # You can also create simple shell scripts directly inside your
