@@ -119,7 +119,7 @@
 
     home-manager
 
-    nerd-fonts.jetbrains-mono
+    #nerd-fonts.jetbrains-mono
 
     #sddm-astronaut
     
@@ -132,6 +132,10 @@
     })
 
   ];
+
+  # Make sure fonts installed here actually get picked up
+  fonts.fontconfig.enable = true;
+  fonts.packages = [ pkgs.nerd-fonts.jetbrains-mono ];
 
   home-manager = {
     extraSpecialArgs = { inherit inputs; };
