@@ -48,8 +48,8 @@
 
       # https://wiki.hyprland.org/Configuring/Variables/#general
       general = {
-        gaps_in = 5;
-        gaps_out = 20;
+        gaps_in = 2;
+        gaps_out = 10;
         border_size = 2;
         # https://wiki.hyprland.org/Configuring/Variables/#variable-types for info about colors;
         # This has to be move to extraConfig for now
@@ -64,10 +64,11 @@
 
       # https://wiki.hyprland.org/Configuring/Variables/#decoration
       decoration = {
-          rounding = 10;
+          rounding = 5;
           rounding_power = 2;
 
           # Change transparency of focused and unfocused windows;
+          # This is for all windows, even firefox. Don't change.
           active_opacity = 1.0;
           inactive_opacity = 1.0;
 
