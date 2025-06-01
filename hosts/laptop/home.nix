@@ -266,13 +266,18 @@ in
   # plain files is through 'home.file'.
   home.file = 
   let 
-    wallpaper = builtins.fetchurl {
+    forest-wallpaper = builtins.fetchurl {
       url = "https://gruvbox-wallpapers.pages.dev/wallpapers/irl/forest-3.jpg";
       sha256 = "14l56mlia6ncpc8aj15z1cdpm38f8hn14c1p1js67d3b7k6rhbnz";
     };
+    nix-wallpaper = builtins.fetchurl {
+      url = "https://gruvbox-wallpapers.pages.dev/wallpapers/minimalistic/nix.png";
+      sha256 = "0j5zz31fkmlkcbnj49a643vxdsvq486vf4l2r4hc6fdr43h8kzwc";
+    };
   in {
     # Default wallpaper
-    "Pictures/Wallpapers/forest-3.jpg".source = wallpaper;
+    "Pictures/Wallpapers/forest-3.jpg".source = forest-wallpaper;
+    "Pictures/Wallpapers/nix-gold.jpg".source = nix-wallpaper;
 
     # Manage who we trust
     ".ssh/known_hosts".text = ''

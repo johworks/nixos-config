@@ -291,6 +291,7 @@
         "nm-applet --indicator &"
         # Wallpaper engine
         "swww-daemon && swww img /home/john/Pictures/Wallpapers/forest-3.jpg"
+        #"swww-daemon && swww img /home/john/Pictures/Wallpapers/nix-gold.jpg"
         # Top bar
         "waybar &"
         # Notifications (requires libnotify)
