@@ -2,7 +2,7 @@
 
 {
   programs.waybar = {
-    enable = true;
+    #enable = true;
     systemd.enable = true;
     style = ''
       ${builtins.readFile "${pkgs.waybar}/etc/xdg/waybar/style.css"}
@@ -13,7 +13,7 @@
       }
 
       * {
-        font-size: 18px;
+        font-size: 14px;
         font-family: "JetBrainsMono Nerd Font";
       }
     '';
@@ -21,7 +21,7 @@
     settings = [{
       height = 30;
       layer = "top";
-      position = "bottom";
+      position = "top";
       tray = { spacing = 10; };
       modules-center = [ "hyprland/window" ];
       modules-left = [ "hyprland/workspaces" "hyprland/mode" ];

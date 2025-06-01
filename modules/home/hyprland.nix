@@ -1,7 +1,7 @@
 { config, pkgs, ... }: {
 
-  imports = [ ./waybar/waybar.nix ];
-  #imports = [ ./waybar.nix ];
+  #imports = [ ./waybar/waybar.nix ];
+  imports = [ ./waybar.nix ];
 
   # This manages the ~/.config/hypr/hyprland.config file
   wayland.windowManager.hyprland = {
@@ -291,7 +291,7 @@
         # Wallpaper engine
         "swww-daemon && swww img /home/john/Pictures/Wallpapers/forest-3.jpg"
         # Top bar
-        "waybar"
+        #"waybar"
         # Notifications (requires libnotify)
         "dunst"
       ];
