@@ -287,11 +287,11 @@
       #################
       exec-once = [
         # Network manager
-        "nm-applet --indicator"
+        "nm-applet --indicator &"
         # Wallpaper engine
         "swww-daemon && swww img /home/john/Pictures/Wallpapers/forest-3.jpg"
         # Top bar
-        #"waybar"
+        "waybar &"
         # Notifications (requires libnotify)
         "dunst"
       ];

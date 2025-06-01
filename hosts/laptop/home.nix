@@ -251,8 +251,8 @@ in
     adwaita-qt
 
     # Just some random version of python idk
-    python311
-
+    # Just use nix-shell with all your python packages
+    #python311
 
     # # You can also create simple shell scripts directly inside your
     # # configuration. For example, this adds a command 'my-hello' to your
