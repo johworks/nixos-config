@@ -195,6 +195,16 @@ in
         "browser.download.panel.shown" = true;
         "identity.fxaccounts.enabled" = false;
         "signon.remeberSignons" = false;
+        # Remove sponsored bs
+        "browser.newtabpage.activity-stream.feeds.section.topstories" = false;
+        "browser.newtabpage.activity-stream.showSponsored" = false;
+        "browser.newtabpage.activity-stream.showSponsoredTopSites" = false;
+        # Disable snippets (Firefox promotional messages)
+        "browser.newtabpage.activity-stream.feeds.snippets" = false;
+        # Optional: Clean up new tab layout further
+        "browser.newtabpage.activity-stream.feeds.topsites" = true;
+        "browser.newtabpage.activity-stream.feeds.section.highlights" = false;
+        "browser.newtabpage.activity-stream.feeds.section.recommendationProvider" = false;
       };
 
       search.engines = {
@@ -237,7 +247,7 @@ in
   home.packages = with pkgs; [
 
     # Look for a new browser that doesn't steal data
-    firefox
+    #firefox
 
     # Password manager
     # Not configured yet
