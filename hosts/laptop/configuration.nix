@@ -9,6 +9,8 @@
     [ # Include the results of the hardware scan.
       ./hardware-configuration.nix
       inputs.home-manager.nixosModules.home-manager
+      #../../modules/home/home-assistant.nix
+      ../../modules/nixos/home-assistant.nix
     ];
 
   # Bootloader.
