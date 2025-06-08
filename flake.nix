@@ -20,6 +20,8 @@
   {
     # For NixOS rebuild
     nixosConfigurations = {
+
+      # Intel Laptop
       laptop = nixpkgs.lib.nixosSystem {
         system = "x86_64-linux";
         specialArgs = { inherit inputs; };
@@ -29,6 +31,15 @@
         ];
       };
 
+      # Intel Nuc 14
+      nuc = nixpkgs.lib.nixosSystem {
+        system = "x86_64-linux";
+        specialArgs = { inherit inputs; };
+        modules = [ 
+          ./hosts/nuc/configuration.nix 
+          inputs.home-manager.nixosModules.home-manager
+        ];
+      };
 
 
     };

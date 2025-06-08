@@ -1,11 +1,11 @@
 { config, pkgs, inputs, ... }:
-let
-  gruvboxPlus = import ../../modules/home/gruvbox-plus.nix { inherit pkgs; };
-in 
+#let
+#  gruvboxPlus = import ../../modules/home/gruvbox-plus.nix { inherit pkgs; };
+#in 
 {
 
   imports = [ 
-    ../../modules/home/hyprland.nix
+    #../../modules/home/hyprland.nix
   ];
 
 
@@ -14,38 +14,38 @@ in
   home.username = "john";
   home.homeDirectory = "/home/john";
 
-  home.pointerCursor = {
-    gtk.enable = true;
-    package = pkgs.bibata-cursors;
-    name = "Bibata-Modern-Ice";
-    size = 14;
-  };
+  #home.pointerCursor = {
+  #  gtk.enable = true;
+  #  package = pkgs.bibata-cursors;
+  #  name = "Bibata-Modern-Ice";
+  #  size = 14;
+  #};
 
-  # Enable gtk (GNOME)
-  gtk = {
-    enable = true;
-      #cursorTheme = {
-      #  package = pkgs.bibata-cursors;
-      #  name = "Bibata-Modern-Ice";
-      #};
-    theme = {
-      package = pkgs.adw-gtk3;
-      name = "adw-gtk3";
-    };
-    iconTheme = {
-      package = gruvboxPlus;
-      name = "GruvboxPlus";
-    };
-    font = {
-      name = "JetBrainsMono Nerd Font";
-      size = 14;
-    };
-  };
+  ## Enable gtk (GNOME)
+  #gtk = {
+  #  enable = true;
+  #    #cursorTheme = {
+  #    #  package = pkgs.bibata-cursors;
+  #    #  name = "Bibata-Modern-Ice";
+  #    #};
+  #  theme = {
+  #    package = pkgs.adw-gtk3;
+  #    name = "adw-gtk3";
+  #  };
+  #  iconTheme = {
+  #    package = gruvboxPlus;
+  #    name = "GruvboxPlus";
+  #  };
+  #  font = {
+  #    name = "JetBrainsMono Nerd Font";
+  #    size = 14;
+  #  };
+  #};
 
-  # Enable qt (KDE)
-  qt.enable = true;
-  qt.platformTheme = "gtk";
-  qt.style.name = "adwaita-dark";
+  ## Enable qt (KDE)
+  #qt.enable = true;
+  #qt.platformTheme = "gtk";
+  #qt.style.name = "adwaita-dark";
 
 
   # Enable and configure neovim
@@ -256,10 +256,10 @@ in
 
     # Icons that GTK apps (like wofi) use
     #papirus-icon-theme
-    kdePackages.breeze-icons  # default used by gtk
+    #kdePackages.breeze-icons  # default used by gtk
 
     # Make Qt applications integrate with GNOME stylings
-    adwaita-qt
+    #adwaita-qt
 
     # Just some random version of python idk
     # Just use nix-shell with all your python packages
@@ -277,18 +277,18 @@ in
   # plain files is through 'home.file'.
   home.file = 
   let 
-    forest-wallpaper = builtins.fetchurl {
-      url = "https://gruvbox-wallpapers.pages.dev/wallpapers/irl/forest-3.jpg";
-      sha256 = "14l56mlia6ncpc8aj15z1cdpm38f8hn14c1p1js67d3b7k6rhbnz";
-    };
-    nix-wallpaper = builtins.fetchurl {
-      url = "https://gruvbox-wallpapers.pages.dev/wallpapers/minimalistic/nix.png";
-      sha256 = "0j5zz31fkmlkcbnj49a643vxdsvq486vf4l2r4hc6fdr43h8kzwc";
-    };
+    #forest-wallpaper = builtins.fetchurl {
+    #  url = "https://gruvbox-wallpapers.pages.dev/wallpapers/irl/forest-3.jpg";
+    #  sha256 = "14l56mlia6ncpc8aj15z1cdpm38f8hn14c1p1js67d3b7k6rhbnz";
+    #};
+    #nix-wallpaper = builtins.fetchurl {
+    #  url = "https://gruvbox-wallpapers.pages.dev/wallpapers/minimalistic/nix.png";
+    #  sha256 = "0j5zz31fkmlkcbnj49a643vxdsvq486vf4l2r4hc6fdr43h8kzwc";
+    #};
   in {
     # Default wallpaper
-    "Pictures/Wallpapers/forest-3.jpg".source = forest-wallpaper;
-    "Pictures/Wallpapers/nix-gold.jpg".source = nix-wallpaper;
+    #"Pictures/Wallpapers/forest-3.jpg".source = forest-wallpaper;
+    #"Pictures/Wallpapers/nix-gold.jpg".source = nix-wallpaper;
 
     # Manage who we trust
     ".ssh/known_hosts".text = ''
@@ -317,7 +317,7 @@ in
   home.sessionVariables = {
     EDITOR = "nvim";
 
-    QT_STYLE_OVERRIDE = "adwaita-dark";
+    #QT_STYLE_OVERRIDE = "adwaita-dark";
 
     #STEAM_EXTRA_COMPAT_TOOLS_PATHS = "${config.home.homeDirectory}/.steam/root/compatibilitytools.d";
   };

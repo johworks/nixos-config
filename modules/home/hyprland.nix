@@ -1,6 +1,5 @@
 { config, pkgs, ... }: {
 
-  #imports = [ ./waybar/waybar.nix ];
   imports = [ ./waybar.nix ];
 
   # This manages the ~/.config/hypr/hyprland.config file
