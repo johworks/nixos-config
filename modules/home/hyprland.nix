@@ -24,7 +24,7 @@
 
       # See https://wiki.hyprland.org/Configuring/Keywords/
       "$terminal" = "kitty";
-      "$fileManager" = "pcmanfm";
+      "$fileManager" = "nautilus";
       "$menu" = "wofi --show drun --allow-images";
 
       #############################
@@ -304,8 +304,8 @@
   # Hyprland packages
   home.packages = with pkgs; [
     #kdePackages.dolphin    # file manager (qt6)
-    #nautilus                # file manager (gtk3?)
-    pcmanfm                 # file manager (both?)
+    nautilus                # file manager (gtk3?)
+    #pcmanfm                 # file manager (both?)
     waybar     # if workspaces don't work properly add the -Dexperimental=true flag
     dunst      # notification manager
     libnotify  # needed for libnotify
