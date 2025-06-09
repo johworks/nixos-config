@@ -11,9 +11,9 @@
     # Apparently optional (/dev/dri will be auto-detected?)
     #extraPackages = [ pkgs.vaapiIntel pkgs.intel-media-driver ];
 
-    environment = {
-      TZ = "America/New_York";
-    };
+    #environment = {
+    #  TZ = "America/New_York";
+    #};
 
     # Config location: /var/lib/jellyfin
     dataDir = "/var/lib/jellyfin";
@@ -21,6 +21,7 @@
   };
 
   systemd.services.jellyfin.serviceConfig = {
+    Environment = "TZ=America/New_York";
     #DeviceAllow = [ "/dev/dri" ];
     SupplementaryGroups = [ "video" ];
     # Binds this into the services namespace (just like docker!)
