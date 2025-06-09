@@ -18,6 +18,21 @@
   networking.hostName = "john-nuc"; # Define your hostname.
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
 
+  # Create a media group
+  users.groups.media = {};
+
+  systemd.tmpfiles.rules = [
+    "d /data/media 0775 root media -"
+  ];
+
+  fileSystems."/data/media" = {
+    device = "/dev/disk/by-uuid/3c4c7e33-f992-4295-9ec2-2f954fe77c27";
+    fsType = "ext4";
+    options = [ "defaults" ];
+  };
+
+
+
   # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
 
   # Configure network proxy if necessary
@@ -89,7 +104,7 @@
   users.users.john = {
     isNormalUser = true;
     description = "john";
-    extraGroups = [ "networkmanager" "wheel" ];
+    extraGroups = [ "networkmanager" "wheel" "media" ];
     #packages = with pkgs; [
     #];
   };
