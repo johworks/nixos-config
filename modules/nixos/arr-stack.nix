@@ -5,7 +5,7 @@
   services.jellyfin = {
     enable = true;
     openFirewall = true;
-    user = "john";  # PUID/PGID 1000
+    user = "jellyfin";
     group = "users";
 
     # Apparently optional (/dev/dri will be auto-detected?)
@@ -22,11 +22,11 @@
 
   systemd.services.jellyfin.serviceConfig = {
     #DeviceAllow = [ "/dev/dri" ];
-    #SupplementaryGroups = [ "video" ];
+    SupplementaryGroups = [ "video" ];
     # Binds this into the services namespace (just like docker!)
-    #BindPaths = [
-    #  "/data/media:/data/media"
-    #];
+    BindReadOnlyPaths = [
+      "/data/media"
+    ];
   };
 
   # HTTP and HTTPS

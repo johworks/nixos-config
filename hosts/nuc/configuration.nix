@@ -9,6 +9,7 @@
     [ # Include the results of the hardware scan.
       ./hardware-configuration.nix
       inputs.home-manager.nixosModules.home-manager
+      ../../modules/nixos/arr-stack.nix
     ];
 
   # Bootloader.
@@ -19,7 +20,10 @@
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
 
   # Create a media group
-  users.groups.media = {};
+  users.groups.media = {
+    name = "media";
+    members = [ "john" "jellyfin" ];
+  };
 
   # Create dir for mount
   systemd.tmpfiles.rules = [
