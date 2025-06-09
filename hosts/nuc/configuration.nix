@@ -20,10 +20,7 @@
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
 
   # Create a media group
-  users.groups.media = {
-    name = "media";
-    members = [ "john" "jellyfin" ];
-  };
+  users.groups.media = {};
 
   # Create dir for mount
   systemd.tmpfiles.rules = [
