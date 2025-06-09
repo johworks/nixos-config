@@ -23,33 +23,31 @@
 
   # Create dir for mount
   systemd.tmpfiles.rules = [
-    "d /mnt/ToshibaHDD 0775 root media -"
+    "d /data 0775 root media -"
 
-    "d /mnt/ToshibaHDD/data 0775 root media -"
+    "d /data/media 0775 root media -"
+    "d /data/media/books 0775 root media -"
+    "d /data/media/movies 0775 root media -"
+    "d /data/media/music 0775 root media -"
+    "d /data/media/tv 0775 root media -"
 
-    "d /mnt/ToshibaHDD/data/media 0775 root media -"
-    "d /mnt/ToshibaHDD/data/media/books 0775 root media -"
-    "d /mnt/ToshibaHDD/data/media/movies 0775 root media -"
-    "d /mnt/ToshibaHDD/data/media/music 0775 root media -"
-    "d /mnt/ToshibaHDD/data/media/tv 0775 root media -"
+    "d /data/torrents 0775 root media -"
+    "d /data/torrents/books 0775 root media -"
+    "d /data/torrents/movies 0775 root media -"
+    "d /data/torrents/music 0775 root media -"
+    "d /data/torrents/tv 0775 root media -"
 
-    "d /mnt/ToshibaHDD/data/torrents 0775 root media -"
-    "d /mnt/ToshibaHDD/data/torrents/books 0775 root media -"
-    "d /mnt/ToshibaHDD/data/torrents/movies 0775 root media -"
-    "d /mnt/ToshibaHDD/data/torrents/music 0775 root media -"
-    "d /mnt/ToshibaHDD/data/torrents/tv 0775 root media -"
-
-    "d /mnt/ToshibaHDD/data/usenet 0775 root media -"
-    "d /mnt/ToshibaHDD/data/usenet/incomplete 0775 root media -"
-    "d /mnt/ToshibaHDD/data/usenet/complete 0775 root media -"
-    "d /mnt/ToshibaHDD/data/usenet/complete/books 0775 root media -"
-    "d /mnt/ToshibaHDD/data/usenet/complete/movies 0775 root media -"
-    "d /mnt/ToshibaHDD/data/usenet/complete/music 0775 root media -"
-    "d /mnt/ToshibaHDD/data/usenet/complete/tv 0775 root media -"
+    "d /data/usenet 0775 root media -"
+    "d /data/usenet/incomplete 0775 root media -"
+    "d /data/usenet/complete 0775 root media -"
+    "d /data/usenet/complete/books 0775 root media -"
+    "d /data/usenet/complete/movies 0775 root media -"
+    "d /data/usenet/complete/music 0775 root media -"
+    "d /data/usenet/complete/tv 0775 root media -"
   ];
 
   # Mount the USB HDD (root:media)
-  fileSystems."/mnt/media" = {
+  fileSystems."/data" = {
     device = "/dev/disk/by-uuid/3c4c7e33-f992-4295-9ec2-2f954fe77c27";
     fsType = "ext4";
     options = [ "defaults" ];

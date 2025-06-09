@@ -24,9 +24,9 @@
     #DeviceAllow = [ "/dev/dri" ];
     #SupplementaryGroups = [ "video" ];
     # Binds this into the services namespace (just like docker!)
-    BindPaths = [
-      "/data/media:/data/media"
-    ];
+    #BindPaths = [
+    #  "/data/media:/data/media"
+    #];
   };
 
   # HTTP and HTTPS
