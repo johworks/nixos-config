@@ -63,12 +63,31 @@
   # networking.proxy.noProxy = "127.0.0.1,localhost,internal.domain";
 
   # Enable networking
-  networking.networkmanager.enable = true;
+  #networking.networkmanager.enable = true;
 
   # Pull in special ethernet kernal module
   boot.extraModulePackages = [ config.boot.kernelPackages.r8125 ]; # offical realtek one
   boot.blacklistedKernelModules = [ "r8169" ]; # need to use /\ b/c r8125 rev 0xc is too new
   hardware.enableAllFirmware = true;  # Attempt to get ethernet firmware pulled in
+
+  networking.networkmanager = {
+    enable = true;
+
+    # Make sure to connect to ether
+    ensureProfiles.profiles = { 
+      "wired-eth0" = {
+        connection = {
+          id = "wired-eth0";
+          type = "ethernet";
+          interface-name = "enp1s0";
+          autoconnect = "true";
+        };
+        ipv4 = { method = "auto"; };
+        ipv6 = { method = "ignore"; };
+      };
+    };
+  };
+
 
   # Set your time zone.
   time.timeZone = "America/New_York";
