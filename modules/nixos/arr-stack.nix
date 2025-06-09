@@ -25,7 +25,7 @@
     #SupplementaryGroups = [ "video" ];
     # Binds this into the services namespace (just like docker!)
     BindPaths = [
-      "/media/john/ToshibaHDD/data/media:/data/media"
+      "/data/media:/data/media"
     ];
   };
 
