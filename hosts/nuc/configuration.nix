@@ -10,6 +10,7 @@
       ./hardware-configuration.nix
       inputs.home-manager.nixosModules.home-manager
       #../../modules/nixos/arr-stack.nix
+      ../../modules/nixos/nixarr.nix
     ];
 
   # Bootloader.
