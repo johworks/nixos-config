@@ -9,7 +9,7 @@
     [ # Include the results of the hardware scan.
       ./hardware-configuration.nix
       inputs.home-manager.nixosModules.home-manager
-      ../../modules/nixos/arr-stack.nix
+      #../../modules/nixos/arr-stack.nix
     ];
 
   # Bootloader.

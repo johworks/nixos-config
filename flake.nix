@@ -14,9 +14,19 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };    
 
+    nixarr = {
+      url = "github:rasmus-kirk/nixarr";
+      #inputs.nixpkgs.follows = "nixpkgs";
+    };
+
   };
 
-  outputs = { self, nixpkgs, home-manager, ... }@inputs:
+  outputs = { self, 
+    nixpkgs,
+    home-manager,
+    nixarr,
+    ... 
+  }@inputs:
   {
     # For NixOS rebuild
     nixosConfigurations = {
@@ -37,7 +47,8 @@
         specialArgs = { inherit inputs; };
         modules = [ 
           ./hosts/nuc/configuration.nix 
-          inputs.home-manager.nixosModules.home-manager
+          home-manager.nixosModules.home-manager
+          nixarr.nixosModules.default
         ];
       };
 
