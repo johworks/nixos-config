@@ -9,29 +9,33 @@
   nixarr = {
     enable = true;
 
-    jellyfin.enable = true;
-    jellyseerr.enable = true;
+    jellyfin.enable = true;          # 8096
+    jellyseerr.enable = true;        # 5055
 
-    # Arr apps
-    radarr.enable = true;
-    sonarr.enable = true;
-    prowlarr.enable = true;
+    radarr.enable = true;            # 8989
+    sonarr.enable = true;            # 7878
+    prowlarr.enable = true;          # 9696
+    readarr.enable = true;           # 8787
 
-    #qbittorrent = {
-    #  enable = true;
-    #  # I'm pretty sure this is wrong
-    #  # I need a Wire Gaurd config file
-    #  vpn = {
-    #    enable = true;
-    #    provider = "nordvpn"; # optional
-    #  };
-    #};
+    # This is broken for some group reason
+    #readarr-audiobook.enable = true; # 9494
+
+    vpn = {
+      enable = true;
+      wgConf = "/data/.secret/wg.conf";
+    };
+
+
+    transmission = {
+      enable = true;
+      vpn.enable = true;
+      peerPort = 1637;  # I think?
+    };
 
     mediaDir = "/data/media";
     stateDir = "/data/media/.state/nixarr";
     #downloadDir = "/data/torrents";
 
   };
-
 
 }

@@ -26,8 +26,11 @@
   # Create dir for mount
   systemd.tmpfiles.rules = [
     "d /data 0775 root media -"
+    "d /data/.secret 0775 root media -"
 
     "d /data/media 0775 root media -"
+    "d /data/media/.state 0775 root media -"
+
     "d /data/media/books 0775 root media -"
     "d /data/media/movies 0775 root media -"
     "d /data/media/music 0775 root media -"
