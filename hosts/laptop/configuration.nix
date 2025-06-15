@@ -3,15 +3,71 @@
 # and in the NixOS manual (accessible by running ‘nixos-help’).
 
 { config, pkgs, inputs, ... }:
-
+let
+  bedrock-fhs = import ../../modules/nixos/bedrock/bedrock-fhs.nix { inherit pkgs; };
+  bedrock-server = import ../../modules/nixos/bedrock/bedrock-server.nix { inherit pkgs; };
+in 
 {
   imports =
     [ # Include the results of the hardware scan.
       ./hardware-configuration.nix
       inputs.home-manager.nixosModules.home-manager
-      #../../modules/home/home-assistant.nix
-      ../../modules/nixos/home-assistant.nix
+      #../../modules/nixos/home-assistant.nix
     ];
+
+
+  ### Minecraft Bedrock Server
+
+  systemd.tmpfiles.rules = [
+    "d /var/lib/bedrock 0755 bedrock bedrock -"
+  ];
+
+  users.users.bedrock = {
+    isSystemUser = true;
+    home = "/var/lib/bedrock";
+    group = "bedrock";
+  };
+
+  users.groups.bedrock = { };
+
+  systemd.services.bedrock-fhs = {
+    description = "Minecraft Bedrock Dedicated Server";
+    after = [ "network.target" ];
+    wantedBy = [ "multi-user.target" ];
+
+    serviceConfig = {
+      ExecStart = "${bedrock-fhs}/bin/bedrock-fhs";
+      WorkingDirectory = "/var/lib/bedrock";
+      User = "bedrock";
+      Group = "bedrock";
+      Restart = "always";
+      RestartSec = "5";
+      NoNewPrivileges = true;
+    };
+
+    # Make sure the world directory exists
+    preStart = ''
+      mkdir -p /var/lib/bedrock
+
+      cp -n ${bedrock-server}/*.json /var/lib/bedrock/ || true
+      cp -n ${bedrock-server}/*.txt /var/lib/bedrock/ || true
+      cp -n ${bedrock-server}/*.bin /var/lib/bedrock/ || true
+      cp -n ${bedrock-server}/server.properties /var/lib/bedrock/ || true
+      cp -n ${bedrock-server}/bedrock_server /var/lib/bedrock/
+      chmod +x /var/lib/bedrock/bedrock_server
+
+      cp -rn ${bedrock-server}/resource_packs /var/lib/bedrock/ || true
+      cp -rn ${bedrock-server}/behavior_packs /var/lib/bedrock/ || true
+      cp -rn ${bedrock-server}/definitions /var/lib/bedrock/ || true
+    '';
+  };
+
+
+  networking.firewall.allowedTCPPorts = [ 19132 ];
+  networking.firewall.allowedUDPPorts = [ 19132 ];
+
+  ### Minecraft Bedrock Server
+
 
   # Bootloader.
   boot.loader.systemd-boot.enable = true;
@@ -121,6 +177,8 @@
 
     home-manager
 
+    bedrock-fhs
+
     #nerd-fonts.jetbrains-mono
 
     #sddm-astronaut
@@ -150,7 +208,7 @@
 
   # Enable the OpenSSH daemon.
   services.openssh = {
-    enable = false;
+    enable = true;
     settings.PasswordAuthentication = true;  # key only access (set to true rn though)
     settings.PermitRootLogin = "no";
   };
