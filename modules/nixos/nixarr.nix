@@ -6,6 +6,16 @@
     inputs.nixarr.nixosModules.default
   ];
 
+  users.users.jellyfin.extraGroups = [ "render" "video" ];  # renderD128 access
+
+  systemd.services.jellyfin.serviceConfig = {
+    DeviceAllow = [ "/dev/dri/renderD128" "/dev/dri/card1" ];
+    BindPaths = [ "/dev/dri" ];
+    SupplementaryGroups = [ "render" "video" ];
+  };
+
+  networking.firewall.allowedTCPPorts = [ 8096 5055 8989 7878 9696 8787 9091 ];
+
   nixarr = {
     enable = true;
 
@@ -29,13 +39,11 @@
     transmission = {
       enable = true;
       vpn.enable = true;
-      peerPort = 1637;  # I think?
+      peerPort = 2529;
     };
 
     mediaDir = "/data/media";
     stateDir = "/data/media/.state/nixarr";
-    #downloadDir = "/data/torrents";
-
   };
 
 }

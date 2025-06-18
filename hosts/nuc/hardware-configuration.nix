@@ -13,10 +13,6 @@
   boot.kernelModules = [ "kvm-intel" ];
   boot.extraModulePackages = [ ];
 
-  #boot.extraModulePackages = [ config.boot.kernelPackages.r8125 ]; # offical realtek one
-  #boot.blacklistedKernelModules = [ "r8169" ]; # need to use /\ b/c r8125 rev 0xc is too new
-  #hardware.enableAllFirmware = true;  # Attempt to get ethernet firmware pulled in
-
   fileSystems."/" =
     { device = "/dev/disk/by-uuid/2f158c4b-cf16-4751-b205-f1a29f7e9d9a";
       fsType = "ext4";

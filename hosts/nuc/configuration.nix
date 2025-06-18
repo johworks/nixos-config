@@ -16,9 +16,19 @@
   # Bootloader.
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
+  boot.kernelParams = [ "pcie_aspm=off" ];
+
+  networking.useDHCP = false;
 
   networking.hostName = "john-nuc"; # Define your hostname.
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
+
+  hardware.opengl = {
+    enable = true;
+    extraPackages = with pkgs; [
+      intel-media-driver
+    ];
+  };
 
   # Create a media group
   users.groups.media = {};
@@ -30,25 +40,6 @@
 
     "d /data/media 0775 root media -"
     "d /data/media/.state 0775 root media -"
-
-    "d /data/media/books 0775 root media -"
-    "d /data/media/movies 0775 root media -"
-    "d /data/media/music 0775 root media -"
-    "d /data/media/tv 0775 root media -"
-
-    "d /data/torrents 0775 root media -"
-    "d /data/torrents/books 0775 root media -"
-    "d /data/torrents/movies 0775 root media -"
-    "d /data/torrents/music 0775 root media -"
-    "d /data/torrents/tv 0775 root media -"
-
-    "d /data/usenet 0775 root media -"
-    "d /data/usenet/incomplete 0775 root media -"
-    "d /data/usenet/complete 0775 root media -"
-    "d /data/usenet/complete/books 0775 root media -"
-    "d /data/usenet/complete/movies 0775 root media -"
-    "d /data/usenet/complete/music 0775 root media -"
-    "d /data/usenet/complete/tv 0775 root media -"
   ];
 
   # Mount the USB HDD (root:media)
@@ -57,7 +48,6 @@
     fsType = "ext4";
     options = [ "defaults" ];
   };
-
 
 
   # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
@@ -74,22 +64,39 @@
   boot.blacklistedKernelModules = [ "r8169" ]; # need to use /\ b/c r8125 rev 0xc is too new
   hardware.enableAllFirmware = true;  # Attempt to get ethernet firmware pulled in
 
+  #systemd.services.force-1Gbit = {
+  #  description = "Force Realtek NIC to 1G from 2.5G";
+  #  after = [ "network-online.target" ];
+  #  wantedBy = [ "multi-user.target" ];
+  #  serviceConfig = {
+  #    Type = "oneshot";
+  #    ExecStart = "${pkgs.ethtool}/bin/ethtool -s enp1s0 speed 1000 duplex full autoneg off";
+  #  };
+  #};
+
   networking.networkmanager = {
     enable = true;
 
     # Make sure to connect to ether
-    ensureProfiles.profiles = { 
-      "wired-eth0" = {
-        connection = {
-          id = "wired-eth0";
-          type = "ethernet";
-          interface-name = "enp1s0";
-          autoconnect = "true";
-        };
-        ipv4 = { method = "auto"; };
-        ipv6 = { method = "ignore"; };
-      };
-    };
+    #ensureProfiles.profiles = { 
+    #  "wired-eth0" = {
+    #    connection = {
+    #      id = "wired-eth0";
+    #      type = "ethernet";
+    #      interface-name = "enp1s0";
+    #      autoconnect = true;
+    #    };
+    #    ipv4 = { method = "auto"; route-metric = 100;};
+    #    ipv6 = { method = "auto"; route-metric = 100;};
+
+    #    # Slow down 2.5G => 1G
+    #    ethtool = {
+    #      speed = 1000;
+    #      duplex = "full";
+    #      autoneg = false;
+    #    };
+    #  };
+    #};
   };
 
 
@@ -168,6 +175,9 @@
     vim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
     wget
     home-manager
+    pciutils
+    intel-media-driver
+    ethtool
   ];
 
 
