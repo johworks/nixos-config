@@ -6,7 +6,7 @@ let
     exec ./bedrock_server
   '';
 in
-pkgs.buildFHSUserEnv {
+pkgs.buildFHSEnv {
   name = "bedrock-fhs";
   targetPkgs = pkgs: [
     pkgs.glibc
@@ -17,7 +17,5 @@ pkgs.buildFHSUserEnv {
     pkgs.libsodium
   ];
 
-    #runScript = "${bedrock-server}/bedrock_server";
-    #runScript = "cd /var/lib/bedrock && ./bedrock_server";
   runScript = "${wrapperScript}";
 }

@@ -44,7 +44,7 @@ in
 
   # Enable qt (KDE)
   qt.enable = true;
-  qt.platformTheme = "gtk";
+  qt.platformTheme.name = "gtk";
   qt.style.name = "adwaita-dark";
 
 
@@ -154,6 +154,7 @@ in
 	extraConfig = {
 		init.defaultBranch = "main";
 		core.editor = "nvim";
+        pull.rebase = true;
 	};
   };
 

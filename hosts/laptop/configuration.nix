@@ -12,8 +12,17 @@ in
     [ # Include the results of the hardware scan.
       ./hardware-configuration.nix
       inputs.home-manager.nixosModules.home-manager
-      #../../modules/nixos/home-assistant.nix
+      #../../modules/nixos/bedrock/bedrock-connect.nix
     ];
+
+
+  virtualisation.podman = {
+    enable = true;
+    dockerCompat = true;  # Optional: adds `docker` CLI alias
+    defaultNetwork.settings.dns_enabled = false;
+
+    #networks.bedrockconnectnet.subnet = "10.89.0.0/24";
+  };
 
 
   ### Minecraft Bedrock Server
