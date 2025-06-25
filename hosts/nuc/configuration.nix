@@ -11,6 +11,8 @@
       inputs.home-manager.nixosModules.home-manager
       #../../modules/nixos/arr-stack.nix
       ../../modules/nixos/nixarr.nix
+      #../../modules/nixos/zurg/zurg.nix
+      ../../modules/nixos/home-assistant.nix
     ];
 
   # Bootloader.
