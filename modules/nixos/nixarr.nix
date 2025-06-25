@@ -36,8 +36,9 @@
     };
 
 
+    # Turn this off for now. I don't need to get anything new
     transmission = {
-      enable = true;
+      enable = false;
       vpn.enable = true;
       peerPort = 2529;
     };
