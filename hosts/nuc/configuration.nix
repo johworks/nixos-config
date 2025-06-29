@@ -9,10 +9,9 @@
     [ # Include the results of the hardware scan.
       ./hardware-configuration.nix
       inputs.home-manager.nixosModules.home-manager
-      #../../modules/nixos/arr-stack.nix
-      ../../modules/nixos/nixarr.nix
-      #../../modules/nixos/zurg/zurg.nix
+      #../../modules/nixos/nixarr.nix
       ../../modules/nixos/home-assistant.nix
+      ../../modules/nixos/pihole.nix
     ];
 
   # Bootloader.
@@ -58,47 +57,15 @@
   # networking.proxy.default = "http://user:password@proxy:port/";
   # networking.proxy.noProxy = "127.0.0.1,localhost,internal.domain";
 
-  # Enable networking
-  #networking.networkmanager.enable = true;
-
   # Pull in special ethernet kernal module
   boot.extraModulePackages = [ config.boot.kernelPackages.r8125 ]; # offical realtek one
   boot.blacklistedKernelModules = [ "r8169" ]; # need to use /\ b/c r8125 rev 0xc is too new
   hardware.enableAllFirmware = true;  # Attempt to get ethernet firmware pulled in
 
-  #systemd.services.force-1Gbit = {
-  #  description = "Force Realtek NIC to 1G from 2.5G";
-  #  after = [ "network-online.target" ];
-  #  wantedBy = [ "multi-user.target" ];
-  #  serviceConfig = {
-  #    Type = "oneshot";
-  #    ExecStart = "${pkgs.ethtool}/bin/ethtool -s enp1s0 speed 1000 duplex full autoneg off";
-  #  };
-  #};
-
+  # Enable networking
   networking.networkmanager = {
     enable = true;
-
-    # Make sure to connect to ether
-    #ensureProfiles.profiles = { 
-    #  "wired-eth0" = {
-    #    connection = {
-    #      id = "wired-eth0";
-    #      type = "ethernet";
-    #      interface-name = "enp1s0";
-    #      autoconnect = true;
-    #    };
-    #    ipv4 = { method = "auto"; route-metric = 100;};
-    #    ipv6 = { method = "auto"; route-metric = 100;};
-
-    #    # Slow down 2.5G => 1G
-    #    ethtool = {
-    #      speed = 1000;
-    #      duplex = "full";
-    #      autoneg = false;
-    #    };
-    #  };
-    #};
+    dns = "none";
   };
 
 
