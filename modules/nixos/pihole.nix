@@ -14,7 +14,6 @@ in
   # Podman container
   virtualisation.oci-containers.containers.pihole = {
     image = "pihole/pihole:latest";
-    ports = [ "53:53/udp" "53:53/tcp" "80:80" ];
     environment = {
       TZ = "America/New_York";
       WEBPASSWORD = "admin";  # Change this!
@@ -23,7 +22,13 @@ in
       "${configDir}/etc-pihole:/etc/pihole"
       "${configDir}/etc-dnsmasq.d:/etc/dnsmasq.d"
     ];
-    extraOptions = [ "--cap-add=NET_ADMIN" ];
+    extraOptions = [ 
+      "--cap-add=NET_ADMIN"
+      "--network=host"
+    ];
   };
+
+  networking.firewall.allowedUDPPorts = [ 53 ];
+  networking.firewall.allowedTCPPorts = [ 53 80 443 ];
 
 }
