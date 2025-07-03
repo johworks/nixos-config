@@ -17,6 +17,7 @@ in
     environment = {
       TZ = "America/New_York";
       WEBPASSWORD = "admin";  # Change this!
+      FTLCONF_dns_upstreams = "1.1.1.1;9.9.9.9";
     };
     volumes = [
       "${configDir}/etc-pihole:/etc/pihole"
@@ -24,11 +25,12 @@ in
     ];
     extraOptions = [ 
       "--cap-add=NET_ADMIN"
+      "--cap-add=NET_RAW"
       "--network=host"
     ];
   };
 
-  networking.firewall.allowedUDPPorts = [ 53 ];
-  networking.firewall.allowedTCPPorts = [ 53 80 443 ];
+  networking.firewall.allowedUDPPorts = [ 53 67 ];
+  networking.firewall.allowedTCPPorts = [ 53 67 80 443 ];
 
 }

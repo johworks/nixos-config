@@ -19,9 +19,6 @@
   boot.loader.efi.canTouchEfiVariables = true;
   boot.kernelParams = [ "pcie_aspm=off" ];
 
-  networking.useDHCP = false;
-
-  networking.hostName = "john-nuc"; # Define your hostname.
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
 
   hardware.opengl = {
@@ -41,6 +38,8 @@
 
     "d /data/media 0775 root media -"
     "d /data/media/.state 0775 root media -"
+
+    "d /etc/wireguard 0775 root root -"
   ];
 
   # Mount the USB HDD (root:media)
@@ -63,9 +62,29 @@
   hardware.enableAllFirmware = true;  # Attempt to get ethernet firmware pulled in
 
   # Enable networking
-  networking.networkmanager = {
-    enable = true;
-    dns = "none";
+  networking = {
+    networkmanager = {
+      enable = true;
+      dns = "none";
+    };
+    useDHCP = false;
+    hostName = "john-nuc"; # Define your hostname.
+    interfaces.enp1s0 = {
+      useDHCP = false;
+      ipv4.addresses = [{
+        address = "192.168.10.2";
+        prefixLength = 24;
+      }];
+    };
+    defaultGateway = { address = "192.168.10.1"; interface = "enp1s0"; };
+
+    wg-quick.interfaces = { 
+      wg0 = {
+        configFile = "/etc/wireguard/wg0.conf";
+        autostart = true;
+      };
+    };
+
   };
 
 
@@ -147,6 +166,8 @@
     pciutils
     intel-media-driver
     ethtool
+    dig
+    wireguard-tools
   ];
 
 
