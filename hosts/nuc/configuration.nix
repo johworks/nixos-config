@@ -12,6 +12,7 @@
       #../../modules/nixos/nixarr.nix
       ../../modules/nixos/home-assistant.nix
       ../../modules/nixos/pihole.nix
+      ../../modules/nixos/vaultwarden.nix
     ];
 
   # Bootloader.
@@ -40,6 +41,8 @@
     "d /data/media/.state 0775 root media -"
 
     "d /etc/wireguard 0775 root root -"
+
+    "d /etc/nixos/secret 0775 root root -"
   ];
 
   # Mount the USB HDD (root:media)
@@ -77,15 +80,38 @@
       }];
     };
     defaultGateway = { address = "192.168.10.1"; interface = "enp1s0"; };
+    #nameservers = [ "192.168.10.2" ];
 
     wg-quick.interfaces = { 
       wg0 = {
+        # Copied manaully because it's secret
         configFile = "/etc/wireguard/wg0.conf";
         autostart = true;
+        # Force traffic through VPN
+        #postUp = ''
+        #  ip route del default
+        #  ip route add default dev wg0
+        #'';
+        #postDown = ''
+        #  ip route del default
+        #  ip route add default via 192.168.10.1 dev enp1s0
+        #'';
       };
     };
 
+    nat = {
+      enable = true;
+      # Route traffic over the VPN
+      internalInterfaces = [ "enp1s0" ];
+      externalInterface = "wg0";
+    };
+
+    firewall.enable = true;
+    firewall.allowedUDPPorts = [ 43996 ];
+
   };
+
+  boot.kernel.sysctl = { "net.ipv4.ip_forward" = "1"; };
 
 
   # Set your time zone.
