@@ -72,6 +72,7 @@
     };
     useDHCP = false;
     hostName = "john-nuc"; # Define your hostname.
+
     interfaces.enp1s0 = {
       useDHCP = false;
       ipv4.addresses = [{
@@ -79,21 +80,22 @@
         prefixLength = 24;
       }];
     };
+
     defaultGateway = { address = "192.168.10.1"; interface = "enp1s0"; };
-    #nameservers = [ "192.168.10.2" ];
 
     wg-quick.interfaces = { 
       wg0 = {
-        # Copied manaully because it's secret
         configFile = "/etc/wireguard/wg0.conf";
         autostart = true;
       };
     };
 
+    # NAT not needed for LAN traffic
     nat = {
       enable = true;
       # Route traffic over the VPN
       internalInterfaces = [ "enp1s0" ];
+      #internalInterfaces = [ ];
       externalInterface = "wg0";
     };
 
@@ -104,6 +106,19 @@
 
   boot.kernel.sysctl = { "net.ipv4.ip_forward" = "1"; };
 
+  #systemd.services.setup-vpn-routing = {
+  #  description = "Set up routing rules to send server traffic through wg0";
+  #  after = [ "network.target" "wg-quick-wg0.service" ];
+  #  wantedBy = [ "multi-user.target" ];
+  #  serviceConfig = {
+  #    Type = "oneshot";
+  #    ExecStart = "${pkgs.writeShellScriptBin "vpn-routing" ''
+  #      #!${pkgs.runtimeShell}
+  #      ${pkgs.iproute2}/bin/ip rule add from 192.168.10.2 lookup 100
+  #      ${pkgs.iproute2}/bin/ip route add default dev wg0 table 100
+  #    ''}/bin/vpn-routing";
+  #  };
+  #};
 
   # Set your time zone.
   time.timeZone = "America/New_York";
@@ -185,6 +200,7 @@
     ethtool
     dig
     wireguard-tools
+    openssl
   ];
 
 

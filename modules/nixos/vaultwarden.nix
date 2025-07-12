@@ -9,11 +9,12 @@
     # Environment variables → /var/lib/vaultwarden.env
     config = {
       # Listen on all LAN addresses; change port if you like
-      ROCKET_ADDRESS = "0.0.0.0";
+      #ROCKET_ADDRESS = "0.0.0.0";
+      ROCKET_ADDRESS = "127.0.0.1";
       ROCKET_PORT    = 8222;
 
       # Internal URL the web-UI will report; adjust to your LAN name/IP
-      DOMAIN = "http://vaultwarden.lan:8222";
+      DOMAIN = "http://vaultwarden.local";
 
       # Sign-ups are disabled; you’ll create users from the admin panel
       SIGNUPS_ALLOWED = true;
@@ -26,11 +27,32 @@
     };
   };
 
-  ## 2.  Firewall: expose the chosen port only to the LAN
-  networking.firewall = {
-    allowedTCPPorts = [ 8222 ];
-    # If IPv6 is enabled on your LAN, add allowedTCPPorts6 as well
+  # Prob going to need to add pihole
+  services.nginx = {
+    enable = true;
+    virtualHosts = {
+      "vaultwarden.local" = {
+        forceSSL = true;
+        enableACME = false;
+
+        sslCertificate = "/home/john/local-certs/vaultwarden.crt";
+        sslCertificateKey = "/home/john/local-certs/vaultwarden.key";
+
+        locations."/" = {
+          proxyPass = "http://localhost:8222";
+          proxyWebsockets = true;
+        };
+      };
+    };
+
   };
+
+  #security.acme = {
+  #  acceptTerms = true;
+  #  defaults.email = "viridianveil@protonmail.com";
+  #};
+
+  networking.firewall.allowedTCPPorts = [ 80 443 ];
 
   ## 3.  Optional: ship the CLI so you can run `vaultwarden hash …`
   environment.systemPackages = with pkgs; [ vaultwarden ];
