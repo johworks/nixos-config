@@ -228,7 +228,7 @@
         darkreader
         youtube-shorts-block
         sponsorblock
-        keepassxc-browser
+        bitwarden
       ];
     };
   };
