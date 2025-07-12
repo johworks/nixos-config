@@ -9,7 +9,6 @@
     [ # Include the results of the hardware scan.
       ./hardware-configuration.nix
       inputs.home-manager.nixosModules.home-manager
-      #../../modules/nixos/nixarr.nix
       ../../modules/nixos/home-assistant.nix
       ../../modules/nixos/pihole.nix
       ../../modules/nixos/vaultwarden.nix
@@ -42,7 +41,8 @@
 
     "d /etc/wireguard 0775 root root -"
 
-    "d /etc/nixos/secret 0775 root root -"
+    # Secrets
+    #"d /etc/nixos/secret 0775 root root -"
   ];
 
   # Mount the USB HDD (root:media)
@@ -87,15 +87,6 @@
         # Copied manaully because it's secret
         configFile = "/etc/wireguard/wg0.conf";
         autostart = true;
-        # Force traffic through VPN
-        #postUp = ''
-        #  ip route del default
-        #  ip route add default dev wg0
-        #'';
-        #postDown = ''
-        #  ip route del default
-        #  ip route add default via 192.168.10.1 dev enp1s0
-        #'';
       };
     };
 

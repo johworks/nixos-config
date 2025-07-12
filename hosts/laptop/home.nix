@@ -182,16 +182,6 @@ in
     enable = true;
     profiles.default = {
 
-      # Have been refactored into a sub-module or something idk
-      #bookmarks = [
-      #  {
-      #    name = "nixpkgs-search";
-      #    tags = [ "nix" ];
-      #    keyword = "nix";
-      #    url = "https://search.nixos.org/packages";
-      #  }
-      #];
-
       settings = {
         "dom.security.https_only_mode" = true;  # This might break self-hosted apps
         "browser.download.panel.shown" = true;
