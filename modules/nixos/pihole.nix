@@ -4,22 +4,6 @@ let
 in 
 {
 
-  #systemd.tmpfiles.rules = [
-  #  "d ${configDir}/etc-pihole 0755 root root - -"
-  #  "d ${configDir}/etc-dnsmasq.d 0755 root root - -"
-  #];
-
-  ## Set this box as the router
-  #environment.etc."pihole-dnsmasq.d/99-gateway.conf".text = ''
-  #  dhcp-option=option:router,192.168.10.2
-  #'';
-
-  ## Make sure pihole doesn't bind to wg, only LAN
-  #environment.etc."pihole-dnsmasq.d/01-bind.conf".text = ''
-  #  interface=enp1s0
-  #  bind-interfaces
-  #'';
-
   systemd.tmpfiles.rules = [
     "d ${configDir}/etc-pihole 0755 root root - -"
     "d ${configDir}/etc-dnsmasq.d 0755 root root - -"
@@ -36,13 +20,11 @@ in
       TZ = "America/New_York";
       WEBPASSWORD = "admin";  # Change this!
       FTLCONF_dns_upstreams = "1.1.1.1;9.9.9.9";
-      WEB_PORT = "8000";
+      FTLCONF_webserver_port = "8000";
     };
     volumes = [
       "${configDir}/etc-pihole:/etc/pihole"
       "${configDir}/etc-dnsmasq.d:/etc/dnsmasq.d"
-      #"/etc/pihole-dnsmasq.d/99-gateway.conf:/etc/dnsmasq.d/99-gateway.conf:ro"
-      #"/etc/pihole-dnsmasq.d/01-bind.conf:/etc/dnsmasq.d/01-bind.conf:ro"
     ];
     #ports = [
     #  "53:53/tcp"
