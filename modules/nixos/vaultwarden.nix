@@ -14,7 +14,7 @@
       ROCKET_PORT    = 8222;
 
       # Internal URL the web-UI will report; adjust to your LAN name/IP
-      DOMAIN = "http://vaultwarden.local";
+      DOMAIN = "http://vault.lan";
 
       # Sign-ups are disabled; you’ll create users from the admin panel
       SIGNUPS_ALLOWED = true;
@@ -31,12 +31,12 @@
   services.nginx = {
     enable = true;
     virtualHosts = {
-      "vaultwarden.local" = {
+      "vault.lan" = {
         forceSSL = true;
         enableACME = false;
 
-        sslCertificate = "/home/john/local-certs/vaultwarden.crt";
-        sslCertificateKey = "/home/john/local-certs/vaultwarden.key";
+        sslCertificate = "/etc/ssl/private/vaultwarden.crt";
+        sslCertificateKey = "/etc/ssl/private/vaultwarden.key";
 
         locations."/" = {
           proxyPass = "http://localhost:8222";
