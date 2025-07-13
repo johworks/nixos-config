@@ -154,6 +154,7 @@
 	extraConfig = {
 		init.defaultBranch = "main";
 		core.editor = "nvim";
+        pull.rebase = "true";
 	};
   };
 
