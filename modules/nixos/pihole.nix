@@ -7,8 +7,10 @@ in
   systemd.tmpfiles.rules = [
     "d ${configDir}/etc-pihole 0755 root root - -"
     "d ${configDir}/etc-dnsmasq.d 0755 root root - -"
-    "f ${configDir}/etc-dnsmasq.d/99-gateway.conf 0644 root root - dhcp-option=option:router,192.168.10.2"
-    "f ${configDir}/etc-dnsmasq.d/01-bind.conf 0644 root root - interface=192.168.10.2\nbind-interfaces"
+    "f ${configDir}/etc-dnsmasq.d/99-gateway.conf 0644 root root - dhcp-option=option:router,192.168.10.1"
+
+    #"f ${configDir}/etc-dnsmasq.d/99-gateway.conf 0644 root root - dhcp-option=option:router,192.168.10.2"
+    #"f ${configDir}/etc-dnsmasq.d/01-bind.conf 0644 root root - interface=192.168.10.2\nbind-interfaces"
   ];
 
   virtualisation.podman.enable = true;

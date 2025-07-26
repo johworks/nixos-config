@@ -12,6 +12,7 @@
       ../../modules/nixos/home-assistant.nix
       ../../modules/nixos/pihole.nix
       ../../modules/nixos/vaultwarden.nix
+      ../../modules/nixos/bedrock-server.nix
     ];
 
   # Bootloader.
@@ -99,8 +100,8 @@
       externalInterface = "wg0";
     };
 
-    firewall.enable = true;
-    firewall.allowedUDPPorts = [ 43996 ];
+    #firewall.enable = true;
+    #firewall.allowedUDPPorts = [ 43996 ];
 
   };
 
