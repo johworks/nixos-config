@@ -238,10 +238,10 @@ in
   home.packages = with pkgs; [
 
     # Look for a new browser that doesn't steal data
+    # Enabled above /\
     #firefox
 
     # Password manager
-    # Not configured yet
     #keepassxc
 
     # Icons that GTK apps (like wofi) use
@@ -251,9 +251,15 @@ in
     # Make Qt applications integrate with GNOME stylings
     adwaita-qt
 
-    # Just some random version of python idk
-    # Just use nix-shell with all your python packages
-    #python311
+    # Compress videos before storage
+    ffmpeg
+    
+    # Interact with iCloud photos
+    icloudpd
+
+    # I guess make isn't installed by default?
+    gnumake
+    tree
 
     # # You can also create simple shell scripts directly inside your
     # # configuration. For example, this adds a command 'my-hello' to your

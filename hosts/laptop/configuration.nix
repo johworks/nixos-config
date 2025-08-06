@@ -24,60 +24,6 @@ in
     #networks.bedrockconnectnet.subnet = "10.89.0.0/24";
   };
 
-
-  ### Minecraft Bedrock Server
-
-  systemd.tmpfiles.rules = [
-    "d /var/lib/bedrock 0755 bedrock bedrock -"
-  ];
-
-  users.users.bedrock = {
-    isSystemUser = true;
-    home = "/var/lib/bedrock";
-    group = "bedrock";
-  };
-
-  users.groups.bedrock = { };
-
-  systemd.services.bedrock-fhs = {
-    description = "Minecraft Bedrock Dedicated Server";
-    after = [ "network.target" ];
-    wantedBy = [ "multi-user.target" ];
-
-    serviceConfig = {
-      ExecStart = "${bedrock-fhs}/bin/bedrock-fhs";
-      WorkingDirectory = "/var/lib/bedrock";
-      User = "bedrock";
-      Group = "bedrock";
-      Restart = "always";
-      RestartSec = "5";
-      NoNewPrivileges = true;
-    };
-
-    # Make sure the world directory exists
-    preStart = ''
-      mkdir -p /var/lib/bedrock
-
-      cp -n ${bedrock-server}/*.json /var/lib/bedrock/ || true
-      cp -n ${bedrock-server}/*.txt /var/lib/bedrock/ || true
-      cp -n ${bedrock-server}/*.bin /var/lib/bedrock/ || true
-      cp -n ${bedrock-server}/server.properties /var/lib/bedrock/ || true
-      cp -n ${bedrock-server}/bedrock_server /var/lib/bedrock/
-      chmod +x /var/lib/bedrock/bedrock_server
-
-      cp -rn ${bedrock-server}/resource_packs /var/lib/bedrock/ || true
-      cp -rn ${bedrock-server}/behavior_packs /var/lib/bedrock/ || true
-      cp -rn ${bedrock-server}/definitions /var/lib/bedrock/ || true
-    '';
-  };
-
-
-  networking.firewall.allowedTCPPorts = [ 19132 ];
-  networking.firewall.allowedUDPPorts = [ 19132 ];
-
-  ### Minecraft Bedrock Server
-
-
   # Bootloader.
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
