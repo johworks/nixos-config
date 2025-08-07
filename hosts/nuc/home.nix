@@ -14,40 +14,6 @@
   home.username = "john";
   home.homeDirectory = "/home/john";
 
-  #home.pointerCursor = {
-  #  gtk.enable = true;
-  #  package = pkgs.bibata-cursors;
-  #  name = "Bibata-Modern-Ice";
-  #  size = 14;
-  #};
-
-  ## Enable gtk (GNOME)
-  #gtk = {
-  #  enable = true;
-  #    #cursorTheme = {
-  #    #  package = pkgs.bibata-cursors;
-  #    #  name = "Bibata-Modern-Ice";
-  #    #};
-  #  theme = {
-  #    package = pkgs.adw-gtk3;
-  #    name = "adw-gtk3";
-  #  };
-  #  iconTheme = {
-  #    package = gruvboxPlus;
-  #    name = "GruvboxPlus";
-  #  };
-  #  font = {
-  #    name = "JetBrainsMono Nerd Font";
-  #    size = 14;
-  #  };
-  #};
-
-  ## Enable qt (KDE)
-  #qt.enable = true;
-  #qt.platformTheme = "gtk";
-  #qt.style.name = "adwaita-dark";
-
-
   # Enable and configure neovim
   programs.neovim = 
   let
@@ -77,7 +43,6 @@
 		lua-language-server
 		nixd
         pyright
-
 
         # For telescope
         ripgrep
@@ -158,10 +123,10 @@
 	};
   };
 
-  # Setup SSH to work with GitHub
   programs.ssh = {
   	enable = true;
 	matchBlocks = {
+        # Setup SSH to work with GitHub
 		"github.com" = {
 			user = "git";
 			hostname = "github.com";
@@ -176,6 +141,51 @@
     '';
 	
   };
+
+  # The home.packages option allows you to install Nix packages into your
+  # environment.
+  home.packages = with pkgs; [
+    sops
+    # # You can also create simple shell scripts directly inside your
+    # # configuration. For example, this adds a command 'my-hello' to your
+    # # environment:
+    # (pkgs.writeShellScriptBin "my-hello" ''
+    #   echo "Hello, ${config.home.username}!"
+    # '')
+  ];
+
+  # Home Manager is pretty good at managing dotfiles. The primary way to manage
+  # plain files is through 'home.file'.
+  home.file = {
+
+    # Manage who we trust
+    ".ssh/known_hosts".text = ''
+        github.com ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOMqqnkVzrm0SdG6UOoqKLsabgH5C9okWi0dh2l9GKJl
+        github.com ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCj7ndNxQowgcQnjshcLrqPEiiphnt+VTTvDP6mHBL9j1aNUkY4Ue1gvwnGLVlOhGeYrnZaMgRK6+PKCUXaDbC7qtbW8gIkhL7aGCsOr/C56SJMy/BCZfxd1nWzAOxSDPgVsmerOBYfNqltV9/hWCqBywINIR+5dIg6JTJ72pcEpEjcYgXkE2YEFXV1JHnsKgbLWNlhScqb2UmyRkQyytRLtL+38TGxkxCflmO+5Z8CSSNY7GidjMIZ7Q4zMjA2n1nGrlTDkzwDCsw+wqFPGQA179cnfGWOWRVruj16z6XyvxvjJwbz0wQZ75XK5tKSb7FNyeIEs4TT4jk+S4dhPeAUC5y+bDYirYgM4GC7uEnztnZyaVWQ7B381AK4Qdrwt51ZqExKbQpTUNn+EjqoTwvqNj4kqx5QUCI0ThS/YkOxJCXmPUWZbhjpCg56i+2aB6CmK2JGhn57K5mj0MNdBXA4/WnwH6XoPWJzK5Nyu2zB3nAZp+S5hpQs+p1vN1/wsjk=
+        github.com ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBEmKSENjQEezOmxkZMy7opKgwFB9nkt5YRrYMjNuG5N87uRgg6CLrbo5wAdT/y6v0mKV0U2w0WZ2YB/++Tpockg=
+      '';
+  };
+
+  # Home Manager can also manage your environment variables through
+  # 'home.sessionVariables'. These will be explicitly sourced when using a
+  # shell provided by Home Manager. If you don't want to manage your shell
+  # through Home Manager then you have to manually source 'hm-session-vars.sh'
+  # located at either
+  #
+  #  ~/.nix-profile/etc/profile.d/hm-session-vars.sh
+  #
+  # or
+  #
+  #  ~/.local/state/nix/profiles/profile/etc/profile.d/hm-session-vars.sh
+  #
+  # or
+  #
+  #  /etc/profiles/per-user/john/etc/profile.d/hm-session-vars.sh
+  #
+  home.sessionVariables = {
+    EDITOR = "nvim";
+  };
+
 
   # Setup firefox; Move to it's own file soon
   programs.firefox = {
@@ -244,85 +254,7 @@
   # release notes.
   home.stateVersion = "25.05"; # Please read the comment before changing.
 
-  # The home.packages option allows you to install Nix packages into your
-  # environment.
-  home.packages = with pkgs; [
-
-    # Look for a new browser that doesn't steal data
-    #firefox
-
-    # Password manager
-    # Not configured yet
-    keepassxc
-
-    # Icons that GTK apps (like wofi) use
-    #papirus-icon-theme
-    #kdePackages.breeze-icons  # default used by gtk
-
-    # Make Qt applications integrate with GNOME stylings
-    #adwaita-qt
-
-    # Just some random version of python idk
-    # Just use nix-shell with all your python packages
-    #python311
-
-    # # You can also create simple shell scripts directly inside your
-    # # configuration. For example, this adds a command 'my-hello' to your
-    # # environment:
-    # (pkgs.writeShellScriptBin "my-hello" ''
-    #   echo "Hello, ${config.home.username}!"
-    # '')
-  ];
-
-  # Home Manager is pretty good at managing dotfiles. The primary way to manage
-  # plain files is through 'home.file'.
-  home.file = 
-  let 
-    #forest-wallpaper = builtins.fetchurl {
-    #  url = "https://gruvbox-wallpapers.pages.dev/wallpapers/irl/forest-3.jpg";
-    #  sha256 = "14l56mlia6ncpc8aj15z1cdpm38f8hn14c1p1js67d3b7k6rhbnz";
-    #};
-    #nix-wallpaper = builtins.fetchurl {
-    #  url = "https://gruvbox-wallpapers.pages.dev/wallpapers/minimalistic/nix.png";
-    #  sha256 = "0j5zz31fkmlkcbnj49a643vxdsvq486vf4l2r4hc6fdr43h8kzwc";
-    #};
-  in {
-    # Default wallpaper
-    #"Pictures/Wallpapers/forest-3.jpg".source = forest-wallpaper;
-    #"Pictures/Wallpapers/nix-gold.jpg".source = nix-wallpaper;
-
-    # Manage who we trust
-    ".ssh/known_hosts".text = ''
-        github.com ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOMqqnkVzrm0SdG6UOoqKLsabgH5C9okWi0dh2l9GKJl
-        github.com ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCj7ndNxQowgcQnjshcLrqPEiiphnt+VTTvDP6mHBL9j1aNUkY4Ue1gvwnGLVlOhGeYrnZaMgRK6+PKCUXaDbC7qtbW8gIkhL7aGCsOr/C56SJMy/BCZfxd1nWzAOxSDPgVsmerOBYfNqltV9/hWCqBywINIR+5dIg6JTJ72pcEpEjcYgXkE2YEFXV1JHnsKgbLWNlhScqb2UmyRkQyytRLtL+38TGxkxCflmO+5Z8CSSNY7GidjMIZ7Q4zMjA2n1nGrlTDkzwDCsw+wqFPGQA179cnfGWOWRVruj16z6XyvxvjJwbz0wQZ75XK5tKSb7FNyeIEs4TT4jk+S4dhPeAUC5y+bDYirYgM4GC7uEnztnZyaVWQ7B381AK4Qdrwt51ZqExKbQpTUNn+EjqoTwvqNj4kqx5QUCI0ThS/YkOxJCXmPUWZbhjpCg56i+2aB6CmK2JGhn57K5mj0MNdBXA4/WnwH6XoPWJzK5Nyu2zB3nAZp+S5hpQs+p1vN1/wsjk=
-        github.com ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBEmKSENjQEezOmxkZMy7opKgwFB9nkt5YRrYMjNuG5N87uRgg6CLrbo5wAdT/y6v0mKV0U2w0WZ2YB/++Tpockg=
-      '';
-  };
-
-  # Home Manager can also manage your environment variables through
-  # 'home.sessionVariables'. These will be explicitly sourced when using a
-  # shell provided by Home Manager. If you don't want to manage your shell
-  # through Home Manager then you have to manually source 'hm-session-vars.sh'
-  # located at either
-  #
-  #  ~/.nix-profile/etc/profile.d/hm-session-vars.sh
-  #
-  # or
-  #
-  #  ~/.local/state/nix/profiles/profile/etc/profile.d/hm-session-vars.sh
-  #
-  # or
-  #
-  #  /etc/profiles/per-user/john/etc/profile.d/hm-session-vars.sh
-  #
-  home.sessionVariables = {
-    EDITOR = "nvim";
-
-    #QT_STYLE_OVERRIDE = "adwaita-dark";
-
-    #STEAM_EXTRA_COMPAT_TOOLS_PATHS = "${config.home.homeDirectory}/.steam/root/compatibilitytools.d";
-  };
-
+  
   # Let Home Manager install and manage itself.
   programs.home-manager.enable = true;
 }

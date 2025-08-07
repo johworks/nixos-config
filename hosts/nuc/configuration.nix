@@ -8,6 +8,7 @@
   imports =
     [ # Include the results of the hardware scan.
       ./hardware-configuration.nix
+      inputs.sops-nix.nixosModules.sops
       inputs.home-manager.nixosModules.home-manager
       ../../modules/nixos/home-assistant.nix
       ../../modules/nixos/pihole.nix
@@ -42,8 +43,6 @@
 
     "d /etc/wireguard 0775 root root -"
 
-    # Secrets
-    #"d /etc/nixos/secret 0775 root root -"
   ];
 
   # Mount the USB HDD (root:media)
@@ -53,6 +52,10 @@
     options = [ "defaults" ];
   };
 
+  # Configure SOPS-NIX
+  sops.defaultSopsFile = ./secrets/secrets.yaml;
+  sops.defaultSopsFormat = "yaml";
+  sops.age.keyFile = "/home/john/.config/sops/age/keys.txt";  # no comments allowed in here
 
   # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
 
@@ -204,6 +207,7 @@
     openssl
   ];
 
+  environment.variables = { EDITOR = "nvim"; VISUAL = "nvim"; };
 
   home-manager = {
     extraSpecialArgs = { inherit inputs; };

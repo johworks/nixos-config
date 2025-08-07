@@ -14,9 +14,9 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };    
 
-    nixarr = {
-      url = "github:rasmus-kirk/nixarr";
-      #inputs.nixpkgs.follows = "nixpkgs";
+    sops-nix = {
+      url = "github:Mic92/sops-nix";
+      inputs.nixpkgs.follows = "nixpkgs";
     };
 
   };
@@ -24,7 +24,7 @@
   outputs = { self, 
     nixpkgs,
     home-manager,
-    nixarr,
+    sops-nix,
     ... 
   }@inputs:
   {
@@ -48,7 +48,7 @@
         modules = [ 
           ./hosts/nuc/configuration.nix 
           home-manager.nixosModules.home-manager
-          nixarr.nixosModules.default
+          sops-nix.nixosModules.sops
         ];
       };
 
