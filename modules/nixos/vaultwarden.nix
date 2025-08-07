@@ -3,14 +3,21 @@
 let
   myDomain = "vault.goobhub.org";
   myAcmeEmail = "viridianveil@protonmail.com";
+  backupDir = "/data/vaultwarden/backups";
 in
 {
   #####################################################################
   # 1. Vaultwarden service
   #####################################################################
+
+  systemd.tmpfiles.rules = [
+    "d ${backupDir} 0750 vaultwarden vaultwarden -"
+  ];
+
   services.vaultwarden = {
     enable    = true;
     dbBackend = "sqlite";
+    backupDir = "${backupDir}";
     config = {
       # Only listen on localhost; nginx will terminate TLS
       ROCKET_ADDRESS = "127.0.0.1";

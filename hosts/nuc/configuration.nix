@@ -43,7 +43,6 @@
     "d /data/media/.state 0775 root media -"
 
     "d /etc/wireguard 0775 root root -"
-
   ];
 
   # Mount the USB HDD (root:media)
