@@ -14,6 +14,7 @@
       ../../modules/nixos/pihole.nix
       ../../modules/nixos/vaultwarden.nix
       ../../modules/nixos/bedrock-server.nix
+      ../../modules/nixos/josh/josh-website.nix
     ];
 
   # Bootloader.
