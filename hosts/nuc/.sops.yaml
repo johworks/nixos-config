@@ -1,8 +1,0 @@
-keys:
-  - &primary age18t746dc2xxr4ul5t4wthnrmhrmhuukmgmh3u4ke2rmxca56anarsesw4jy
-creation_rules:
-  - path_regex: secrets/secrets.yaml$
-    key_groups:
-      - age:
-        - *primary
-        #- ssh-ed25519 AAAA...<ssh_public_key> # optionally use SSH key

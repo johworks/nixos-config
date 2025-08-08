@@ -131,7 +131,14 @@
 			user = "git";
 			hostname = "github.com";
 			identityFile = "~/.ssh/github_id_ed25519";
+            identitiesOnly = true;
 		};
+        desktop = {
+          host = "192.168.10.133";
+          user = "john";
+          identityFile = "~/.ssh/general_id_ed25519";
+          identitiesOnly = true;
+        };
     };
 
     # Control known_hosts through home.file

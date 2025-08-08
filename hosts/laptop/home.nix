@@ -219,7 +219,6 @@ in
         darkreader
         youtube-shorts-block
         sponsorblock
-        keepassxc-browser
       ];
     };
   };
@@ -243,7 +242,7 @@ in
 
     # Password manager
     # Not configured yet
-    keepassxc
+    #keepassxc
 
     # Icons that GTK apps (like wofi) use
     #papirus-icon-theme
