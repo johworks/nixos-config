@@ -25,31 +25,75 @@ in
     size = 14;
   };
 
-  # Enable gtk (GNOME)
-  gtk = {
-    enable = true;
-      #cursorTheme = {
-      #  package = pkgs.bibata-cursors;
-      #  name = "Bibata-Modern-Ice";
-      #};
-    theme = {
-      package = pkgs.adw-gtk3;
-      name = "adw-gtk3";
-    };
-    iconTheme = {
-      package = gruvboxPlus;
-      name = "GruvboxPlus";
-    };
-    font = {
-      name = "JetBrainsMono Nerd Font";
-      size = 14;
-    };
+  ## Enable gtk (GNOME)
+  #gtk = {
+  #  enable = true;
+  #    #cursorTheme = {
+  #    #  package = pkgs.bibata-cursors;
+  #    #  name = "Bibata-Modern-Ice";
+  #    #};
+  #  theme = {
+  #    package = pkgs.adw-gtk3;
+  #    name = "adw-gtk3";
+  #  };
+  #  iconTheme = {
+  #    package = gruvboxPlus;
+  #    name = "GruvboxPlus";
+  #  };
+  #  font = {
+  #    name = "JetBrainsMono Nerd Font";
+  #    size = 14;
+  #  };
+  #};
+
+
+  gtk.theme = {
+    package = pkgs.gnome-themes-extra;
+    name = "Adwaita-dark";
   };
 
-  # Enable qt (KDE)
-  qt.enable = true;
-  qt.platformTheme.name = "gtk";
-  qt.style.name = "adwaita-dark";
+  dconf.settings."org/gnome/desktop/interface" = {
+    color-scheme = "prefer-dark";
+  };
+
+
+    #  gtk = {
+    #    enable = true;
+    #    theme = {
+    #      package = pkgs.adw-gtk3;   # GTK3 apps
+    #      name = "adw-gtk3";
+    #    };
+    #    iconTheme = {
+    #      package = gruvboxPlus;
+    #      name = "GruvboxPlus";
+    #    };
+    #    font = { name = "Noto Sans"; size = 11; };
+    #  };
+    #
+    #  # libadwaita (GTK4) dark mode + fonts
+    #  dconf.settings = {
+    #    "org/gnome/desktop/interface" = {
+    #      color-scheme = "prefer-dark";
+    #      font-name = "Noto Sans 11";
+    #      monospace-font-name = "JetBrainsMono Nerd Font 11";
+    #      # optional: document-font-name, etc.
+    #    };
+    #  };
+
+
+  qt = {
+    enable = true;
+    platformTheme.name = "gtk";   # sets QT_QPA_PLATFORMTHEME=gtk
+    style.name = "adwaita-dark";  # used when available
+  };
+  
+  # Remove this to avoid overriding/forcing a style:
+  # home.sessionVariables.QT_STYLE_OVERRIDE = "adwaita-dark";
+
+  ## Enable qt (KDE)
+  #qt.enable = true;
+  #qt.platformTheme.name = "gtk";
+  #qt.style.name = "adwaita-dark";
 
 
   # This value determines the Home Manager release that your configuration is
@@ -64,20 +108,14 @@ in
   # The home.packages option allows you to install Nix packages into your
   # environment.
   home.packages = with pkgs; [
-
-    # Look for a new browser that doesn't steal data
-    # Enabled above /\
-    #firefox
-
-    # Password manager
-    #keepassxc
-
     # Icons that GTK apps (like wofi) use
     #papirus-icon-theme
     kdePackages.breeze-icons  # default used by gtk
 
     # Make Qt applications integrate with GNOME stylings
-    adwaita-qt
+    adwaita-qt           # Qt style that matches Adwaita
+    qt6.qtwayland
+    qt5.qtwayland
 
     # Compress videos before storage
     ffmpeg
@@ -96,6 +134,7 @@ in
     #   echo "Hello, ${config.home.username}!"
     # '')
   ];
+
 
   # Home Manager is pretty good at managing dotfiles. The primary way to manage
   # plain files is through 'home.file'.
@@ -140,8 +179,8 @@ in
   #
   home.sessionVariables = {
     EDITOR = "nvim";
-
-    QT_STYLE_OVERRIDE = "adwaita-dark";
+    QT_QPA_PLATFORM = "wayland";   # prefer Wayland backend
+    #QT_STYLE_OVERRIDE = "adwaita-dark";
 
     #STEAM_EXTRA_COMPAT_TOOLS_PATHS = "${config.home.homeDirectory}/.steam/root/compatibilitytools.d";
   };

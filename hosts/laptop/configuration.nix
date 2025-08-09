@@ -75,6 +75,13 @@ in
     defaultSession = "hyprland";
   };
 
+
+  environment.sessionVariables = {
+    EDITOR = "nvim";
+    MOZ_ENABLE_WAYLAND = "1";
+    QT_QPA_PLATFORM = "wayland";
+  };
+
   # Enable the gnome-keyring daemon for your user
   #systemd.user.services.gnome-keyring-daemon = {
   #  description = "GNOME Keyring Daemon";
@@ -148,9 +155,23 @@ in
 
   ];
 
-  # Make sure fonts installed here actually get picked up
+  ## Make sure fonts installed here actually get picked up
+  #fonts.fontconfig.enable = true;
+  #fonts.packages = [ pkgs.nerd-fonts.jetbrains-mono ];
+
   fonts.fontconfig.enable = true;
-  fonts.packages = [ pkgs.nerd-fonts.jetbrains-mono ];
+  fonts.packages = with pkgs; [
+    nerd-fonts.jetbrains-mono
+    noto-fonts
+    noto-fonts-cjk-sans
+    noto-fonts-emoji
+  ];
+  fonts.fontconfig.defaultFonts = {
+    sansSerif = [ "Noto Sans" ];
+    serif     = [ "Noto Serif" ];
+    monospace = [ "JetBrainsMono Nerd Font" ];
+    emoji     = [ "Noto Color Emoji" ];
+  };
 
   home-manager = {
     extraSpecialArgs = { inherit inputs; };

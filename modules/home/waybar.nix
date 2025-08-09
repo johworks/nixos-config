@@ -4,18 +4,12 @@
   programs.waybar = {
     #enable = true;
     #systemd.enable = true;
+
     style = ''
       ${builtins.readFile "${pkgs.waybar}/etc/xdg/waybar/style.css"}
-
-      window#waybar {
-        background: transparent;
-        border-bottom: none;
-      }
-
-      * {
-        font-size: 14px;
-        font-family: "JetBrainsMono Nerd Font";
-      }
+      window#waybar { background: transparent; border-bottom: none; }
+      * { font-size: 12px; font-family: "Noto Sans"; }
+      .clock, .cpu, .memory { font-family: "JetBrainsMono Nerd Font"; }
     '';
 
     settings = [{
