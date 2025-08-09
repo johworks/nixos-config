@@ -294,7 +294,7 @@
         "swww-daemon && swww img /home/john/Pictures/Wallpapers/forest-3.jpg"
         #"swww-daemon && swww img /home/john/Pictures/Wallpapers/nix-gold.jpg"
         # Top bar
-        "waybar &"
+        #"waybar &"
         # Notifications (requires libnotify)
         "dunst"
       ];
@@ -307,7 +307,7 @@
     #kdePackages.dolphin    # file manager (qt6)
     nautilus                # file manager (gtk3?)
     #pcmanfm                 # file manager (both?)
-    waybar     # if workspaces don't work properly add the -Dexperimental=true flag
+    #waybar     # if workspaces don't work properly add the -Dexperimental=true flag
     dunst      # notification manager
     libnotify  # needed for libnotify
     swww       # wallpaper daemon (a bunch of others)
