@@ -25,7 +25,7 @@
 
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
 
-  hardware.opengl = {
+  hardware.graphics= {  # opengl
     enable = true;
     extraPackages = with pkgs; [
       intel-media-driver

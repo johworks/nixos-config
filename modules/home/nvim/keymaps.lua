@@ -22,7 +22,8 @@ vim.keymap.set('v', 'J', ":m '>+1<CR>gv=gv")
 vim.keymap.set('v', 'K', ":m '<-2<CR>gv=gv")
 
 -- Easier saving
-vim.keymap.set('n', '<C-s>', ":w")
+-- vim.keymap.set('n', '<C-s>', ":w")
+vim.keymap.set('n', '<C-s>', vim.cmd.write, { desc = "Save file" })
 
 -- J now keeps cursor at the start of line
 vim.keymap.set('n', 'J', "mzJ`z")
