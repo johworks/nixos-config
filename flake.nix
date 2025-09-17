@@ -2,7 +2,14 @@
   description = "Nixos and Home Manager flake";
 
   inputs = {
-    nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
+
+    nixpkgs = {
+      url = "github:nixos/nixpkgs/nixos-unstable";
+    };
+
+    nixpkgs-latest = {
+      url = "github:nixos/nixpkgs/nixos-unstable";
+    };
 
     home-manager = {
       url = "github:nix-community/home-manager";
@@ -23,6 +30,7 @@
 
   outputs = { self, 
     nixpkgs,
+    nixpkgs-latest,
     home-manager,
     sops-nix,
     ... 

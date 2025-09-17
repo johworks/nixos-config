@@ -1,4 +1,4 @@
-{ config, pkgs, inputs, ... }:
+{ config, pkgs, pkgsLatest, inputs, ... }:
 #let
 #  gruvboxPlus = import ../../modules/home/gruvbox-plus.nix { inherit pkgs; };
 #in 
@@ -24,6 +24,8 @@
   home.packages = with pkgs; [
     sops
     tree
+    # Interact with iCloud photos
+    pkgsLatest.icloudpd
     # # You can also create simple shell scripts directly inside your
     # # configuration. For example, this adds a command 'my-hello' to your
     # # environment:

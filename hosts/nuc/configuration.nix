@@ -210,11 +210,23 @@
 
   environment.variables = { EDITOR = "nvim"; VISUAL = "nvim"; };
 
+
   home-manager = {
-    extraSpecialArgs = { inherit inputs; };
-    users = {
-	"john" = import ./home.nix;
+    # Make HM use the same pkgs as the system
+    useGlobalPkgs = true;
+    useUserPackages = true;
+
+    extraSpecialArgs = {
+      inherit inputs; 
+      # Another pkgs that's even newer
+      pkgsLatest = import inputs.nixpkgs-latest {
+        system = pkgs.stdenv.hostPlatform.system;
+      };
     };
+    users = {
+	  "john" = import ./home.nix;
+    };
+
     backupFileExtension = "backup";
   };
 
