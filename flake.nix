@@ -26,6 +26,12 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    # Your Neovim repo as a non-flake input (works fine even if it has no flake)
+    shared-nvim = {
+      url = "github:johworks/shared-nvim";
+      flake = false;
+    };
+
   };
 
   outputs = { self, 
@@ -33,6 +39,7 @@
     nixpkgs-latest,
     home-manager,
     sops-nix,
+    shared-nvim,
     ... 
   }@inputs:
   {

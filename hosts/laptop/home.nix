@@ -6,7 +6,9 @@ in
 
   imports = [ 
     ../../modules/home/hyprland.nix
-    ../../modules/home/nvim/nvim.nix
+    #../../modules/home/nvim/nvim.nix
+    #../../modules/home/shared-nvim/home-manager/nvim.nix
+    (inputs.shared-nvim + "/home-manager/nvim.nix")
     ../../modules/home/firefox.nix
     ../../modules/home/git.nix
     ../../modules/home/ssh.nix
@@ -127,6 +129,9 @@ in
     gnumake
     tree
     ripgrep
+
+    # Full suite of tools (calc == excel)
+    libreoffice
 
     # # You can also create simple shell scripts directly inside your
     # # configuration. For example, this adds a command 'my-hello' to your

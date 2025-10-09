@@ -60,11 +60,11 @@
     },
     "nixpkgs-latest": {
       "locked": {
-        "lastModified": 1757745802,
-        "narHash": "sha256-hLEO2TPj55KcUFUU1vgtHE9UEIOjRcH/4QbmfHNF820=",
+        "lastModified": 1759831965,
+        "narHash": "sha256-vgPm2xjOmKdZ0xKA6yLXPJpjOtQPHfaZDRtH+47XEBo=",
         "owner": "nixos",
         "repo": "nixpkgs",
-        "rev": "c23193b943c6c689d70ee98ce3128239ed9e32d1",
+        "rev": "c9b6fb798541223bbb396d287d16f43520250518",
         "type": "github"
       },
       "original": {
@@ -80,7 +80,24 @@
         "home-manager": "home-manager",
         "nixpkgs": "nixpkgs",
         "nixpkgs-latest": "nixpkgs-latest",
+        "shared-nvim": "shared-nvim",
         "sops-nix": "sops-nix"
+      }
+    },
+    "shared-nvim": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1759976558,
+        "narHash": "sha256-YSlYiIeg1ECxzOb5jaI4et/BP44o/4yqa4Sm/8KG1IQ=",
+        "owner": "johworks",
+        "repo": "shared-nvim",
+        "rev": "5fd62ee108ffd5157b49203cd9f80efef963ad01",
+        "type": "github"
+      },
+      "original": {
+        "owner": "johworks",
+        "repo": "shared-nvim",
+        "type": "github"
       }
     },
     "sops-nix": {
