@@ -32,14 +32,20 @@
       flake = false;
     };
 
+    #    finance-tracking = {
+    #      url = "github:johworks/finance_tracking?ref=main";
+    #      inputs.nixpkgs.follows = "nixpkgs";
+    #    };
+
   };
 
-  outputs = { self, 
+  outputs = { self,
     nixpkgs,
     nixpkgs-latest,
     home-manager,
     sops-nix,
     shared-nvim,
+    #    finance-tracking,
     ... 
   }@inputs:
   {
@@ -60,10 +66,11 @@
       nuc = nixpkgs.lib.nixosSystem {
         system = "x86_64-linux";
         specialArgs = { inherit inputs; };
-        modules = [ 
-          ./hosts/nuc/configuration.nix 
+        modules = [
+          ./hosts/nuc/configuration.nix
           home-manager.nixosModules.home-manager
           sops-nix.nixosModules.sops
+            #          finance-tracking.nixosModules.finance-tracking
         ];
       };
 

@@ -16,7 +16,15 @@
       ../../modules/nixos/bedrock-server.nix
       ../../modules/nixos/josh/josh-website.nix
       ../../modules/nixos/ddns/ddns.nix
+      #inputs.finance-tracking.nixosModules.finance-tracking
     ];
+
+  #  finance-tracking = {
+  #    enable = true;
+  #    openFirewall = true;
+  #    host = "0.0.0.0";
+  #    port = 8089;
+  #  };
 
   # Bootloader.
   boot.loader.systemd-boot.enable = true;
