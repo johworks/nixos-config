@@ -11,7 +11,7 @@
       inputs.sops-nix.nixosModules.sops
       inputs.home-manager.nixosModules.home-manager
       ../../modules/nixos/home-assistant.nix
-      ../../modules/nixos/pihole.nix
+      #../../modules/nixos/pihole.nix
       ../../modules/nixos/vaultwarden/vaultwarden.nix
       ../../modules/nixos/bedrock-server.nix
       ../../modules/nixos/josh/josh-website.nix
@@ -81,7 +81,13 @@
   networking = {
     networkmanager = {
       enable = true;
-      dns = "none";
+      dns = "none";  # we'll run our own dns
+      unmanaged = [ 
+        "enp1s0"
+        "wlo1"  # just hard disable wifi to prevent auto connect
+      ];
+      #settings.connection.autoconnect = false;
+      #settings.device.wifi.disable = "true";
     };
     useDHCP = false;
     hostName = "john-nuc"; # Define your hostname.
@@ -89,35 +95,102 @@
     interfaces.enp1s0 = {
       useDHCP = false;
       ipv4.addresses = [{
-        address = "192.168.10.2";
+        address = "192.168.10.2";  # this IP
         prefixLength = 24;
       }];
     };
 
-    defaultGateway = { address = "192.168.10.1"; interface = "enp1s0"; };
-
-    #wg-quick.interfaces = { 
-    #  wg0 = {
-    #    configFile = "/etc/wireguard/wg0.conf";
-    #    autostart = true;
-    #  };
-    #};
-
-    # NAT not needed for LAN traffic
-    nat = {
-      enable = false;
-      # Route traffic over the VPN
-      internalInterfaces = [ "enp1s0" ];
-      #internalInterfaces = [ ];
-      externalInterface = "wg0";
+    defaultGateway = { 
+      address = "192.168.10.1";  # router / wireless ap
+      interface = "enp1s0";
     };
 
-    #firewall.enable = true;
-    #firewall.allowedUDPPorts = [ 43996 ];
+
 
   };
 
   boot.kernel.sysctl = { "net.ipv4.ip_forward" = "1"; };
+
+
+  # DoH + DoT
+  services.stubby = {
+    enable = true;
+    settings = pkgs.stubby.passthru.settingsExample // {
+      appdata_dir = "/var/cache/stubby";
+      upstream_recursive_servers = [
+        # Cloudflare
+        {
+          address_data = "1.1.1.1";
+          tls_auth_name = "cloudflare-dns.com";
+        }
+        # Quad9
+        {
+          address_data = "9.9.9.9";
+          tls_auth_name = "dns.quad9.net";
+        }
+      ];
+      listen_addresses = [
+        "127.0.0.1@8053"
+        "0::1@8053"
+      ];
+
+    };
+  };
+
+  # DNS + DHCP
+  services.dnsmasq = {
+    enable = true;
+    settings = {
+      interface = "enp1s0";
+      bind-interfaces = true;
+
+      # DNS config
+      domain-needed = true;
+      bogus-priv = true;
+      no-resolv = true;
+      server = ["127.0.0.1#8053"];  # -> stubby
+
+      # DHCP pool for LAN
+      dhcp-range = "192.168.10.50,192.168.10.200,24h";
+
+      # Tell clients to send traffic to the router, and DNS here
+      dhcp-option = [
+        "option:router,192.168.10.1"      # router / wireless ap
+        "option:dns-server,192.168.10.2"  # this pc
+      ];
+
+      # Make local names work
+      domain = "lan";
+      expand-hosts = true;
+
+    };
+  };
+
+
+  networking.firewall.allowedTCPPorts = [ 53 ];     # DNS
+  networking.firewall.allowedUDPPorts = [ 53 67 ];  # DNS + DHCP
+
+
+  # Failed wireguard routing
+
+  #wg-quick.interfaces = { 
+  #  wg0 = {
+  #    configFile = "/etc/wireguard/wg0.conf";
+  #    autostart = true;
+  #  };
+  #};
+
+  # NAT not needed for LAN traffic
+  #nat = {
+  #  enable = false;
+  #  # Route traffic over the VPN
+  #  internalInterfaces = [ "enp1s0" ];
+  #  #internalInterfaces = [ ];
+  #  externalInterface = "wg0";
+  #};
+
+  #firewall.enable = true;
+  #firewall.allowedUDPPorts = [ 43996 ];
 
   #systemd.services.setup-vpn-routing = {
   #  description = "Set up routing rules to send server traffic through wg0";
