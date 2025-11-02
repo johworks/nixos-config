@@ -85,6 +85,8 @@
         youtube-shorts-block
         sponsorblock
         bitwarden
+        decentraleyes
+        privacy-badger
       ];
     };
   };

@@ -10,6 +10,7 @@
     ../../modules/home/firefox.nix
     ../../modules/home/git.nix
     ../../modules/home/ssh.nix
+    ../../modules/home/brave.nix
   ];
 
 
