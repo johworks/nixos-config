@@ -17,6 +17,7 @@
       ../../modules/nixos/josh/josh-website.nix
       ../../modules/nixos/ddns/ddns.nix
       #(inputs.shiny-app + "/shiny-app.nix")  # input as flake
+      #inputs.shiny-app.nixosModules.webapp
       #inputs.finance-tracking.nixosModules.finance-tracking
     ];
 
@@ -27,6 +28,9 @@
   #    port = 8089;
   #  };
 
+  private.webapp.enable = true;
+  private.webapp.port = 8000;
+  private.webapp.workDir = "/var/lib/shinyapp";  # only if you want to override the default
   
   # Make larger downloads faster
   nix.settings = {

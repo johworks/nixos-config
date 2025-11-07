@@ -36,10 +36,10 @@
       flake = false;
     };
 
-    #shiny-app = {
-    #  url = "git+ssh://git@github.com/Cgilrein/super_secret_project.git";
-    #  flake = false;
-    #};
+    shiny-app = {
+      url = "git+ssh://git@github.com/Cgilrein/super_secret_project.git?ref=flake-dev";
+      #flake = false;
+    };
 
     #    finance-tracking = {
     #      url = "github:johworks/finance_tracking?ref=main";
@@ -56,7 +56,7 @@
     home-manager,
     sops-nix,
     shared-nvim,
-    #shiny-app,
+    shiny-app,
     #    finance-tracking,
     ... 
   }@inputs:
@@ -93,6 +93,7 @@
           ./hosts/nuc/configuration.nix
           home-manager.nixosModules.home-manager
           sops-nix.nixosModules.sops
+          shiny-app.nixosModules.webapp
             #          finance-tracking.nixosModules.finance-tracking
         ];
       };
