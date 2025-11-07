@@ -11,6 +11,10 @@
       url = "github:nixos/nixpkgs/nixos-unstable";
     };
 
+    nixpkgs-stable-25p05 = {
+      url = "github:nixos/nixpkgs/nixos-25.05";
+    };
+
     home-manager = {
       url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -32,6 +36,11 @@
       flake = false;
     };
 
+    #shiny-app = {
+    #  url = "git+ssh://git@github.com/Cgilrein/super_secret_project.git";
+    #  flake = false;
+    #};
+
     #    finance-tracking = {
     #      url = "github:johworks/finance_tracking?ref=main";
     #      inputs.nixpkgs.follows = "nixpkgs";
@@ -39,24 +48,36 @@
 
   };
 
-  outputs = { self,
+  outputs = { 
+    self,
     nixpkgs,
     nixpkgs-latest,
+    nixpkgs-stable-25p05,
     home-manager,
     sops-nix,
     shared-nvim,
+    #shiny-app,
     #    finance-tracking,
     ... 
   }@inputs:
+  let
+    system = "x86_64-linux";
+
+    pkgs = import nixpkgs { inherit system; };
+
+    stablePkgs = import nixpkgs-stable-25p05 { inherit system; };
+  in 
   {
     # For NixOS rebuild
     nixosConfigurations = {
 
       # Intel Laptop
       laptop = nixpkgs.lib.nixosSystem {
-        system = "x86_64-linux";
-        specialArgs = { inherit inputs; };
-        modules = [ 
+        inherit system;
+        specialArgs = {
+          inherit inputs stablePkgs;
+        };
+        modules = [
           ./hosts/laptop/configuration.nix 
           inputs.home-manager.nixosModules.home-manager
         ];
@@ -64,8 +85,10 @@
 
       # Intel Nuc 14
       nuc = nixpkgs.lib.nixosSystem {
-        system = "x86_64-linux";
-        specialArgs = { inherit inputs; };
+        inherit system;
+        specialArgs = {
+          inherit inputs stablePkgs;
+        };
         modules = [
           ./hosts/nuc/configuration.nix
           home-manager.nixosModules.home-manager

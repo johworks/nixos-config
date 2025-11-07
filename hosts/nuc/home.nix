@@ -10,7 +10,8 @@
     (inputs.shared-nvim + "/home-manager/nvim.nix")  # moved to a flake
     ../../modules/home/firefox.nix
     ../../modules/home/git.nix
-    ../../modules/home/ssh.nix
+    # Moved to configuration.nix
+    #../../modules/home/ssh.nix
     ../../modules/home/brave.nix
   ];
 
@@ -21,6 +22,9 @@
     # Interact with iCloud photos
     pkgsLatest.icloudpd
   ]);
+
+  # Pull private flakes
+  home.sessionVariables.GIT_SSH_COMMAND = "ssh -i ~/.ssh/github_id_ed25519";
 
   # This value determines the Home Manager release that your configuration is
   # compatible with. This helps avoid breakage when a new Home Manager release

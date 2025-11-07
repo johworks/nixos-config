@@ -16,6 +16,7 @@
       ../../modules/nixos/bedrock-server.nix
       ../../modules/nixos/josh/josh-website.nix
       ../../modules/nixos/ddns/ddns.nix
+      #(inputs.shiny-app + "/shiny-app.nix")  # input as flake
       #inputs.finance-tracking.nixosModules.finance-tracking
     ];
 
@@ -25,6 +26,17 @@
   #    host = "0.0.0.0";
   #    port = 8089;
   #  };
+
+  
+  # Make larger downloads faster
+  nix.settings = {
+    # Default is 10 MiB — 50–100 MiB works well for most systems
+    download-buffer-size = 104857600; # 100 MiB
+    # Optional but recommended:
+    max-jobs = "auto";        # Use all cores for builds
+    cores = 0;                # Let Nix decide per job
+  };
+
 
   # Bootloader.
   boot.loader.systemd-boot.enable = true;
@@ -65,6 +77,25 @@
   sops.defaultSopsFile = ./secrets/secrets.yaml;
   sops.defaultSopsFormat = "yaml";
   sops.age.keyFile = "/home/john/.config/sops/age/keys.txt";  # no comments allowed in here
+
+  # First try adding to home-manager as an ENV var
+  #sops.secrets.ssh-key = {
+  #  sopsFile = ./secrets/github_id_ed25519;
+  #  owner = "john";
+  #  mode = "0600";
+  #  path = "/home/john/.ssh/github_id_ed25519";
+  #};
+  #
+  #programs.ssh = {
+  #  enable = true;
+  #  matchBlocks = {
+  #    "github.com" = {
+  #      user = "git";
+  #      hostname = "github.com";
+  #      identityFile = "~/.ssh/github_id_ed25519";
+  #    };
+  #  };
+  #};
 
   # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
 
@@ -328,6 +359,14 @@
     settings.PasswordAuthentication = true;
     settings.PermitRootLogin = "no";
   };
+
+  environment.etc."ssh/ssh_config".text = ''
+    Host github.com
+      HostName github.com
+      User git
+      IdentityFile /home/john/.ssh/github_id_ed25519
+      IdentitiesOnly yes
+  '';
   
 
   # Open ports in the firewall.
