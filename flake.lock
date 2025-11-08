@@ -139,11 +139,11 @@
         "nixpkgs": "nixpkgs_2"
       },
       "locked": {
-        "lastModified": 1762556532,
-        "narHash": "sha256-Kp0KP/DJOCglhRQLKF83pQ0JUkveBKtQYem+r78sQjw=",
+        "lastModified": 1762625190,
+        "narHash": "sha256-SxUDEAhgOpUPLHBDTSrPjQHYXsh5R6xPRnYUukPyLz8=",
         "ref": "flake-dev",
-        "rev": "2352eec8661222535cebe1656fc356acd6e4ab03",
-        "revCount": 15,
+        "rev": "c6f716a36b34cff612490c0d91ed00709ab72665",
+        "revCount": 18,
         "type": "git",
         "url": "ssh://git@github.com/Cgilrein/super_secret_project.git"
       },

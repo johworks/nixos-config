@@ -11,27 +11,32 @@
       inputs.sops-nix.nixosModules.sops
       inputs.home-manager.nixosModules.home-manager
       ../../modules/nixos/home-assistant.nix
-      #../../modules/nixos/pihole.nix
       ../../modules/nixos/vaultwarden/vaultwarden.nix
       ../../modules/nixos/bedrock-server.nix
       ../../modules/nixos/josh/josh-website.nix
       ../../modules/nixos/ddns/ddns.nix
-      #(inputs.shiny-app + "/shiny-app.nix")  # input as flake
-      #inputs.shiny-app.nixosModules.webapp
-      #inputs.finance-tracking.nixosModules.finance-tracking
     ];
 
-  #  finance-tracking = {
-  #    enable = true;
-  #    openFirewall = true;
-  #    host = "0.0.0.0";
-  #    port = 8089;
-  #  };
 
-  private.webapp.enable = true;
-  private.webapp.port = 8000;
-  private.webapp.workDir = "/var/lib/shinyapp";  # only if you want to override the default
-  
+  #private.webapp.enable = true;
+  #private.webapp.port = 8000;
+  #private.webapp.workDir = "/var/lib/shinyapp";  # only if you want to override the default
+
+  private.webapp = {
+    enable = true;
+    workDir = "/var/lib/shinyapp";
+    port = 8000;
+    autoDeploy = {
+      enable = false;  # disable for now
+      repoUrl = "git+ssh://git@github.com/Cgilrein/super_secret_project.git";
+      branch = "flake-dev";
+      secretFile = /var/lib/webapp/webhook-secret; # contains raw secret string
+      listenPort = 9000;
+    };
+  };
+
+
+
   # Make larger downloads faster
   nix.settings = {
     # Default is 10 MiB — 50–100 MiB works well for most systems
