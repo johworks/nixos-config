@@ -25,7 +25,16 @@
   private.webapp = {
     enable = true;
     workDir = "/var/lib/shinyapp";
-    port = 8000;
+    port = 5000;  # this doesn't control the python server atm
+
+    reverseProxy = {
+      enable = true;
+      hostName = "joshnaked.gay";  # for testing
+      #serverAliases = [ "www.example.com" ];
+      enableACME = true;   # ensure security.acme accepts terms + email elsewhere
+      forceSSL = true;
+    };
+
     autoDeploy = {
       enable = false;  # disable for now
       repoUrl = "git+ssh://git@github.com/Cgilrein/super_secret_project.git";

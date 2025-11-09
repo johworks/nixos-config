@@ -37,7 +37,8 @@
     };
 
     shiny-app = {
-      url = "git+ssh://git@github.com/Cgilrein/super_secret_project.git?ref=flake-dev";
+      #url = "git+ssh://git@github.com/Cgilrein/super_secret_project.git?ref=flake-dev";
+      url = "git+ssh://git@github.com/Cgilrein/super_secret_project.git?ref=dev";
       #flake = false;
     };
 
