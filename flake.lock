@@ -139,16 +139,16 @@
         "nixpkgs": "nixpkgs_2"
       },
       "locked": {
-        "lastModified": 1762661475,
-        "narHash": "sha256-aNE+Lm+wix2sZEMIFZE5//HRAta7kj2tccqQ4TBYT7o=",
-        "ref": "dev",
-        "rev": "3cb05aca8ffaee693893198117e930553db80fc6",
-        "revCount": 31,
+        "lastModified": 1762714146,
+        "narHash": "sha256-2t1XEcuQVh1cBOScgrWOxlTTl2pdNmLPYSvNTdZomZ8=",
+        "ref": "feature/webhook",
+        "rev": "92d0b76d1c7808083aa20c037088c63c59ad3ade",
+        "revCount": 41,
         "type": "git",
         "url": "ssh://git@github.com/Cgilrein/super_secret_project.git"
       },
       "original": {
-        "ref": "dev",
+        "ref": "feature/webhook",
         "type": "git",
         "url": "ssh://git@github.com/Cgilrein/super_secret_project.git"
       }

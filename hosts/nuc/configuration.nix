@@ -17,32 +17,60 @@
       ../../modules/nixos/ddns/ddns.nix
     ];
 
+   sops.secrets."webapp_deploy_key" = {
+     owner = "shinyapp";
+     mode = "0400";
+     path = "/run/secrets/webapp_deploy_key";
+   };
 
-  #private.webapp.enable = true;
-  #private.webapp.port = 8000;
-  #private.webapp.workDir = "/var/lib/shinyapp";  # only if you want to override the default
+   sops.secrets."google_ai" = {
+     owner = "shinyapp";
+     mode = "0400";
+     path = "/run/secrets/google_ai";
+   };
+
+   sops.secrets."github_webhook" = {
+     owner = "root";
+     mode = "0400";
+     path = "/run/secrets/github_webhook";
+   };
 
   private.webapp = {
     enable = true;
     workDir = "/var/lib/shinyapp";
-    port = 5000;  # this doesn't control the python server atm
+    port = 5000;
 
     reverseProxy = {
       enable = true;
-      #hostName = "joshnaked.gay";  # for testing
       hostName = "kensfatcock.com";
-      #serverAliases = [ "www.example.com" ];
+      #serverAliases = [ "www.kensfatcock.com" ];  # acme will fail until this is added as a CNAME
       enableACME = true;   # ensure security.acme accepts terms + email elsewhere
       forceSSL = true;
     };
 
+    #autoDeploy = {
+    #  enable = true;
+    #  repoUrl = "git+ssh://git@github.com/Cgilrein/super_secret_project.git";
+    #  branch = "dev";
+    #  secretFile = /run/secrets/github-webhook;   # plain text shared secret
+    #  listenAddress = "127.0.0.1";                # stays local; nginx fronts it
+    #  listenPort = 9000;
+    #  webhookPath = "/github-webhook";            # exposed endpoint on nginx
+    #  proxyViaReverseProxy = true;                # default, but shown explicitly
+    #};
+
+    environment = { GOOGLE_API_KEY = "/run/secrets/google_ai"; };
+
     autoDeploy = {
-      enable = false;  # disable for now
+      enable = true;
       repoUrl = "git+ssh://git@github.com/Cgilrein/super_secret_project.git";
-      branch = "flake-dev";
-      secretFile = /var/lib/webapp/webhook-secret; # contains raw secret string
+      branch = "feature/webhook";
+      keyFile = /run/secrets/webapp_deploy_key;
+      secretFile = /run/secrets/github_webhook;
+      listenAddress = "127.0.0.1";
       listenPort = 9000;
     };
+
   };
 
 
