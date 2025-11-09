@@ -29,7 +29,8 @@
 
     reverseProxy = {
       enable = true;
-      hostName = "joshnaked.gay";  # for testing
+      #hostName = "joshnaked.gay";  # for testing
+      hostName = "kensfatcock.com";
       #serverAliases = [ "www.example.com" ];
       enableACME = true;   # ensure security.acme accepts terms + email elsewhere
       forceSSL = true;

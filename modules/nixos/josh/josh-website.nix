@@ -38,16 +38,15 @@ in
         proxyWebsockets = true;
       };
     };
-    # Using this for testing
-      #virtualHosts."${myDomain1}" = {
-      #  forceSSL   = true;
-      #  enableACME = true;
+    virtualHosts."${myDomain1}" = {
+      forceSSL   = true;
+      enableACME = true;
 
-      #  locations."/" = {
-      #    proxyPass       = "http://127.0.0.1:8223";
-      #    proxyWebsockets = true;
-      #  };
-      #};
+      locations."/" = {
+        proxyPass       = "http://127.0.0.1:8223";
+        proxyWebsockets = true;
+      };
+    };
 
   };
 
