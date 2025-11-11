@@ -48,23 +48,12 @@
       forceSSL = true;
     };
 
-    #autoDeploy = {
-    #  enable = true;
-    #  repoUrl = "git+ssh://git@github.com/Cgilrein/super_secret_project.git";
-    #  branch = "dev";
-    #  secretFile = /run/secrets/github-webhook;   # plain text shared secret
-    #  listenAddress = "127.0.0.1";                # stays local; nginx fronts it
-    #  listenPort = 9000;
-    #  webhookPath = "/github-webhook";            # exposed endpoint on nginx
-    #  proxyViaReverseProxy = true;                # default, but shown explicitly
-    #};
-
     environment = { GOOGLE_API_KEY = "/run/secrets/google_ai"; };
 
     autoDeploy = {
       enable = true;
       repoUrl = "git+ssh://git@github.com/Cgilrein/super_secret_project.git";
-      branch = "feature/webhook";
+      branch = "main";
       keyFile = /run/secrets/webapp_deploy_key;
       secretFile = /run/secrets/github_webhook;
       listenAddress = "127.0.0.1";
