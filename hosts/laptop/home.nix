@@ -15,6 +15,13 @@ in
     ../../modules/home/ssh.nix
   ];
 
+  desktop.hyprland = {
+    enable = true;
+    wallpaper = "${config.home.homeDirectory}/Pictures/Wallpapers/forest-3.jpg";
+  };
+
+  desktop.waybar.enable = lib.mkDefault true;
+
   home.pointerCursor = {
     gtk.enable = true;
     package = pkgs.bibata-cursors;
