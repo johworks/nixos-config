@@ -2,6 +2,7 @@
 let
   cfg = config.desktop.waybar;
   colors = config.theme.colors;
+  fonts = config.theme.fonts;
   hyprEnabled = config.desktop.hyprland.enable or false;
 in
 {
@@ -71,8 +72,8 @@ in
 
         style = ''
           * {
-            font-family: "JetBrainsMono Nerd Font", "Noto Sans", sans-serif;
-            font-size: 12px;
+            font-family: "Symbols Nerd Font Mono", "${fonts.monospace}", "${fonts.sansSerif}", sans-serif;
+            font-size: ${builtins.toString fonts.size}px;
             color: ${colors.foreground};
             min-height: 0;
           }
