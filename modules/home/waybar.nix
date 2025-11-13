@@ -1,225 +1,136 @@
-{ config, pkgs, lib, ... }:
-
+{ lib, config, ... }:
+let
+  cfg = config.desktop.waybar;
+  colors = config.theme.colors;
+  hyprEnabled = config.desktop.hyprland.enable or false;
+in
 {
-  programs.waybar = {
-    enable = true;
-    systemd.enable = true;
+  options.desktop.waybar.enable = lib.mkEnableOption "Waybar status bar";
 
-    style = ''
-      /* === Palette === */
-      @define-color bg        #0b0f14;   /* near-black blue */
-      @define-color bg-alt    #111827;   /* slightly lighter */
-      @define-color fg        #e5e7eb;   /* soft white */
-      @define-color muted     #9ca3af;   /* gray */
-      @define-color purple    #7c3aed;   /* accent */
-      @define-color blue      #2563eb;   /* accent */
-      @define-color orange    #ff8c42;   /* dark orange accent */
-      @define-color red       #ef4444;   /* alert */
+  config = lib.mkMerge [
+    {
+      desktop.waybar.enable = lib.mkDefault hyprEnabled;
+    }
 
-      /* === Base === */
-      * {
-        font-family: Noto Sans, "JetBrainsMono Nerd Font", sans-serif;
-        font-size: 12px;
-        min-height: 0;
-      }
+    (lib.mkIf cfg.enable {
+      programs.waybar = {
+        enable = true;
+        systemd.enable = true;
 
-      window#waybar {
-        background: alpha(@bg, 0.70);
-        border-bottom: 1px solid alpha(@purple, 0.25);
-        color: @fg;
-      }
+        settings = [{
+          layer = "top";
+          position = "top";
+          height = 28;
+          tray = { spacing = 8; };
 
-      tooltip {
-        background: @bg-alt;
-        color: @fg;
-        border: 1px solid alpha(@purple, 0.35);
-      }
+          modules-left = [ "hyprland/workspaces" ];
+          modules-center = [ "clock" ];
+          modules-right = [ "network" "cpu" "memory" "battery" "tray" ];
 
-      /* === Module shell === */
-      #workspaces button,
-      #mode,
-      #window,
-      #network, #pulseaudio, #cpu, #memory, #temperature, #battery, #clock, #tray {
-        padding: 4px 8px;
-        margin: 4px 4px;
-        border-radius: 8px;
-        background: alpha(@bg-alt, 0.8);
-      }
+          "hyprland/workspaces" = {
+            disable-scroll = true;
+            all-outputs = true;
+          };
 
-      /* Subtle separators via left border */
-      #network, #pulseaudio, #cpu, #memory, #temperature, #battery, #clock, #tray {
-        border-left: 1px solid alpha(@purple, 0.15);
-      }
+          clock = {
+            format = "{:%a %H:%M}";
+            format-alt = "{:%Y-%m-%d}";
+            tooltip-format = "{:%A, %B %d %Y | %H:%M}";
+          };
 
-      /* === Workspaces === */
-      #workspaces {
-        padding-left: 4px;
-      }
-      #workspaces button {
-        color: @muted;
-        background: transparent;
-        border: 1px solid transparent;
-      }
-      #workspaces button:hover {
-        color: @fg;
-        background: alpha(@purple, 0.12);
-      }
-      #workspaces button.active {
-        color: @fg;
-        background: alpha(@purple, 0.22);
-        border-color: alpha(@purple, 0.35);
-      }
-      #workspaces button.urgent {
-        color: @fg;
-        background: alpha(@red, 0.22);
-        border-color: alpha(@red, 0.5);
-      }
+          cpu = {
+            format = "{usage}% ";
+            tooltip = false;
+          };
 
-      /* === Mode / Window title === */
-      #mode {
-        font-style: italic;
-        color: @orange;
-        border: 1px solid alpha(@orange, 0.35);
-        background: alpha(@orange, 0.10);
-      }
-      #window {
-        color: @fg;
-      }
+          memory = {
+            format = "{percentage}% ";
+            interval = 5;
+            tooltip-format = "{used} / {total}";
+          };
 
-      /* === Status accents === */
-      #network { border-color: alpha(@blue, 0.35); }
-      #pulseaudio { border-color: alpha(@purple, 0.35); } /* base for both instances */
-      #cpu { border-color: alpha(@blue, 0.25); }
-      #memory { border-color: alpha(@purple, 0.25); }
-      #temperature { border-color: alpha(@orange, 0.35); }
-      #battery { border-color: alpha(@blue, 0.25); }
-      #clock { border-color: alpha(@purple, 0.35); }
+          network = {
+            format-wifi = "{essid} {signalStrength}% ";
+            format-ethernet = "{ifname} {ipaddr}";
+            format-disconnected = "Offline";
+            tooltip-format = "{ifname} {ipaddr}";
+            interval = 3;
+          };
 
-      /* PulseAudio states */
-      #pulseaudio.muted {
-        color: @muted;
-        background: alpha(@bg-alt, 0.6);
-        border-color: alpha(@purple, 0.15);
-      }
+          battery = {
+            format = "{capacity}% {icon}";
+            format-charging = "{capacity}% ";
+            format-plugged = "{capacity}% ";
+            format-icons = [ "" "" "" "" "" ];
+            states = {
+              warning = 30;
+              critical = 15;
+            };
+          };
+        }];
 
-      /* Distinguish sink vs source (instance names become classes) */
-      #pulseaudio.sink   { /* speakers/headphones */ }
-      #pulseaudio.source { /* microphone */ }
+        style = ''
+          * {
+            font-family: "JetBrainsMono Nerd Font", "Noto Sans", sans-serif;
+            font-size: 12px;
+            color: ${colors.foreground};
+            min-height: 0;
+          }
 
-      /* Network states */
-      #network.disconnected {
-        color: @red;
-        border-color: alpha(@red, 0.5);
-        background: alpha(@red, 0.10);
-      }
+          window#waybar {
+            background: ${colors.background}ee;
+            border-bottom: 1px solid ${colors.surfaceAlt};
+          }
 
-      /* Temperature states */
-      #temperature.critical {
-        color: @red;
-        border-color: alpha(@red, 0.6);
-        background: alpha(@red, 0.10);
-      }
+          tooltip {
+            background: ${colors.surface};
+            color: ${colors.foreground};
+            border: 1px solid ${colors.accent};
+          }
 
-      /* Battery states */
-      #battery.warning:not(.charging) {
-        color: @orange;
-        border-color: alpha(@orange, 0.6);
-        background: alpha(@orange, 0.10);
-      }
-      #battery.critical:not(.charging) {
-        color: @red;
-        border-color: alpha(@red, 0.6);
-        background: alpha(@red, 0.10);
-      }
-      #battery.charging {
-        color: @fg;
-        border-color: alpha(@blue, 0.45);
-        background: linear-gradient(90deg, alpha(@blue, 0.18), transparent);
-      }
+          #workspaces button,
+          #clock,
+          #network,
+          #cpu,
+          #memory,
+          #battery,
+          #tray {
+            background: ${colors.surface};
+            padding: 4px 10px;
+            margin: 4px 6px;
+            border-radius: 8px;
+          }
 
-      /* Tray tweaks */
-      #tray > .passive { opacity: 0.7; }
-      #tray > .active { opacity: 1.0; }
-      #tray > .needs-attention {
-        background: alpha(@red, 0.18);
-        border-color: alpha(@red, 0.6);
-      }
-    '';
+          #workspaces button {
+            border: 1px solid transparent;
+            color: ${colors.muted};
+          }
 
-    settings = [{
-      height = 30;
-      layer = "top";
-      position = "top";
-      tray = { spacing = 10; };
+          #workspaces button.focused,
+          #workspaces button.active {
+            color: ${colors.background};
+            background: ${colors.accent};
+            border-color: ${colors.accent};
+          }
 
-      modules-center = [ "hyprland/window" ];
-      modules-left   = [ "hyprland/workspaces" "hyprland/mode" ];
-      modules-right  = [
-        "pulseaudio#sink"      # speakers/headphones
-        "network"
-        "cpu"
-        "memory"
-        "temperature"
-        "battery"
-        "clock"
-        "tray"
-      ];
+          #clock {
+            background: ${colors.accent};
+            color: ${colors.background};
+          }
 
-      battery = {
-        format = "{capacity}% {icon}";
-        format-alt = "{time} {icon}";
-        format-charging = "{capacity}% ";
-        format-icons = [ "" "" "" "" "" ];
-        format-plugged = "{capacity}% ";
-        states = { critical = 15; warning = 30; };
+          #battery.warning {
+            color: ${colors.accent};
+          }
+
+          #battery.critical {
+            color: ${colors.alert};
+          }
+
+          #network.disconnected {
+            color: ${colors.alert};
+          }
+        '';
       };
-
-      clock = {
-        format = "{:%H:%M}";
-        format-alt = "{:%Y-%m-%d}";
-        tooltip-format = "{:%Y-%m-%d | %H:%M}";
-      };
-
-      cpu = { format = "{usage}% "; tooltip = false; };
-      memory = { format = "{}% "; };
-
-      network = {
-        interval = 1;
-        format-wifi = "{essid} ({signalStrength}%) ";
-        format-ethernet = "{ifname}: {ipaddr}/{cidr}   up: {bandwidthUpBits} down: {bandwidthDownBits}";
-        format-linked = "{ifname} (No IP) ";
-        format-disconnected = "Disconnected ⚠";
-        format-alt = "{ifname}: {ipaddr}/{cidr}";
-      };
-
-
-      /* === Audio: sink (output) only === */
-      "pulseaudio#sink" = {
-        format = "{volume}% {icon}";
-        format-bluetooth = "{volume}% {icon}";
-        format-bluetooth-muted = " {icon}";
-        format-muted = "";
-        format-icons = {
-          default = [ "" "" "" ];
-          headphones = "";
-          headset = "";
-          handsfree = "";
-          phone = "";
-          car = "";
-          portable = "";
-        };
-        on-click = "pavucontrol";
-      };
-
-
-      "hyprland/mode" = { format = ''<span style="italic">{}</span>''; };
-
-      temperature = {
-        critical-threshold = 80;
-        format = "{temperatureC}°C {icon}";
-        format-icons = [ "" "" "" ];
-      };
-    }];
-  };
+    })
+  ];
 }
-
