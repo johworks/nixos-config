@@ -78,7 +78,7 @@ in
           }
 
           window#waybar {
-            background: ${colors.background}ee;
+            background: ${colors.surface};
             border-bottom: 1px solid ${colors.surfaceAlt};
           }
 
