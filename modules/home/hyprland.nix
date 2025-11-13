@@ -2,6 +2,8 @@
 let
   cfg = config.desktop.hyprland;
   colors = config.theme.colors;
+  fonts = config.theme.fonts;
+  inherit (builtins) toString;
   inherit (lib)
     mkOption
     types;
@@ -105,7 +107,7 @@ in
       programs.kitty = {
         enable = true;
         font = {
-          name = "JetBrainsMono Nerd Font";
+          name = fonts.monospace;
           size = 12;
         };
         settings = {
@@ -135,6 +137,12 @@ in
           layer = "top";
         };
         style = ''
+          * {
+            font-family: ${fonts.sansSerif};
+            font-size: ${toString fonts.size}px;
+            color: ${colors.foreground};
+          }
+
           window {
             background-color: ${colors.surface};
             border: 2px solid ${colors.accent};

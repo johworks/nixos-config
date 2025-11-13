@@ -162,9 +162,11 @@ in
   fonts.fontconfig.enable = true;
   fonts.packages = with pkgs; [
     nerd-fonts.jetbrains-mono
+    nerd-fonts.symbols-mono
     noto-fonts
     noto-fonts-cjk-sans
     noto-fonts-emoji
+    font-awesome
   ];
   fonts.fontconfig.defaultFonts = {
     sansSerif = [ "Noto Sans" ];
