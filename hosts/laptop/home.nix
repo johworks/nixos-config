@@ -7,8 +7,6 @@ in
   imports = [
     ../../modules/home/profiles/base.nix
     ../../modules/home/profiles/wayland.nix
-    #../../modules/home/nvim/nvim.nix
-    #../../modules/home/shared-nvim/home-manager/nvim.nix
     (inputs.shared-nvim + "/home-manager/nvim.nix")
     ../../modules/home/firefox.nix
     ../../modules/home/git.nix
