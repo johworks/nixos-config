@@ -1,7 +1,4 @@
 { config, pkgs, pkgsLatest, inputs, ... }:
-#let
-#  gruvboxPlus = import ../../modules/home/gruvbox-plus.nix { inherit pkgs; };
-#in 
 {
 
   imports = [
@@ -10,46 +7,41 @@
     (inputs.shared-nvim + "/home-manager/nvim.nix")  # moved to a flake
     ../../modules/home/firefox.nix
     ../../modules/home/git.nix
-    # Moved to configuration.nix
-    #../../modules/home/ssh.nix
     ../../modules/home/brave.nix
   ];
 
   # The home.packages option allows you to install Nix packages into your
   # environment.
   home.packages = config.profiles.basePackages ++ (with pkgs; [
-    sops
+    #sops
     # Interact with iCloud photos
     pkgsLatest.icloudpd
-    nodejs  # needed for npm (OpenAI Codex)
+    #nodejs  # needed for npm (OpenAI Codex)
   ]);
 
-  programs.bash = {
-    enable = true; 
-    # We need this for all shell
-    initExtra = ''
-      # Load Home Manager session vars in interactive shells too
-      if [ -f "$HOME/.nix-profile/etc/profile.d/hm-session-vars.sh" ]; then
-        . "$HOME/.nix-profile/etc/profile.d/hm-session-vars.sh"
-      elif [ -f "/etc/profiles/per-user/$USER/etc/profile.d/hm-session-vars.sh" ]; then
-        . "/etc/profiles/per-user/$USER/etc/profile.d/hm-session-vars.sh"
-      fi
-      '';
-  };
+  ## Needed for npm/codex as well
+  #programs.bash = {
+  #  enable = true; 
+  #  # We need this for all shell
+  #  initExtra = ''
+  #    # Load Home Manager session vars in interactive shells too
+  #    if [ -f "$HOME/.nix-profile/etc/profile.d/hm-session-vars.sh" ]; then
+  #      . "$HOME/.nix-profile/etc/profile.d/hm-session-vars.sh"
+  #    elif [ -f "/etc/profiles/per-user/$USER/etc/profile.d/hm-session-vars.sh" ]; then
+  #      . "/etc/profiles/per-user/$USER/etc/profile.d/hm-session-vars.sh"
+  #    fi
+  #    '';
+  #};
 
+  ## Configure npm prefix via .npmrc
+  #home.file.".npmrc".text = ''
+  #  prefix=${config.home.homeDirectory}/.npm-global
+  #'';
 
-  # Configure npm prefix via .npmrc
-  home.file.".npmrc".text = ''
-    prefix=${config.home.homeDirectory}/.npm-global
-  '';
-
-  # Add ~/.npm-global/bin to PATH for your user
-  home.sessionPath = [
-    "${config.home.homeDirectory}/.npm-global/bin"
-  ];
-
-
-  
+  ## Add ~/.npm-global/bin to PATH for your user
+  #home.sessionPath = [
+  #  "${config.home.homeDirectory}/.npm-global/bin"
+  #];
 
   # Pull private flakes
   # home.sessionVariables.GIT_SSH_COMMAND = "ssh -i ~/.ssh/github_id_ed25519";

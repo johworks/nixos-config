@@ -1,4 +1,4 @@
-{ lib, pkgs, ... }:
+{ config, lib, pkgs, ... }:
 {
   # Shared Home Manager defaults for every host. Override with lib.mkForce
   # in downstream profiles or host modules when a machine needs a different
@@ -9,7 +9,7 @@
     # Default packages for all configs
     profiles.basePackages = lib.mkOption {
       type = with lib.types; listOf package;
-      default = with pkgs; [ gnumake tree ];
+      default = with pkgs; [ gnumake tree sops nodejs ];
     };
   };
 
@@ -21,6 +21,30 @@
     home.sessionVariables = lib.mkDefault {
       EDITOR = "nvim";
     };
+
+    # Needed for npm/codex as well
+    programs.bash = {
+      enable = true;
+      # We need this for all shell
+      initExtra = ''
+        # Load Home Manager session vars in interactive shells too
+        if [ -f "$HOME/.nix-profile/etc/profile.d/hm-session-vars.sh" ]; then
+          . "$HOME/.nix-profile/etc/profile.d/hm-session-vars.sh"
+        elif [ -f "/etc/profiles/per-user/$USER/etc/profile.d/hm-session-vars.sh" ]; then
+          . "/etc/profiles/per-user/$USER/etc/profile.d/hm-session-vars.sh"
+        fi
+        '';
+    };
+
+    # Configure npm prefix via .npmrc
+    home.file.".npmrc".text = ''
+      prefix=${config.home.homeDirectory}/.npm-global
+    '';
+
+    # Add ~/.npm-global/bin to PATH for your user
+    home.sessionPath = [
+      "${config.home.homeDirectory}/.npm-global/bin"
+    ];
 
     home.file.".ssh/known_hosts".text = lib.mkDefault ''
         github.com ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOMqqnkVzrm0SdG6UOoqKLsabgH5C9okWi0dh2l9GKJl
