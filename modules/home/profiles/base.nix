@@ -25,6 +25,7 @@
     # Needed for npm/codex as well
     programs.bash = {
       enable = true;
+
       # We need this for all shell
       initExtra = ''
         # Load Home Manager session vars in interactive shells too
@@ -35,6 +36,7 @@
         fi
         '';
     };
+
 
     # Configure npm prefix via .npmrc
     home.file.".npmrc".text = ''
