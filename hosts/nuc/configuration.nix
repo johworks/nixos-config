@@ -15,6 +15,7 @@
       ../../modules/nixos/bedrock-server.nix
       ../../modules/nixos/josh/josh-website.nix
       ../../modules/nixos/ddns/ddns.nix
+      ../../modules/nixos/qos.nix
     ];
 
    sops.secrets."webapp_deploy_key" = {
@@ -144,39 +145,107 @@
   boot.blacklistedKernelModules = [ "r8169" ]; # need to use /\ b/c r8125 rev 0xc is too new
   hardware.enableAllFirmware = true;  # Attempt to get ethernet firmware pulled in
 
+
+  systemd.network.enable = true;
+
   # Enable networking
   networking = {
-    networkmanager = {
-      enable = true;
-      dns = "none";  # we'll run our own dns
-      unmanaged = [ 
-        "enp1s0"
-        "wlo1"  # just hard disable wifi to prevent auto connect
-      ];
-      #settings.connection.autoconnect = false;
-      #settings.device.wifi.disable = "true";
-    };
+    networkmanager.enable = false; # use networkd for VLANs
+
+    useNetworkd = true;  # apparently the more modern way?
+
     useDHCP = false;
     hostName = "john-nuc"; # Define your hostname.
+  };
 
-    interfaces.enp1s0 = {
-      useDHCP = false;
-      ipv4.addresses = [{
-        address = "192.168.10.2";  # this IP
-        prefixLength = 24;
-      }];
+  # Create VLAN interfaces on top of enp1s0
+  systemd.network.netdevs = {
+    # WAN
+    "10-vlan10" = {
+      netdevConfig = {
+        Name = "vlan10";
+        Kind = "vlan";
+      };
+      vlanConfig.Id = 10;
+    };
+    # LAN
+    "20-vlan20" = {
+      netdevConfig = {
+        Name = "vlan20";
+        Kind = "vlan";
+      };
+      vlanConfig.Id = 20;
+    };
+  };
+
+  # Attach VLAN to parent NIC & assign addressing
+
+  systemd.network.networks = {
+    # Parent/trunk interface: no IP here, just carries VLANs
+    "10-enp1s0" = {
+      matchConfig.Name = "enp1s0";
+      networkConfig = {
+        VLAN = [ "vlan10" "vlan20" ];
+        LinkLocalAddressing = "no"; # rely on VLAN interfaces
+      };
     };
 
-    defaultGateway = { 
-      address = "192.168.10.1";  # router / wireless ap
-      interface = "enp1s0";
+    # VLAN 10 interface (WAN)
+    "20-vlan10" = {
+      matchConfig.Name = "vlan10";
+      DHCP = "ipv4"; # get an IP from WAN
+      networkConfig.IPv6AcceptRA = false;
+      networkConfig.IPv6SendRA = false;
+      networkConfig.LinkLocalAddressing = "no";
+      dhcpV4Config.UseDNS = false; # ignore ISP DNS
+      linkConfig.RequiredForOnline = "routable";
     };
 
-
+    # VLAN 20 interface (LAN)
+    "20-vlan20" = {
+      matchConfig.Name = "vlan20";
+      address = [ "192.168.10.1/24" ];
+      networkConfig.IPv6AcceptRA = false;
+      networkConfig.IPv6SendRA = false;
+      networkConfig.LinkLocalAddressing = "no";
+      linkConfig.RequiredForOnline = "carrier";
+    };
 
   };
 
+    #interfaces.enp1s0 = {
+    #  useDHCP = false;
+    #  ipv4.addresses = [{
+    #    address = "192.168.10.2";  # this IP
+    #    prefixLength = 24;
+    #  }];
+    #};
+
+    #defaultGateway = { 
+    #  address = "192.168.10.1";  # router / wireless ap
+    #  interface = "enp1s0";
+    #};
+
   boot.kernel.sysctl = { "net.ipv4.ip_forward" = "1"; };
+
+  # Disable IPv6 globally for now
+  boot.kernel.sysctl."net.ipv6.conf.all.disable_ipv6" = 1;
+  boot.kernel.sysctl."net.ipv6.conf.default.disable_ipv6" = 1;
+
+  # NAT between LAN (vlan20) and WAN (vlan10)
+  networking.nat = {
+    enable = true;
+    externalInterface = "vlan10";
+    internalInterfaces = [ "vlan20" ];
+  };
+
+  ## CAKE QoS — set to ~90–95% of actual line rate
+  #qos = {
+  #  enable = true;
+  #  wanInterface = "enp1s0";
+  #  downloadMbit = 800;
+  #  uploadMbit = 700;
+  #};
 
 
   # DoH + DoT
@@ -208,7 +277,7 @@
   services.dnsmasq = {
     enable = true;
     settings = {
-      interface = "enp1s0";
+      interface = "vlan20";
       bind-interfaces = true;
 
       # DNS config
@@ -222,8 +291,8 @@
 
       # Tell clients to send traffic to the router, and DNS here
       dhcp-option = [
-        "option:router,192.168.10.1"      # router / wireless ap
-        "option:dns-server,192.168.10.2"  # this pc
+        "option:router,192.168.10.1"      # NUC LAN IP
+        "option:dns-server,192.168.10.1"  # NUC DNS
       ];
 
       # Make local names work
@@ -236,6 +305,9 @@
 
   networking.firewall.allowedTCPPorts = [ 53 ];     # DNS
   networking.firewall.allowedUDPPorts = [ 53 67 ];  # DNS + DHCP
+
+  # Use stubby locally instead of ISP-provided resolvers
+  networking.nameservers = [ "127.0.0.1" ];
 
 
   # Failed wireguard routing
