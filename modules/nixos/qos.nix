@@ -3,7 +3,6 @@
 with lib;
 let
   cfg = config.qos;
-  concatPorts = ports: lib.concatStringsSep " " (map toString ports);
 in {
   options.qos = {
     enable = mkEnableOption "CAKE-based QoS";
@@ -25,74 +24,17 @@ in {
       default = 40;
       description = "Shaped upstream rate (Mbit/s), set to ~90–95% of line rate.";
     };
-
-    gamingUdpPorts = mkOption {
-      type = types.listOf types.int;
-      default = [ 3074 3478 3479 3480 3481 ];
-      description = "Gaming/interactive UDP ports to mark high priority.";
-    };
-
-    voipUdpPorts = mkOption {
-      type = types.listOf types.int;
-      default = [ 5060 5061 ];
-      description = "VoIP UDP ports to mark EF.";
-    };
-
-    interactiveTcpPorts = mkOption {
-      type = types.listOf types.int;
-      default = [ 22 ];
-      description = "Interactive TCP ports (e.g., SSH) to mark higher priority.";
-    };
-
-    bulkTcpPorts = mkOption {
-      type = types.listOf types.int;
-      default = [ 6881 6882 6883 6884 6885 6886 6887 6888 6889 ];
-      description = "Bulk/background TCP ports to mark CS1.";
-    };
   };
 
   config = mkIf cfg.enable {
     boot.kernelModules = [ "ifb" ];
-
-    environment.systemPackages = [ pkgs.iproute2 ];
-
-    networking.nftables = {
-      enable = true;
-      tables.qos = {
-        family = "inet";
-        content = ''
-          table inet qos {
-            chain prerouting {
-              type filter hook prerouting priority mangle; policy accept;
-
-              # Gaming / interactive UDP -> CS6 (voice-equivalent in diffserv4)
-              udp dport { ${concatPorts cfg.gamingUdpPorts} } dscp set cs6 counter comment "gaming"
-
-              # VoIP -> EF
-              udp dport { ${concatPorts cfg.voipUdpPorts} } dscp set ef counter comment "voip"
-
-              # SSH -> CS4 (video class in diffserv4)
-              tcp dport { ${concatPorts cfg.interactiveTcpPorts} } dscp set cs4 counter comment "ssh"
-
-              # Bulk -> CS1 (background)
-              tcp dport { ${concatPorts cfg.bulkTcpPorts} } dscp set cs1 counter comment "bulk-tcp"
-            }
-
-            chain output {
-              type filter hook output priority mangle; policy accept;
-
-              tcp dport { ${concatPorts cfg.interactiveTcpPorts} } dscp set cs4 counter comment "ssh-local"
-            }
-          }
-        '';
-      };
-    };
 
     systemd.services.qos-shaper = {
       description = "CAKE QoS shaper";
       wantedBy = [ "multi-user.target" ];
       after = [ "network-online.target" ];
       requires = [ "network-online.target" ];
+      path = [ pkgs.iproute2 ];
       serviceConfig = {
         Type = "oneshot";
         RemainAfterExit = true;

@@ -76,6 +76,13 @@
     internalInterfaces = [ "vlan20" ];
   };
 
+  qos = {
+    enable = true;
+    wanInterface = "vlan10";
+    downloadMbit = 900;
+    uploadMbit = 780;
+  };
+
   # DoH + DoT
   services.stubby = {
     enable = true;

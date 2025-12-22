@@ -1,3 +1,4 @@
 # Just transfer the bedrock server images manually
 *.zip
 efi-backups
+experiments/qos-tune/
