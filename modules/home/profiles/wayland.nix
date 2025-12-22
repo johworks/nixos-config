@@ -1,6 +1,7 @@
 { lib, ... }:
 {
   imports = [
+    ../theme.nix
     ../hyprland.nix
     ../waybar.nix
   ];
