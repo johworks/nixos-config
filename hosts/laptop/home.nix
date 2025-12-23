@@ -23,7 +23,7 @@ in
 
   desktop.hyprland = {
     enable = true;
-    wallpaper = "${config.home.homeDirectory}/Pictures/Wallpapers/forest-3.jpg";
+    wallpaper = "${config.home.homeDirectory}/Pictures/Wallpapers/sunset-field.jpg";
   };
 
   desktop.waybar.enable = lib.mkDefault true;
@@ -92,8 +92,8 @@ in
   home.file = 
   let 
     forest-wallpaper = builtins.fetchurl {
-      url = "https://gruvbox-wallpapers.pages.dev/wallpapers/irl/forest-3.jpg";
-      sha256 = "14l56mlia6ncpc8aj15z1cdpm38f8hn14c1p1js67d3b7k6rhbnz";
+      url = "https://gruvbox-wallpapers.pages.dev/wallpapers/photography/DKoRY7F.jpeg";
+      sha256 = "15vvx30kzjk4pfzaa50b42p24z5s7wki10v4jq0wdvgr862a7sdd";
     };
     nix-wallpaper = builtins.fetchurl {
       url = "https://gruvbox-wallpapers.pages.dev/wallpapers/minimalistic/nix.png";
@@ -101,7 +101,7 @@ in
     };
   in {
     # Default wallpaper
-    "Pictures/Wallpapers/forest-3.jpg".source = forest-wallpaper;
+    "Pictures/Wallpapers/sunset-field.jpg".source = forest-wallpaper;
     "Pictures/Wallpapers/nix-gold.jpg".source = nix-wallpaper;
 
   };

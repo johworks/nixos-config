@@ -66,7 +66,7 @@ in
 
   config = lib.mkMerge [
     {
-      desktop.hyprland.wallpaper = lib.mkDefault "${config.home.homeDirectory}/Pictures/Wallpapers/forest-3.jpg";
+      desktop.hyprland.wallpaper = lib.mkDefault "${config.home.homeDirectory}/Pictures/Wallpapers/sunset-field.jpg";
     }
 
     (lib.mkIf cfg.enable {

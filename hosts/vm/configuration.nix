@@ -3,7 +3,12 @@
 # and in the NixOS manual (accessible by running ‘nixos-help’).
 
 { config, pkgs, inputs, ... }:
-
+let
+  sddm-background = builtins.fetchurl {
+    url = "https://gruvbox-wallpapers.pages.dev/wallpapers/photography/DKoRY7F.jpeg";
+    sha256 = "15vvx30kzjk4pfzaa50b42p24z5s7wki10v4jq0wdvgr862a7sdd";
+  };
+in
 {
   imports =
     [ # Include the results of the hardware scan.
@@ -113,7 +118,7 @@
       flavor = "mocha";
       font  = "Noto Sans";
       fontSize = "9";
-      background = "${../../wallpapers/forest-3.jpg}";
+      background = "${sddm-background}";
       loginBackground = true;
     })
   ];
