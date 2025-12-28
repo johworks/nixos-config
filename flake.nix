@@ -98,10 +98,21 @@
         ];
       };
 
+      # VM for desktop testing
+      vm = nixpkgs.lib.nixosSystem {
+        inherit system;
+        specialArgs = {
+          inherit inputs stablePkgs;
+        };
+        modules = [
+          ./hosts/vm/configuration.nix
+          home-manager.nixosModules.home-manager
+        ];
+      };
+
 
     };
   };
 
 
 }
-

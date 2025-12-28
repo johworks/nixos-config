@@ -4,8 +4,6 @@
 
 { config, pkgs, inputs, ... }:
 let
-  bedrock-fhs = import ../../modules/nixos/bedrock/bedrock-fhs.nix { inherit pkgs; };
-  bedrock-server = import ../../modules/nixos/bedrock/bedrock-server.nix { inherit pkgs; };
   sddm-background = builtins.fetchurl {
     url = "https://gruvbox-wallpapers.pages.dev/wallpapers/photography/DKoRY7F.jpeg";
     sha256 = "15vvx30kzjk4pfzaa50b42p24z5s7wki10v4jq0wdvgr862a7sdd";
@@ -16,27 +14,21 @@ in
     [ # Include the results of the hardware scan.
       ./hardware-configuration.nix
       inputs.home-manager.nixosModules.home-manager
-      #../../modules/nixos/bedrock/bedrock-connect.nix
     ];
-
-
-  virtualisation.podman = {
-    enable = true;
-    dockerCompat = true;  # Optional: adds `docker` CLI alias
-    defaultNetwork.settings.dns_enabled = false;
-
-    #networks.bedrockconnectnet.subnet = "10.89.0.0/24";
-  };
 
   # Bootloader.
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
 
-  networking.hostName = "john-laptop"; # Define your hostname.
+  networking.hostName = "nixos-vm";
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
 
   # Enable networking
   networking.networkmanager.enable = true;
+
+  # Improve VM integration
+  services.qemuGuest.enable = true;
+  services.spice-vdagentd.enable = true;
 
   # Set your time zone.
   time.timeZone = "America/New_York";
@@ -56,18 +48,6 @@ in
     LC_TIME = "en_US.UTF-8";
   };
 
-
-  # Enable the X11 windowing system.
-  # You can disable this if you're only using the Wayland session.
-  #services.xserver.enable = true;
-
-  # Enable the KDE Plasma Desktop Environment.
-  #services.desktopManager.plasma6.enable = true;
-
-  # Enable automatic login for the user.
-  #services.displayManager.autoLogin.enable = true;
-  #services.displayManager.autoLogin.user = "john";
-
   # Login graphically
   services.displayManager = {
     sddm = {
@@ -79,19 +59,11 @@ in
     defaultSession = "hyprland";
   };
 
-
   environment.sessionVariables = {
     EDITOR = "nvim";
     MOZ_ENABLE_WAYLAND = "1";
     QT_QPA_PLATFORM = "wayland";
   };
-
-  # Enable the gnome-keyring daemon for your user
-  #systemd.user.services.gnome-keyring-daemon = {
-  #  description = "GNOME Keyring Daemon";
-  #  serviceConfig.ExecStart = "${pkgs.gnome-keyring}/bin/gnome-keyring-daemon --start --foreground --components=secrets";
-  #  wantedBy = [ "default.target" ];
-  #};
 
   # Enable hyprland
   programs.hyprland = {
@@ -118,11 +90,6 @@ in
     alsa.enable = true;
     alsa.support32Bit = true;
     pulse.enable = true;
-    jack.enable = true;
-
-    # use the example session manager (no others are packaged yet so this is enabled by default,
-    # no need to redefine it in your config for now)
-    #media-session.enable = true;
   };
 
   # Define a user account. Don't forget to set a password with ‘passwd’.
@@ -143,12 +110,10 @@ in
 
     home-manager
 
-    bedrock-fhs
+    # VM guest experience
+    spice-vdagent     # resolution + clipboard
+    xorg.xrandr       # let x11 dynamically adjust res
 
-    #nerd-fonts.jetbrains-mono
-
-    #sddm-astronaut
-    
     (catppuccin-sddm.override {
       flavor = "mocha";
       font  = "Noto Sans";
@@ -156,12 +121,7 @@ in
       background = "${sddm-background}";
       loginBackground = true;
     })
-
   ];
-
-  ## Make sure fonts installed here actually get picked up
-  #fonts.fontconfig.enable = true;
-  #fonts.packages = [ pkgs.nerd-fonts.jetbrains-mono ];
 
   fonts.fontconfig.enable = true;
   fonts.packages = with pkgs; [
@@ -188,35 +148,12 @@ in
     backupFileExtension = "backup";
   };
 
-  # Enable the OpenSSH daemon.
-  services.openssh = {
-    enable = true;
-    settings.PasswordAuthentication = true;  # key only access (set to true rn though)
-    settings.PermitRootLogin = "no";
-  };
-
-  # Some programs need SUID wrappers, can be configured further or are
-  # started in user sessions.
-  # programs.mtr.enable = true;
-  # programs.gnupg.agent = {
-  #   enable = true;
-  #   enableSSHSupport = true;
-  # };
-
-  # List services that you want to enable:
-
-  # Open ports in the firewall.
-  # networking.firewall.allowedTCPPorts = [ ... ];
-  # networking.firewall.allowedUDPPorts = [ ... ];
-  # Or disable the firewall altogether.
-  # networking.firewall.enable = false;
-
   # This value determines the NixOS release from which the default
   # settings for stateful data, like file locations and database versions
   # on your system were taken. It‘s perfectly fine and recommended to leave
   # this value at the release version of the first install of this system.
   # Before changing this value read the documentation for this option
   # (e.g. man configuration.nix or on https://nixos.org/nixos/options.html).
-  system.stateVersion = "24.11"; # Did you read the comment?
+  system.stateVersion = "25.05"; # Did you read the comment?
 
 }
