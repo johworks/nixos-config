@@ -19,6 +19,7 @@
       ../../modules/nixos/bedrock-server.nix
       ../../modules/nixos/josh/josh-website.nix
       ../../modules/nixos/ddns/ddns.nix
+      ../../modules/nixos/stremio/stremio.nix
       ../../modules/nixos/qos.nix
     ];
 
