@@ -21,7 +21,8 @@ in
 {
   systemd.tmpfiles.rules = [
     "d ${dataDir} 0750 root root - -"
-    "d ${pgDataDir} 0700 root root - -"
+    # Postgres container runs as UID/GID 999; ensure the volume is accessible.
+    "d ${pgDataDir} 0700 999 999 - -"
     "d ${companionCacheDir} 0755 root root - -"
   ];
 
@@ -66,6 +67,7 @@ in
           "hmac_key: \"$HMAC_KEY\"" \
           "domain: \"${myDomain}\"" \
           "host_binding: 127.0.0.1" \
+          "force_resolve: ipv6" \
           "https_only: true" \
           "external_port: 443"
       } > ${configFile}
