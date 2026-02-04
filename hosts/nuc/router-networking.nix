@@ -111,7 +111,8 @@
   services.dnsmasq = {
     enable = true;
     settings = {
-      interface = "vlan20";
+      # Include loopback so the host's resolver (127.0.0.1) works at boot.
+      interface = [ "vlan20" "lo" ];
       bind-interfaces = true;
 
       # DNS config
