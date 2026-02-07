@@ -65,6 +65,7 @@ in
           "  - private_url: \"http://127.0.0.1:8282/companion\"" \
           "invidious_companion_key: \"$INVIDIOUS_COMPANION_KEY\"" \
           "hmac_key: \"$HMAC_KEY\"" \
+          "cookies: \"$YT_COOKIES\"" \
           "domain: \"${myDomain}\"" \
           "host_binding: 127.0.0.1" \
           "force_resolve: ipv6" \
