@@ -83,6 +83,7 @@
         #ublock-origin
         adnauseam
         darkreader
+        df-youtube
         youtube-shorts-block
         sponsorblock
         bitwarden
@@ -92,4 +93,3 @@
     };
   };
 }
-
