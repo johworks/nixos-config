@@ -44,19 +44,11 @@
     # VLAN 10 interface (WAN)
     "20-vlan10" = {
       matchConfig.Name = "vlan10";
-      DHCP = "yes"; # get IPv4 + IPv6 + PD from WAN
-      networkConfig.IPv6AcceptRA = true;
+      DHCP = "ipv4"; # get an IP from WAN
+      networkConfig.IPv6AcceptRA = false;
       networkConfig.IPv6SendRA = false;
-      networkConfig.IPv6PrivacyExtensions = true;
-      # Required for RA/DHCPv6/PD to work.
-      networkConfig.LinkLocalAddressing = "ipv6";
+      networkConfig.LinkLocalAddressing = "no";
       dhcpV4Config.UseDNS = false; # ignore ISP DNS
-      dhcpV6Config = {
-        UseDNS = false; # ignore ISP DNS
-        PrefixDelegationHint = "::/56";
-        # Some ISPs don't set RA flags for DHCPv6-PD; solicit anyway.
-        WithoutRA = "solicit";
-      };
       linkConfig.RequiredForOnline = "routable";
     };
 
@@ -65,27 +57,18 @@
       matchConfig.Name = "vlan20";
       address = [ "192.168.10.1/24" ];
       networkConfig.IPv6AcceptRA = false;
-      networkConfig.IPv6SendRA = true;
-      networkConfig.DHCPPrefixDelegation = true;
-      dhcpPrefixDelegationConfig = {
-        SubnetId = "0x0";
-        UplinkInterface = "vlan10";
-      };
-      # Required for RA to clients.
-      networkConfig.LinkLocalAddressing = "ipv6";
+      networkConfig.IPv6SendRA = false;
+      networkConfig.LinkLocalAddressing = "no";
       linkConfig.RequiredForOnline = "carrier";
     };
   };
 
   boot.kernel.sysctl = {
     "net.ipv4.ip_forward" = "1";
-    # Prefer temporary IPv6 addresses for outbound connections (rotation).
-    "net.ipv6.conf.vlan10.use_tempaddr" = 2;
+    # Disable IPv6 globally for now.
+    "net.ipv6.conf.all.disable_ipv6" = 1;
+    "net.ipv6.conf.default.disable_ipv6" = 1;
   };
-
-  # Enable IPv6 forwarding for routing.
-  boot.kernel.sysctl."net.ipv6.conf.all.forwarding" = 1;
-  boot.kernel.sysctl."net.ipv6.conf.default.forwarding" = 1;
 
   # NAT between LAN (vlan20) and WAN (vlan10)
   networking.nat = {

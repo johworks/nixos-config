@@ -68,7 +68,6 @@ in
           "cookies: \"$YT_COOKIES\"" \
           "domain: \"${myDomain}\"" \
           "host_binding: 127.0.0.1" \
-          "force_resolve: ipv6" \
           "https_only: true" \
           "external_port: 443"
       } > ${configFile}
