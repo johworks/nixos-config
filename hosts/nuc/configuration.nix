@@ -18,6 +18,7 @@
       ../../modules/nixos/vaultwarden/vaultwarden.nix
       ../../modules/nixos/bedrock-server.nix
       ../../modules/nixos/josh/josh-website.nix
+      ../../modules/nixos/blog-static.nix
       ../../modules/nixos/ddns/ddns.nix
       ../../modules/nixos/stremio/stremio.nix
       ../../modules/nixos/invidious/invidious.nix
