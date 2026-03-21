@@ -18,6 +18,10 @@
     useOSProber = true;
   };
 
+  # Fix for the r8125 NIC issue
+  boot.extraModulePackages = [ config.boot.kernelPackages.r8125 ]; # official realtek one
+  boot.blacklistedKernelModules = [ "r8169" ]; # r8125 rev 0xc is too new
+
   networking.hostName = "desktop";
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
 
