@@ -110,6 +110,18 @@
         ];
       };
 
+      # Desktop host with KDE Plasma
+      desktop = nixpkgs.lib.nixosSystem {
+        inherit system;
+        specialArgs = {
+          inherit inputs stablePkgs;
+        };
+        modules = [
+          ./hosts/desktop/configuration.nix
+          home-manager.nixosModules.home-manager
+        ];
+      };
+
 
     };
   };
