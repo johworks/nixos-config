@@ -4,6 +4,7 @@ let
   domain = "goobhub.org";
   matrixDomain = "matrix.${domain}";
   myAcmeEmail = "viridianveil@protonmail.com";
+  enableFederation = false;
   clientConfig = {
     "m.homeserver".base_url = "https://${matrixDomain}";
     "m.identity_server" = {};
@@ -62,6 +63,8 @@ in {
       url_preview_enabled = true;
       enable_registration = false;
       enable_metrics = false;
+      # Keep the server private for now; flip this when you want cross-server chat.
+      federation_domain_whitelist = if enableFederation then null else [ ];
 
       registration_shared_secret_path = config.sops.secrets."matrix-registration-shared-secret".path;
       trusted_key_servers = [
@@ -89,8 +92,11 @@ in {
     virtualHosts.${domain} = {
       enableACME = true;
       forceSSL = true;
-      locations."= /.well-known/matrix/server".extraConfig = mkWellKnown serverConfig;
-      locations."= /.well-known/matrix/client".extraConfig = mkWellKnown clientConfig;
+      locations = {
+        "= /.well-known/matrix/client".extraConfig = mkWellKnown clientConfig;
+      } // lib.optionalAttrs enableFederation {
+        "= /.well-known/matrix/server".extraConfig = mkWellKnown serverConfig;
+      };
     };
 
     virtualHosts.${matrixDomain} = {
