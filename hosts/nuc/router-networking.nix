@@ -114,7 +114,10 @@
     settings = {
       # Include loopback so the host's resolver (127.0.0.1) works at boot.
       interface = [ "vlan20" "lo" ];
-      bind-interfaces = true;
+      #bind-interfaces = true;
+      # vlan 20 can appear slightly after dnsmasq during boot; synamic binding
+      # avoids startup failures on reboot while still restricting interfaces.
+      bind-dynamic = true;
 
       # DNS config
       domain-needed = true;

@@ -22,6 +22,7 @@
       ../../modules/nixos/ddns/ddns.nix
       ../../modules/nixos/stremio/stremio.nix
       ../../modules/nixos/invidious/invidious.nix
+      ../../modules/nixos/matrix/matrix.nix
       ../../modules/nixos/qos.nix
     ];
 
@@ -189,6 +190,7 @@
   environment.systemPackages = with pkgs; [
     vim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
     wget
+    element-desktop
     home-manager
     pciutils
     intel-media-driver

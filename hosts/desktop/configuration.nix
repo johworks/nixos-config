@@ -100,6 +100,7 @@
   environment.systemPackages = with pkgs; [
     vim
     git
+    element-desktop
   ];
 
   # Enable the OpenSSH daemon.

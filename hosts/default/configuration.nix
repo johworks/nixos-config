@@ -135,6 +135,7 @@
   environment.systemPackages = with pkgs; [
     vim
     wget
+    element-desktop
 
     # VM stuff
     spice-vdagent     # res and clipboard

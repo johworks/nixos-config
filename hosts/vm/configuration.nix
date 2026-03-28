@@ -107,6 +107,7 @@ in
   environment.systemPackages = with pkgs; [
     vim
     wget
+    element-desktop
 
     home-manager
 
