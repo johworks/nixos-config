@@ -1,0 +1,115 @@
+{
+  config,
+  pkgs,
+  inputs,
+  ...
+}:
+
+let
+  domain = "goobhub.org";
+  matrixRtcDomain = "matrix-rtc.${domain}";
+  myAcmeEmail = "viridianveil@protonmail.com";
+  rtcPkgs = import inputs.nixpkgs-latest {
+    inherit (pkgs) system;
+  };
+in
+{
+  sops.secrets."matrix-rtc-livekit-secret" = {
+    sopsFile = ./secrets/secrets.yaml;
+    owner = "root";
+    group = "root";
+    mode = "0400";
+  };
+
+  sops.templates."matrix-rtc-livekit-key-file" = {
+    owner = "root";
+    group = "root";
+    mode = "0400";
+    content = ''
+      lk-jwt-service: ${config.sops.placeholder."matrix-rtc-livekit-secret"}
+    '';
+  };
+
+  services.livekit = {
+    enable = true;
+    package = rtcPkgs.livekit;
+    keyFile = config.sops.templates."matrix-rtc-livekit-key-file".path;
+    settings = {
+      port = 7880;
+      room.auto_create = false;
+      rtc = {
+        tcp_port = 7881;
+        port_range_start = 50000;
+        port_range_end = 60000;
+        use_external_ip = true;
+      };
+    };
+  };
+
+  services.lk-jwt-service = {
+    enable = true;
+    package = rtcPkgs."lk-jwt-service";
+    keyFile = config.sops.templates."matrix-rtc-livekit-key-file".path;
+    livekitUrl = "wss://${matrixRtcDomain}/livekit/sfu";
+    port = 8080;
+  };
+
+  systemd.services.lk-jwt-service = {
+    wants = [
+      "livekit.service"
+      "matrix-synapse.service"
+    ];
+    after = [
+      "livekit.service"
+      "matrix-synapse.service"
+    ];
+    environment.LIVEKIT_FULL_ACCESS_HOMESERVERS = domain;
+  };
+
+  services.nginx = {
+    enable = true;
+    virtualHosts.${matrixRtcDomain} = {
+      enableACME = true;
+      forceSSL = true;
+
+      locations."/livekit/jwt/" = {
+        proxyPass = "http://127.0.0.1:8080";
+        recommendedProxySettings = true;
+        extraConfig = ''
+          rewrite ^/livekit/jwt/(.*)$ /$1 break;
+        '';
+      };
+
+      locations."/livekit/sfu/" = {
+        proxyPass = "http://127.0.0.1:7880";
+        proxyWebsockets = true;
+        recommendedProxySettings = true;
+        extraConfig = ''
+          rewrite ^/livekit/sfu/(.*)$ /$1 break;
+          proxy_send_timeout 120s;
+          proxy_read_timeout 120s;
+          proxy_buffering off;
+          proxy_set_header Accept-Encoding gzip;
+          proxy_set_header Upgrade $http_upgrade;
+          proxy_set_header Connection "upgrade";
+        '';
+      };
+    };
+  };
+
+  security.acme = {
+    acceptTerms = true;
+    defaults.email = myAcmeEmail;
+  };
+
+  networking.firewall = {
+    enable = true;
+    allowedTCPPorts = [ 7881 ];
+    allowedUDPPortRanges = [
+      {
+        from = 50000;
+        to = 60000;
+      }
+    ];
+  };
+}

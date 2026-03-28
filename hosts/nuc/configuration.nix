@@ -2,48 +2,54 @@
 # your system.  Help is available in the configuration.nix(5) man page
 # and in the NixOS manual (accessible by running ‘nixos-help’).
 
-{ config, pkgs, inputs, ... }:
+{
+  config,
+  pkgs,
+  inputs,
+  ...
+}:
 
 {
-  imports =
-    [ # Include the results of the hardware scan.
-      ./hardware-configuration.nix
-      ./router-hardware.nix
-      ./router-networking.nix
-      ./router-users.nix
-      # ./router-storage.nix
-      inputs.sops-nix.nixosModules.sops
-      inputs.home-manager.nixosModules.home-manager
-      ../../modules/nixos/home-assistant.nix
-      ../../modules/nixos/vaultwarden/vaultwarden.nix
-      ../../modules/nixos/bedrock-server.nix
-      ../../modules/nixos/josh/josh-website.nix
-      ../../modules/nixos/blog-static.nix
-      ../../modules/nixos/ddns/ddns.nix
-      ../../modules/nixos/stremio/stremio.nix
-      ../../modules/nixos/invidious/invidious.nix
-      ../../modules/nixos/matrix/matrix.nix
-      ../../modules/nixos/coturn/coturn.nix
-      ../../modules/nixos/qos.nix
-    ];
+  imports = [
+    # Include the results of the hardware scan.
+    ./hardware-configuration.nix
+    ./router-hardware.nix
+    ./router-networking.nix
+    ./router-users.nix
+    # ./router-storage.nix
+    inputs.sops-nix.nixosModules.sops
+    inputs.home-manager.nixosModules.home-manager
+    ../../modules/nixos/home-assistant.nix
+    ../../modules/nixos/vaultwarden/vaultwarden.nix
+    ../../modules/nixos/bedrock-server.nix
+    ../../modules/nixos/josh/josh-website.nix
+    ../../modules/nixos/blog-static.nix
+    ../../modules/nixos/ddns/ddns.nix
+    ../../modules/nixos/stremio/stremio.nix
+    ../../modules/nixos/invidious/invidious.nix
+    ../../modules/nixos/matrix/matrix.nix
+    ../../modules/nixos/coturn/coturn.nix
+    ../../modules/nixos/matrix-rtc/matrix-rtc.nix
+    ../../modules/nixos/qos.nix
+  ];
 
-   sops.secrets."webapp_deploy_key" = {
-     owner = "shinyapp";
-     mode = "0400";
-     path = "/run/secrets/webapp_deploy_key";
-   };
+  sops.secrets."webapp_deploy_key" = {
+    owner = "shinyapp";
+    mode = "0400";
+    path = "/run/secrets/webapp_deploy_key";
+  };
 
-   sops.secrets."google_ai" = {
-     owner = "shinyapp";
-     mode = "0400";
-     path = "/run/secrets/google_ai";
-   };
+  sops.secrets."google_ai" = {
+    owner = "shinyapp";
+    mode = "0400";
+    path = "/run/secrets/google_ai";
+  };
 
-   sops.secrets."github_webhook" = {
-     owner = "root";
-     mode = "0400";
-     path = "/run/secrets/github_webhook";
-   };
+  sops.secrets."github_webhook" = {
+    owner = "root";
+    mode = "0400";
+    path = "/run/secrets/github_webhook";
+  };
 
   private.webapp = {
     enable = true;
@@ -54,11 +60,13 @@
       enable = true;
       hostName = "kensfatcock.com";
       #serverAliases = [ "www.kensfatcock.com" ];  # acme will fail until this is added as a CNAME
-      enableACME = true;   # ensure security.acme accepts terms + email elsewhere
+      enableACME = true; # ensure security.acme accepts terms + email elsewhere
       forceSSL = true;
     };
 
-    environment = { GOOGLE_API_KEY = "/run/secrets/google_ai"; };
+    environment = {
+      GOOGLE_API_KEY = "/run/secrets/google_ai";
+    };
 
     autoDeploy = {
       enable = true;
@@ -72,26 +80,27 @@
 
   };
 
-
-
   # Make larger downloads faster
   nix.settings = {
     # Default is 10 MiB — 50–100 MiB works well for most systems
     download-buffer-size = 104857600; # 100 MiB
     # Optional but recommended:
-    max-jobs = "auto";        # Use all cores for builds
-    cores = 0;                # Let Nix decide per job
+    max-jobs = "auto"; # Use all cores for builds
+    cores = 0; # Let Nix decide per job
   };
-
 
   # Bootloader.
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
   boot.kernelParams = [ "pcie_aspm=off" ];
 
-  nix.settings.experimental-features = [ "nix-command" "flakes" ];
+  nix.settings.experimental-features = [
+    "nix-command"
+    "flakes"
+  ];
 
-  hardware.graphics= {  # opengl
+  hardware.graphics = {
+    # opengl
     enable = true;
     extraPackages = with pkgs; [
       intel-media-driver
@@ -101,7 +110,7 @@
   # Configure SOPS-NIX
   sops.defaultSopsFile = ./secrets/secrets.yaml;
   sops.defaultSopsFormat = "yaml";
-  sops.age.keyFile = "/home/john/.config/sops/age/keys.txt";  # no comments allowed in here
+  sops.age.keyFile = "/home/john/.config/sops/age/keys.txt"; # no comments allowed in here
 
   # First try adding to home-manager as an ENV var
   #sops.secrets.ssh-key = {
@@ -127,7 +136,6 @@
   # Configure network proxy if necessary
   # networking.proxy.default = "http://user:password@proxy:port/";
   # networking.proxy.noProxy = "127.0.0.1,localhost,internal.domain";
-
 
   # Set your time zone.
   time.timeZone = "America/New_York";
@@ -182,7 +190,6 @@
   # Enable touchpad support (enabled default in most desktopManager).
   # services.xserver.libinput.enable = true;
 
-
   # Allow unfree packages
   nixpkgs.config.allowUnfree = true;
 
@@ -201,10 +208,10 @@
     openssl
   ];
 
-  environment.variables = { EDITOR = "nvim"; VISUAL = "nvim"; };
-
-
-
+  environment.variables = {
+    EDITOR = "nvim";
+    VISUAL = "nvim";
+  };
 
   # Some programs need SUID wrappers, can be configured further or are
   # started in user sessions.
@@ -217,7 +224,6 @@
   # List services that you want to enable:
 
   # Enable the OpenSSH daemon.
-  
 
   # Open ports in the firewall.
   # networking.firewall.allowedTCPPorts = [ ... ];
