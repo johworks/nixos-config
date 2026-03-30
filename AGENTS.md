@@ -2,6 +2,8 @@
 
 This flake uses NixOS with Home Manager as a NixOS module. Bias changes toward clarity over cleverness: small diffs, explicit intent, and configurations that future-you can read fast.
 
+K.I.S.S (Keep It Simple Stupid)
+
 ## High-level Principles
 - Keep modules small, one concern each; avoid new directory conventions without cause.
 - Comment intent (why) when a value is non-obvious; skip obvious what-comments.

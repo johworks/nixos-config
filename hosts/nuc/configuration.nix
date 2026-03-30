@@ -19,10 +19,10 @@
     # ./router-storage.nix
     inputs.sops-nix.nixosModules.sops
     inputs.home-manager.nixosModules.home-manager
-    ../../modules/nixos/home-assistant.nix
+    # ../../modules/nixos/home-assistant.nix
     ../../modules/nixos/vaultwarden/vaultwarden.nix
     ../../modules/nixos/bedrock-server.nix
-    ../../modules/nixos/josh/josh-website.nix
+    # ../../modules/nixos/josh/josh-website.nix
     ../../modules/nixos/blog-static.nix
     ../../modules/nixos/ddns/ddns.nix
     ../../modules/nixos/stremio/stremio.nix
@@ -33,52 +33,52 @@
     ../../modules/nixos/qos.nix
   ];
 
-  sops.secrets."webapp_deploy_key" = {
-    owner = "shinyapp";
-    mode = "0400";
-    path = "/run/secrets/webapp_deploy_key";
-  };
+  # sops.secrets."webapp_deploy_key" = {
+  #   owner = "shinyapp";
+  #   mode = "0400";
+  #   path = "/run/secrets/webapp_deploy_key";
+  # };
 
-  sops.secrets."google_ai" = {
-    owner = "shinyapp";
-    mode = "0400";
-    path = "/run/secrets/google_ai";
-  };
+  # sops.secrets."google_ai" = {
+  #   owner = "shinyapp";
+  #   mode = "0400";
+  #   path = "/run/secrets/google_ai";
+  # };
 
-  sops.secrets."github_webhook" = {
-    owner = "root";
-    mode = "0400";
-    path = "/run/secrets/github_webhook";
-  };
+  # sops.secrets."github_webhook" = {
+  #   owner = "root";
+  #   mode = "0400";
+  #   path = "/run/secrets/github_webhook";
+  # };
 
-  private.webapp = {
-    enable = true;
-    workDir = "/var/lib/shinyapp";
-    port = 5000;
+  # private.webapp = {
+  #   enable = true;
+  #   workDir = "/var/lib/shinyapp";
+  #   port = 5000;
 
-    reverseProxy = {
-      enable = true;
-      hostName = "kensfatcock.com";
-      #serverAliases = [ "www.kensfatcock.com" ];  # acme will fail until this is added as a CNAME
-      enableACME = true; # ensure security.acme accepts terms + email elsewhere
-      forceSSL = true;
-    };
+  #   reverseProxy = {
+  #     enable = true;
+  #     hostName = "kensfatcock.com";
+  #     #serverAliases = [ "www.kensfatcock.com" ];  # acme will fail until this is added as a CNAME
+  #     enableACME = true; # ensure security.acme accepts terms + email elsewhere
+  #     forceSSL = true;
+  #   };
 
-    environment = {
-      GOOGLE_API_KEY = "/run/secrets/google_ai";
-    };
+  #   environment = {
+  #     GOOGLE_API_KEY = "/run/secrets/google_ai";
+  #   };
 
-    autoDeploy = {
-      enable = true;
-      repoUrl = "git+ssh://git@github.com/Cgilrein/super_secret_project.git";
-      branch = "main";
-      keyFile = /run/secrets/webapp_deploy_key;
-      secretFile = /run/secrets/github_webhook;
-      listenAddress = "127.0.0.1";
-      listenPort = 9000;
-    };
+  #   autoDeploy = {
+  #     enable = true;
+  #     repoUrl = "git+ssh://git@github.com/Cgilrein/super_secret_project.git";
+  #     branch = "main";
+  #     keyFile = /run/secrets/webapp_deploy_key;
+  #     secretFile = /run/secrets/github_webhook;
+  #     listenAddress = "127.0.0.1";
+  #     listenPort = 9000;
+  #   };
 
-  };
+  # };
 
   # Make larger downloads faster
   nix.settings = {

@@ -2,13 +2,20 @@
 
 {
   # Create a media group
-  users.groups.media = {};
+  users.groups.media = { };
 
   # Define a user account. Don't forget to set a password with ‘passwd’.
   users.users.john = {
     isNormalUser = true;
     description = "john";
-    extraGroups = [ "networkmanager" "wheel" "media" ];
+    extraGroups = [
+      "networkmanager"
+      "wheel"
+      "media"
+    ];
+    openssh.authorizedKeys.keys = [
+      "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIC6u080JUBY1CNv0JAsKbTe2pQ4d1cuyFykJrlJ5HIyh desktop->nuc"
+    ];
     #packages = with pkgs; [
     #];
   };
@@ -39,7 +46,8 @@
   # Enable the OpenSSH daemon.
   services.openssh = {
     enable = true;
-    settings.PasswordAuthentication = true;
+    settings.PasswordAuthentication = false;
+    settings.KbdInteractiveAuthentication = false;
     settings.PermitRootLogin = "no";
   };
 

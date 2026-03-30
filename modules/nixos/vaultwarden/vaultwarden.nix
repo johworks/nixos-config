@@ -1,4 +1,9 @@
-{ config, lib, pkgs, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 
 let
   myDomain = "vault.goobhub.org";
@@ -18,18 +23,18 @@ in
   ];
 
   services.vaultwarden = {
-    enable    = true;
+    enable = true;
     dbBackend = "sqlite";
     backupDir = "${backupDir}";
     config = {
       # Only listen on localhost; nginx will terminate TLS
       ROCKET_ADDRESS = "127.0.0.1";
-      ROCKET_PORT    = 8222;
+      ROCKET_PORT = 8222;
 
       # Tell users the external URL is HTTPS
       DOMAIN = "https://${myDomain}";
 
-      SIGNUPS_ALLOWED = true;
+      SIGNUPS_ALLOWED = false;
       ADMIN_TOKEN = "$argon2id$v=19$m=65540,t=3,p=4$aRPjxTgv5LL3fD9Tv4cV+ksx1odV6IN7TA/leVyBQNQ$fHUzPUj6Vwgg6wToZSQLdm5GEp86G1eENPtr0wBFcSU";
     };
   };
@@ -40,13 +45,13 @@ in
   services.nginx = {
     enable = true;
     virtualHosts."${myDomain}" = {
-      forceSSL   = true;
+      forceSSL = true;
       enableACME = true;
 
       # 1) Admin only on localhost
       locations."/admin" = {
         # only allow 127.0.0.1 (and maybe your LAN) to hit /admin
-        proxyPass       = "http://127.0.0.1:8222";
+        proxyPass = "http://127.0.0.1:8222";
         proxyWebsockets = true;
         extraConfig = ''
           allow 127.0.0.1;
@@ -55,7 +60,7 @@ in
       };
 
       locations."/" = {
-        proxyPass       = "http://127.0.0.1:8222";
+        proxyPass = "http://127.0.0.1:8222";
         proxyWebsockets = true;
         extraConfig = ''
           proxy_set_header Host              $host;
@@ -67,7 +72,6 @@ in
     };
   };
 
-
   #####################################################################
   # 3. ACME global settings
   #####################################################################
@@ -75,7 +79,7 @@ in
     acceptTerms = true;
     # globally used for any host with enableACME = true
     defaults = {
-      email  = "${myAcmeEmail}";
+      email = "${myAcmeEmail}";
       # Use the staging server for testing?
       # caServer = "https://acme-staging-v02.api.letsencrypt.org/directory";
     };
@@ -87,7 +91,10 @@ in
   # 4. Firewall
   #####################################################################
   networking.firewall = {
-    allowedTCPPorts = [ 80 443 ];
+    allowedTCPPorts = [
+      80
+      443
+    ];
     # ensure nginx can bind
     enable = true;
   };
@@ -95,7 +102,12 @@ in
   #####################################################################
   # 5. CLI helpers (generate admin_token hash)
   #####################################################################
-  environment.systemPackages = with pkgs; [ vaultwarden restic sqlite coreutils ];
+  environment.systemPackages = with pkgs; [
+    vaultwarden
+    restic
+    sqlite
+    coreutils
+  ];
 
   #####################################################################
   # 6. Backup to the cloud (AWS + restic)
@@ -105,15 +117,17 @@ in
   sops.secrets."s3.env" = {
     sopsFile = ./secrets/s3.env;
     format = "dotenv";
-    owner  = "root";
-    group  = "root";
-    mode   = "0400";
+    owner = "root";
+    group = "root";
+    mode = "0400";
   };
-
 
   systemd.services."vw-backup-to-s3" = {
     description = "Vaultwarden: local backup then encrypted upload (restic -> s3)";
-    after = [ "backup-vaultwarden.service" "network-online.target" ];
+    after = [
+      "backup-vaultwarden.service"
+      "network-online.target"
+    ];
     wants = [ "network-online.target" ];
     #unitConfig.ConditionPathExists=!"/run/systemd/system/backup-vaultwarden.service.d"; # harmless; we'll also check in the script
     serviceConfig = {
@@ -127,7 +141,13 @@ in
       # Keep temp files private during run:
       PrivateTmp = true;
     };
-    path = with pkgs; [ bash coreutils sqlite restic systemd ];
+    path = with pkgs; [
+      bash
+      coreutils
+      sqlite
+      restic
+      systemd
+    ];
     script = ''
       set -Eeuo pipefail
 
@@ -193,13 +213,11 @@ in
   systemd.timers."vw-backup-to-s3" = {
     wantedBy = [ "timers.target" ];
     timerConfig = {
-      OnCalendar = "daily";        # or "03:40", "Mon..Fri 03:40", etc.
+      OnCalendar = "daily"; # or "03:40", "Mon..Fri 03:40", etc.
       RandomizedDelaySec = "1h";
-      Persistent = true;           # catch up after downtime
-      Unit = "vw-backup-to-s3.service";  # optional, but explicit
+      Persistent = true; # catch up after downtime
+      Unit = "vw-backup-to-s3.service"; # optional, but explicit
     };
   };
-
-
 
 }
