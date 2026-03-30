@@ -90,22 +90,6 @@
         "type": "github"
       }
     },
-    "nixpkgs_2": {
-      "locked": {
-        "lastModified": 1735563628,
-        "narHash": "sha256-OnSAY7XDSx7CtDoqNh8jwVwh4xNL/2HaJxGjryLWzX8=",
-        "owner": "NixOS",
-        "repo": "nixpkgs",
-        "rev": "b134951a4c9f3c995fd7be05f3243f8ecd65d798",
-        "type": "github"
-      },
-      "original": {
-        "owner": "NixOS",
-        "ref": "nixos-24.05",
-        "repo": "nixpkgs",
-        "type": "github"
-      }
-    },
     "root": {
       "inputs": {
         "firefox-addons": "firefox-addons",
@@ -114,7 +98,6 @@
         "nixpkgs-latest": "nixpkgs-latest",
         "nixpkgs-stable-25p05": "nixpkgs-stable-25p05",
         "shared-nvim": "shared-nvim",
-        "shiny-app": "shiny-app",
         "sops-nix": "sops-nix"
       }
     },
@@ -132,25 +115,6 @@
         "owner": "johworks",
         "repo": "shared-nvim",
         "type": "github"
-      }
-    },
-    "shiny-app": {
-      "inputs": {
-        "nixpkgs": "nixpkgs_2"
-      },
-      "locked": {
-        "lastModified": 1762825178,
-        "narHash": "sha256-CB5+ignWgmaE7YRDx9uIqMzSGTYxZlnPfVTuRcNhR4g=",
-        "ref": "main",
-        "rev": "e67ca8e060c687bdbb0252329ace5c9b72e3627c",
-        "revCount": 44,
-        "type": "git",
-        "url": "ssh://git@github.com/Cgilrein/super_secret_project.git"
-      },
-      "original": {
-        "ref": "main",
-        "type": "git",
-        "url": "ssh://git@github.com/Cgilrein/super_secret_project.git"
       }
     },
     "sops-nix": {

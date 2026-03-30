@@ -23,7 +23,7 @@
     firefox-addons = {
       url = "gitlab:rycee/nur-expressions?dir=pkgs/firefox-addons";
       inputs.nixpkgs.follows = "nixpkgs";
-    };    
+    };
 
     sops-nix = {
       url = "github:Mic92/sops-nix";
@@ -36,10 +36,10 @@
       flake = false;
     };
 
-    shiny-app = {
-      url = "git+ssh://git@github.com/Cgilrein/super_secret_project.git?ref=main";
-      #flake = false;
-    };
+    # shiny-app = {
+    #   url = "git+ssh://git@github.com/Cgilrein/super_secret_project.git?ref=main";
+    #   #flake = false;
+    # };
 
     #    finance-tracking = {
     #      url = "github:johworks/finance_tracking?ref=main";
@@ -48,83 +48,82 @@
 
   };
 
-  outputs = { 
-    self,
-    nixpkgs,
-    nixpkgs-latest,
-    nixpkgs-stable-25p05,
-    home-manager,
-    sops-nix,
-    shared-nvim,
-    shiny-app,
-    #    finance-tracking,
-    ... 
-  }@inputs:
-  let
-    system = "x86_64-linux";
+  outputs =
+    {
+      self,
+      nixpkgs,
+      nixpkgs-latest,
+      nixpkgs-stable-25p05,
+      home-manager,
+      sops-nix,
+      shared-nvim,
+      # shiny-app,
+      #    finance-tracking,
+      ...
+    }@inputs:
+    let
+      system = "x86_64-linux";
 
-    pkgs = import nixpkgs { inherit system; };
+      pkgs = import nixpkgs { inherit system; };
 
-    stablePkgs = import nixpkgs-stable-25p05 { inherit system; };
-  in 
-  {
-    # For NixOS rebuild
-    nixosConfigurations = {
+      stablePkgs = import nixpkgs-stable-25p05 { inherit system; };
+    in
+    {
+      # For NixOS rebuild
+      nixosConfigurations = {
 
-      # Intel Laptop
-      laptop = nixpkgs.lib.nixosSystem {
-        inherit system;
-        specialArgs = {
-          inherit inputs stablePkgs;
+        # Intel Laptop
+        laptop = nixpkgs.lib.nixosSystem {
+          inherit system;
+          specialArgs = {
+            inherit inputs stablePkgs;
+          };
+          modules = [
+            ./hosts/laptop/configuration.nix
+            inputs.home-manager.nixosModules.home-manager
+          ];
         };
-        modules = [
-          ./hosts/laptop/configuration.nix 
-          inputs.home-manager.nixosModules.home-manager
-        ];
-      };
 
-      # Intel Nuc 14
-      nuc = nixpkgs.lib.nixosSystem {
-        inherit system;
-        specialArgs = {
-          inherit inputs stablePkgs;
-        };
-        modules = [
-          ./hosts/nuc/configuration.nix
-          home-manager.nixosModules.home-manager
-          sops-nix.nixosModules.sops
-          shiny-app.nixosModules.webapp
+        # Intel Nuc 14
+        nuc = nixpkgs.lib.nixosSystem {
+          inherit system;
+          specialArgs = {
+            inherit inputs stablePkgs;
+          };
+          modules = [
+            ./hosts/nuc/configuration.nix
+            home-manager.nixosModules.home-manager
+            sops-nix.nixosModules.sops
+            # shiny-app.nixosModules.webapp
             #          finance-tracking.nixosModules.finance-tracking
-        ];
-      };
-
-      # VM for desktop testing
-      vm = nixpkgs.lib.nixosSystem {
-        inherit system;
-        specialArgs = {
-          inherit inputs stablePkgs;
+          ];
         };
-        modules = [
-          ./hosts/vm/configuration.nix
-          home-manager.nixosModules.home-manager
-        ];
-      };
 
-      # Desktop host with KDE Plasma
-      desktop = nixpkgs.lib.nixosSystem {
-        inherit system;
-        specialArgs = {
-          inherit inputs stablePkgs;
+        # VM for desktop testing
+        vm = nixpkgs.lib.nixosSystem {
+          inherit system;
+          specialArgs = {
+            inherit inputs stablePkgs;
+          };
+          modules = [
+            ./hosts/vm/configuration.nix
+            home-manager.nixosModules.home-manager
+          ];
         };
-        modules = [
-          ./hosts/desktop/configuration.nix
-          home-manager.nixosModules.home-manager
-        ];
+
+        # Desktop host with KDE Plasma
+        desktop = nixpkgs.lib.nixosSystem {
+          inherit system;
+          specialArgs = {
+            inherit inputs stablePkgs;
+          };
+          modules = [
+            ./hosts/desktop/configuration.nix
+            home-manager.nixosModules.home-manager
+          ];
+        };
+
       };
-
-
     };
-  };
-
 
 }
