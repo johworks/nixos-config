@@ -19,6 +19,7 @@
         tree
         sops
         nodejs
+        bubblewrap
       ];
     };
   };
