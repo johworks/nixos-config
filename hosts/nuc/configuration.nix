@@ -9,6 +9,13 @@
   ...
 }:
 
+let
+  latestPkgs = import inputs.nixpkgs-latest {
+    inherit (pkgs) system;
+    config.allowUnfree = true;
+  };
+in
+
 {
   imports = [
     # Include the results of the hardware scan.
@@ -152,7 +159,7 @@
   environment.systemPackages = with pkgs; [
     vim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
     wget
-    element-desktop
+    latestPkgs.element-desktop
     home-manager
     pciutils
     intel-media-driver

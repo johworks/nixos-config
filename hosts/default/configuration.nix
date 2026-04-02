@@ -4,6 +4,13 @@
 
 { config, pkgs, inputs, ... }:
 
+let
+  latestPkgs = import inputs.nixpkgs-latest {
+    inherit (pkgs) system;
+    config.allowUnfree = true;
+  };
+in
+
 {
   imports =
     [ # Include the results of the hardware scan.
@@ -135,7 +142,7 @@
   environment.systemPackages = with pkgs; [
     vim
     wget
-    element-desktop
+    latestPkgs.element-desktop
 
     # VM stuff
     spice-vdagent     # res and clipboard

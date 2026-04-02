@@ -6,6 +6,10 @@
 let
   bedrock-fhs = import ../../modules/nixos/bedrock/bedrock-fhs.nix { inherit pkgs; };
   bedrock-server = import ../../modules/nixos/bedrock/bedrock-server.nix { inherit pkgs; };
+  latestPkgs = import inputs.nixpkgs-latest {
+    inherit (pkgs) system;
+    config.allowUnfree = true;
+  };
   sddm-background = builtins.fetchurl {
     url = "https://gruvbox-wallpapers.pages.dev/wallpapers/photography/DKoRY7F.jpeg";
     sha256 = "15vvx30kzjk4pfzaa50b42p24z5s7wki10v4jq0wdvgr862a7sdd";
@@ -140,7 +144,7 @@ in
   environment.systemPackages = with pkgs; [
     vim
     wget
-    element-desktop
+    latestPkgs.element-desktop
 
     home-manager
 

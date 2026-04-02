@@ -2,3 +2,4 @@
 *.zip
 efi-backups
 experiments/qos-tune/
+.codex

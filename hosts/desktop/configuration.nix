@@ -1,5 +1,12 @@
 { config, pkgs, inputs, ... }:
 
+let
+  latestPkgs = import inputs.nixpkgs-latest {
+    inherit (pkgs) system;
+    config.allowUnfree = true;
+  };
+in
+
 {
   imports = [
     ./hardware-configuration.nix
@@ -100,7 +107,7 @@
   environment.systemPackages = with pkgs; [
     vim
     git
-    element-desktop
+    latestPkgs.element-desktop
   ];
 
   # Enable the OpenSSH daemon.
