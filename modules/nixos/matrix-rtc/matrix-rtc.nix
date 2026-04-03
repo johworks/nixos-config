@@ -8,6 +8,7 @@
 let
   domain = "goobhub.org";
   matrixRtcDomain = "matrix-rtc.${domain}";
+  turnDomain = "turn.${domain}";
   myAcmeEmail = "viridianveil@protonmail.com";
   rtcPkgs = import inputs.nixpkgs-latest {
     inherit (pkgs) system;
@@ -41,7 +42,16 @@ in
         tcp_port = 7881;
         port_range_start = 50000;
         port_range_end = 60000;
-        use_external_ip = true;
+        # Diagnostic: prefer local interface candidates so LAN clients do not
+        # need to hairpin through the public WAN address.
+        use_external_ip = false;
+      };
+      # MatrixRTC media flows through LiveKit, so use its embedded TURN
+      # instead of a separate coturn service.
+      turn = {
+        enabled = true;
+        domain = turnDomain;
+        udp_port = 3478;
       };
     };
   };
@@ -105,6 +115,7 @@ in
   networking.firewall = {
     enable = true;
     allowedTCPPorts = [ 7881 ];
+    allowedUDPPorts = [ 3478 ];
     allowedUDPPortRanges = [
       {
         from = 50000;

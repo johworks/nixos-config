@@ -92,7 +92,9 @@ in
 
       max_upload_size = "100M";
       url_preview_enabled = true;
-      enable_registration = false;
+      # Allow self-signup only when the user has a Synapse-issued registration token.
+      enable_registration = true;
+      registration_requires_token = true;
       enable_metrics = false;
       # Keep the server private for now; flip this when you want cross-server chat.
       federation_domain_whitelist = if enableFederation then null else [ ];

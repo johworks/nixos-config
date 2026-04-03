@@ -36,7 +36,6 @@ in
     ../../modules/nixos/stremio/stremio.nix
     ../../modules/nixos/invidious/invidious.nix
     ../../modules/nixos/matrix/matrix.nix
-    ../../modules/nixos/coturn/coturn.nix
     ../../modules/nixos/matrix-rtc/matrix-rtc.nix
     ../../modules/nixos/qos.nix
   ];
