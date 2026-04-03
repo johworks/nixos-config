@@ -45,6 +45,9 @@ in
         # Diagnostic: prefer local interface candidates so LAN clients do not
         # need to hairpin through the public WAN address.
         use_external_ip = false;
+        # Podman bridge addresses are not reachable by clients and just add
+        # noise to ICE candidate gathering.
+        ips.excludes = [ "10.88.0.0/16" ];
       };
       # MatrixRTC media flows through LiveKit, so use its embedded TURN
       # instead of a separate coturn service.
