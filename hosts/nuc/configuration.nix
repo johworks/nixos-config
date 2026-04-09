@@ -5,28 +5,21 @@
 {
   config,
   pkgs,
+  pkgsUnstable,
   inputs,
   ...
 }:
-
-let
-  latestPkgs = import inputs.nixpkgs-latest {
-    inherit (pkgs) system;
-    config.allowUnfree = true;
-  };
-in
-
 {
   imports = [
     # Include the results of the hardware scan.
     ./hardware-configuration.nix
+    ../../modules/nixos/common/base.nix
+    ../../modules/nixos/common/maintenance.nix
     ./router-hardware.nix
     ./router-networking.nix
     ./router-users.nix
     # ./myapp-disabled.nix
     # ./router-storage.nix
-    inputs.sops-nix.nixosModules.sops
-    inputs.home-manager.nixosModules.home-manager
     # ../../modules/nixos/home-assistant.nix
     ../../modules/nixos/vaultwarden/vaultwarden.nix
     #../../modules/nixos/bedrock-server.nix
@@ -51,13 +44,12 @@ in
 
   # Bootloader.
   boot.loader.systemd-boot.enable = true;
+  boot.loader.systemd-boot.configurationLimit = 5;
   boot.loader.efi.canTouchEfiVariables = true;
   boot.kernelParams = [ "pcie_aspm=off" ];
 
-  nix.settings.experimental-features = [
-    "nix-command"
-    "flakes"
-  ];
+  # Keep more rollback history on the NUC than on workstation-style systems.
+  nix.gc.options = "--delete-older-than 90d";
 
   hardware.graphics = {
     # opengl
@@ -97,24 +89,6 @@ in
   # networking.proxy.default = "http://user:password@proxy:port/";
   # networking.proxy.noProxy = "127.0.0.1,localhost,internal.domain";
 
-  # Set your time zone.
-  time.timeZone = "America/New_York";
-
-  # Select internationalisation properties.
-  i18n.defaultLocale = "en_US.UTF-8";
-
-  i18n.extraLocaleSettings = {
-    LC_ADDRESS = "en_US.UTF-8";
-    LC_IDENTIFICATION = "en_US.UTF-8";
-    LC_MEASUREMENT = "en_US.UTF-8";
-    LC_MONETARY = "en_US.UTF-8";
-    LC_NAME = "en_US.UTF-8";
-    LC_NUMERIC = "en_US.UTF-8";
-    LC_PAPER = "en_US.UTF-8";
-    LC_TELEPHONE = "en_US.UTF-8";
-    LC_TIME = "en_US.UTF-8";
-  };
-
   # Enable the X11 windowing system.
   services.xserver.enable = true;
 
@@ -150,15 +124,12 @@ in
   # Enable touchpad support (enabled default in most desktopManager).
   # services.xserver.libinput.enable = true;
 
-  # Allow unfree packages
-  nixpkgs.config.allowUnfree = true;
-
   # List packages installed in system profile. To search, run:
   # $ nix search wget
   environment.systemPackages = with pkgs; [
     vim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
     wget
-    latestPkgs.element-desktop
+    pkgsUnstable.element-desktop
     home-manager
     pciutils
     intel-media-driver

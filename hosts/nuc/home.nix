@@ -1,27 +1,34 @@
-{ config, pkgs, pkgsLatest, inputs, ... }:
+{
+  config,
+  pkgs,
+  pkgsUnstable,
+  inputs,
+  ...
+}:
 {
 
   imports = [
     ../../modules/home/profiles/base.nix
     ../../modules/home/profiles/server.nix
-    (inputs.shared-nvim + "/home-manager/nvim.nix")  # moved to a flake
+    (inputs.shared-nvim + "/home-manager/nvim.nix") # moved to a flake
     ../../modules/home/firefox.nix
     ../../modules/home/git.nix
-    ../../modules/home/brave.nix
   ];
 
   # The home.packages option allows you to install Nix packages into your
   # environment.
-  home.packages = config.profiles.basePackages ++ (with pkgs; [
-    #sops
-    # Interact with iCloud photos
-    pkgsLatest.icloudpd
-    #nodejs  # needed for npm (OpenAI Codex)
-  ]);
+  home.packages =
+    config.profiles.basePackages
+    ++ (with pkgs; [
+      #sops
+      # Interact with iCloud photos
+      pkgsUnstable.icloudpd
+      #nodejs  # needed for npm (OpenAI Codex)
+    ]);
 
   ## Needed for npm/codex as well
   #programs.bash = {
-  #  enable = true; 
+  #  enable = true;
   #  # We need this for all shell
   #  initExtra = ''
   #    # Load Home Manager session vars in interactive shells too

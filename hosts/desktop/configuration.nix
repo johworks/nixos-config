@@ -1,16 +1,15 @@
-{ config, pkgs, inputs, ... }:
-
-let
-  latestPkgs = import inputs.nixpkgs-latest {
-    inherit (pkgs) system;
-    config.allowUnfree = true;
-  };
-in
-
+{
+  config,
+  pkgs,
+  pkgsUnstable,
+  inputs,
+  ...
+}:
 {
   imports = [
     ./hardware-configuration.nix
-    inputs.home-manager.nixosModules.home-manager
+    ../../modules/nixos/common/base.nix
+    ../../modules/nixos/common/maintenance.nix
   ];
 
   # Bootloader.
@@ -30,28 +29,9 @@ in
   boot.blacklistedKernelModules = [ "r8169" ]; # r8125 rev 0xc is too new
 
   networking.hostName = "desktop";
-  nix.settings.experimental-features = [ "nix-command" "flakes" ];
 
   # Enable networking
   networking.networkmanager.enable = true;
-
-  # Set your time zone.
-  time.timeZone = "America/New_York";
-
-  # Select internationalisation properties.
-  i18n.defaultLocale = "en_US.UTF-8";
-
-  i18n.extraLocaleSettings = {
-    LC_ADDRESS = "en_US.UTF-8";
-    LC_IDENTIFICATION = "en_US.UTF-8";
-    LC_MEASUREMENT = "en_US.UTF-8";
-    LC_MONETARY = "en_US.UTF-8";
-    LC_NAME = "en_US.UTF-8";
-    LC_NUMERIC = "en_US.UTF-8";
-    LC_PAPER = "en_US.UTF-8";
-    LC_TELEPHONE = "en_US.UTF-8";
-    LC_TIME = "en_US.UTF-8";
-  };
 
   # Enable the X11 windowing system.
   # You can disable this if you're only using the Wayland session.
@@ -84,7 +64,10 @@ in
   users.users.john = {
     isNormalUser = true;
     description = "john";
-    extraGroups = [ "networkmanager" "wheel" ];
+    extraGroups = [
+      "networkmanager"
+      "wheel"
+    ];
     packages = with pkgs; [
       kdePackages.kate
     ];
@@ -100,14 +83,11 @@ in
   # Install firefox.
   programs.firefox.enable = true;
 
-  # Allow unfree packages
-  nixpkgs.config.allowUnfree = true;
-
   # List packages installed in system profile.
   environment.systemPackages = with pkgs; [
     vim
     git
-    latestPkgs.element-desktop
+    pkgsUnstable.element-desktop
   ];
 
   # Enable the OpenSSH daemon.

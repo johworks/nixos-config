@@ -1,7 +1,7 @@
 {
   config,
   pkgs,
-  inputs,
+  pkgsUnstable,
   ...
 }:
 
@@ -10,9 +10,6 @@ let
   matrixRtcDomain = "matrix-rtc.${domain}";
   turnDomain = "turn.${domain}";
   myAcmeEmail = "viridianveil@protonmail.com";
-  rtcPkgs = import inputs.nixpkgs-latest {
-    inherit (pkgs) system;
-  };
 in
 {
   sops.secrets."matrix-rtc-livekit-secret" = {
@@ -33,7 +30,7 @@ in
 
   services.livekit = {
     enable = true;
-    package = rtcPkgs.livekit;
+    package = pkgsUnstable.livekit;
     keyFile = config.sops.templates."matrix-rtc-livekit-key-file".path;
     settings = {
       port = 7880;
@@ -61,7 +58,7 @@ in
 
   services.lk-jwt-service = {
     enable = true;
-    package = rtcPkgs."lk-jwt-service";
+    package = pkgsUnstable."lk-jwt-service";
     keyFile = config.sops.templates."matrix-rtc-livekit-key-file".path;
     livekitUrl = "wss://${matrixRtcDomain}/livekit/sfu";
     port = 8080;

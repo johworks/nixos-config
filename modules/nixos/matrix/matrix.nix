@@ -2,6 +2,7 @@
   config,
   lib,
   pkgs,
+  pkgsUnstable,
   inputs,
   ...
 }:
@@ -12,9 +13,6 @@ let
   matrixRtcDomain = "matrix-rtc.${domain}";
   myAcmeEmail = "viridianveil@protonmail.com";
   enableFederation = false;
-  latestPkgs = import inputs.nixpkgs-latest {
-    inherit (pkgs) system;
-  };
   clientConfig = {
     "m.homeserver".base_url = "https://${matrixDomain}";
     "m.identity_server" = { };
@@ -38,12 +36,12 @@ let
 in
 {
   disabledModules = [ "services/matrix/synapse.nix" ];
-  imports = [ (inputs.nixpkgs-latest.outPath + "/nixos/modules/services/matrix/synapse.nix") ];
+  imports = [ (inputs.nixpkgsUnstable.outPath + "/nixos/modules/services/matrix/synapse.nix") ];
 
   nixpkgs.overlays = [
     (final: prev: {
-      matrix-synapse = latestPkgs.matrix-synapse;
-      matrix-synapse-unwrapped = latestPkgs.matrix-synapse-unwrapped;
+      matrix-synapse = pkgsUnstable.matrix-synapse;
+      matrix-synapse-unwrapped = pkgsUnstable.matrix-synapse-unwrapped;
     })
   ];
 

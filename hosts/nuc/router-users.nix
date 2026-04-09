@@ -1,4 +1,9 @@
-{ pkgs, inputs, ... }:
+{
+  pkgs,
+  pkgsUnstable,
+  inputs,
+  ...
+}:
 
 {
   # Create a media group
@@ -30,11 +35,7 @@
     useUserPackages = true;
 
     extraSpecialArgs = {
-      inherit inputs;
-      # Another pkgs that's even newer
-      pkgsLatest = import inputs.nixpkgs-latest {
-        system = pkgs.stdenv.hostPlatform.system;
-      };
+      inherit inputs pkgsUnstable;
     };
     users = {
       "john" = import ./home.nix;

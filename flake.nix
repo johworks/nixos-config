@@ -3,31 +3,32 @@
 
   inputs = {
 
-    nixpkgs = {
+    nixpkgsUnstable = {
       url = "github:nixos/nixpkgs/nixos-unstable";
     };
 
-    nixpkgs-latest = {
-      url = "github:nixos/nixpkgs/nixos-unstable";
-    };
-
-    nixpkgs-stable-25p05 = {
+    nixpkgsStable = {
       url = "github:nixos/nixpkgs/nixos-25.05";
     };
 
     home-manager = {
       url = "github:nix-community/home-manager";
-      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.nixpkgs.follows = "nixpkgsUnstable";
+    };
+
+    home-managerStable = {
+      url = "github:nix-community/home-manager/release-25.05";
+      inputs.nixpkgs.follows = "nixpkgsStable";
     };
 
     firefox-addons = {
       url = "gitlab:rycee/nur-expressions?dir=pkgs/firefox-addons";
-      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.nixpkgs.follows = "nixpkgsUnstable";
     };
 
     sops-nix = {
       url = "github:Mic92/sops-nix";
-      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.nixpkgs.follows = "nixpkgsUnstable";
     };
 
     # Your Neovim repo as a non-flake input (works fine even if it has no flake)
@@ -51,10 +52,10 @@
   outputs =
     {
       self,
-      nixpkgs,
-      nixpkgs-latest,
-      nixpkgs-stable-25p05,
+      nixpkgsUnstable,
+      nixpkgsStable,
       home-manager,
+      home-managerStable,
       sops-nix,
       shared-nvim,
       # shiny-app,
@@ -64,35 +65,47 @@
     let
       system = "x86_64-linux";
 
-      pkgs = import nixpkgs { inherit system; };
+      mkPkgs =
+        nixpkgsInput:
+        import nixpkgsInput {
+          inherit system;
+          config.allowUnfree = true;
+        };
 
-      stablePkgs = import nixpkgs-stable-25p05 { inherit system; };
+      pkgsUnstable = mkPkgs nixpkgsUnstable;
+      pkgsStable = mkPkgs nixpkgsStable;
+
+      mkHost =
+        {
+          hostName,
+          nixpkgsInput,
+          extraModules ? [ ],
+        }:
+        nixpkgsInput.lib.nixosSystem {
+          inherit system;
+          specialArgs = {
+            inherit inputs pkgsStable pkgsUnstable;
+          };
+          modules = [ (./hosts + "/${hostName}/configuration.nix") ] ++ extraModules;
+        };
     in
     {
       # For NixOS rebuild
       nixosConfigurations = {
 
         # Intel Laptop
-        laptop = nixpkgs.lib.nixosSystem {
-          inherit system;
-          specialArgs = {
-            inherit inputs stablePkgs;
-          };
-          modules = [
-            ./hosts/laptop/configuration.nix
-            inputs.home-manager.nixosModules.home-manager
-          ];
+        laptop = mkHost {
+          hostName = "laptop";
+          nixpkgsInput = nixpkgsUnstable;
+          extraModules = [ inputs.home-manager.nixosModules.home-manager ];
         };
 
         # Intel Nuc 14
-        nuc = nixpkgs.lib.nixosSystem {
-          inherit system;
-          specialArgs = {
-            inherit inputs stablePkgs;
-          };
-          modules = [
-            ./hosts/nuc/configuration.nix
-            home-manager.nixosModules.home-manager
+        nuc = mkHost {
+          hostName = "nuc";
+          nixpkgsInput = nixpkgsStable;
+          extraModules = [
+            home-managerStable.nixosModules.home-manager
             sops-nix.nixosModules.sops
             # shiny-app.nixosModules.webapp
             #          finance-tracking.nixosModules.finance-tracking
@@ -100,27 +113,17 @@
         };
 
         # VM for desktop testing
-        vm = nixpkgs.lib.nixosSystem {
-          inherit system;
-          specialArgs = {
-            inherit inputs stablePkgs;
-          };
-          modules = [
-            ./hosts/vm/configuration.nix
-            home-manager.nixosModules.home-manager
-          ];
+        vm = mkHost {
+          hostName = "vm";
+          nixpkgsInput = nixpkgsUnstable;
+          extraModules = [ home-manager.nixosModules.home-manager ];
         };
 
         # Desktop host with KDE Plasma
-        desktop = nixpkgs.lib.nixosSystem {
-          inherit system;
-          specialArgs = {
-            inherit inputs stablePkgs;
-          };
-          modules = [
-            ./hosts/desktop/configuration.nix
-            home-manager.nixosModules.home-manager
-          ];
+        desktop = mkHost {
+          hostName = "desktop";
+          nixpkgsInput = nixpkgsUnstable;
+          extraModules = [ home-manager.nixosModules.home-manager ];
         };
 
       };

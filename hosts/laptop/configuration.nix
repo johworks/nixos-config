@@ -2,31 +2,31 @@
 # your system.  Help is available in the configuration.nix(5) man page
 # and in the NixOS manual (accessible by running ‘nixos-help’).
 
-{ config, pkgs, inputs, ... }:
+{
+  config,
+  pkgs,
+  pkgsUnstable,
+  inputs,
+  ...
+}:
 let
-  bedrock-fhs = import ../../modules/nixos/bedrock/bedrock-fhs.nix { inherit pkgs; };
-  bedrock-server = import ../../modules/nixos/bedrock/bedrock-server.nix { inherit pkgs; };
-  latestPkgs = import inputs.nixpkgs-latest {
-    inherit (pkgs) system;
-    config.allowUnfree = true;
-  };
   sddm-background = builtins.fetchurl {
     url = "https://gruvbox-wallpapers.pages.dev/wallpapers/photography/DKoRY7F.jpeg";
     sha256 = "15vvx30kzjk4pfzaa50b42p24z5s7wki10v4jq0wdvgr862a7sdd";
   };
 in
 {
-  imports =
-    [ # Include the results of the hardware scan.
-      ./hardware-configuration.nix
-      inputs.home-manager.nixosModules.home-manager
-      #../../modules/nixos/bedrock/bedrock-connect.nix
-    ];
-
+  imports = [
+    # Include the results of the hardware scan.
+    ./hardware-configuration.nix
+    ../../modules/nixos/common/base.nix
+    ../../modules/nixos/common/maintenance.nix
+    #../../modules/nixos/bedrock/bedrock-connect.nix
+  ];
 
   virtualisation.podman = {
     enable = true;
-    dockerCompat = true;  # Optional: adds `docker` CLI alias
+    dockerCompat = true; # Optional: adds `docker` CLI alias
     defaultNetwork.settings.dns_enabled = false;
 
     #networks.bedrockconnectnet.subnet = "10.89.0.0/24";
@@ -34,32 +34,13 @@ in
 
   # Bootloader.
   boot.loader.systemd-boot.enable = true;
+  boot.loader.systemd-boot.configurationLimit = 5;
   boot.loader.efi.canTouchEfiVariables = true;
 
   networking.hostName = "john-laptop"; # Define your hostname.
-  nix.settings.experimental-features = [ "nix-command" "flakes" ];
 
   # Enable networking
   networking.networkmanager.enable = true;
-
-  # Set your time zone.
-  time.timeZone = "America/New_York";
-
-  # Select internationalisation properties.
-  i18n.defaultLocale = "en_US.UTF-8";
-
-  i18n.extraLocaleSettings = {
-    LC_ADDRESS = "en_US.UTF-8";
-    LC_IDENTIFICATION = "en_US.UTF-8";
-    LC_MEASUREMENT = "en_US.UTF-8";
-    LC_MONETARY = "en_US.UTF-8";
-    LC_NAME = "en_US.UTF-8";
-    LC_NUMERIC = "en_US.UTF-8";
-    LC_PAPER = "en_US.UTF-8";
-    LC_TELEPHONE = "en_US.UTF-8";
-    LC_TIME = "en_US.UTF-8";
-  };
-
 
   # Enable the X11 windowing system.
   # You can disable this if you're only using the Wayland session.
@@ -83,7 +64,6 @@ in
     defaultSession = "hyprland";
   };
 
-
   environment.sessionVariables = {
     EDITOR = "nvim";
     MOZ_ENABLE_WAYLAND = "1";
@@ -106,8 +86,8 @@ in
   # Desktop portals
   services.dbus.enable = true;
   xdg.portal.enable = true;
-  xdg.portal.extraPortals = [ 
-    pkgs.xdg-desktop-portal-gtk 
+  xdg.portal.extraPortals = [
+    pkgs.xdg-desktop-portal-gtk
     pkgs.xdg-desktop-portal-hyprland
   ];
 
@@ -133,30 +113,28 @@ in
   users.users.john = {
     isNormalUser = true;
     description = "john";
-    extraGroups = [ "networkmanager" "wheel" ];
+    extraGroups = [
+      "networkmanager"
+      "wheel"
+    ];
   };
-
-  # Allow unfree packages (Like Discord)
-  nixpkgs.config.allowUnfree = true;
 
   # List packages installed in system profile. To search, run:
   # $ nix search wget
   environment.systemPackages = with pkgs; [
     vim
     wget
-    latestPkgs.element-desktop
+    pkgsUnstable.element-desktop
 
     home-manager
-
-    bedrock-fhs
 
     #nerd-fonts.jetbrains-mono
 
     #sddm-astronaut
-    
+
     (catppuccin-sddm.override {
       flavor = "mocha";
-      font  = "Noto Sans";
+      font = "Noto Sans";
       fontSize = "9";
       background = "${sddm-background}";
       loginBackground = true;
@@ -179,9 +157,9 @@ in
   ];
   fonts.fontconfig.defaultFonts = {
     sansSerif = [ "Noto Sans" ];
-    serif     = [ "Noto Serif" ];
+    serif = [ "Noto Serif" ];
     monospace = [ "JetBrainsMono Nerd Font" ];
-    emoji     = [ "Noto Color Emoji" ];
+    emoji = [ "Noto Color Emoji" ];
   };
 
   home-manager = {
@@ -196,7 +174,7 @@ in
   # Enable the OpenSSH daemon.
   services.openssh = {
     enable = true;
-    settings.PasswordAuthentication = true;  # key only access (set to true rn though)
+    settings.PasswordAuthentication = true; # key only access (set to true rn though)
     settings.PermitRootLogin = "no";
   };
 

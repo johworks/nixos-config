@@ -9,7 +9,6 @@
 - `laptop`: Hyprland desktop + SDDM (Wayland), personal workstation.
 - `nuc`: XFCE + LightDM, server-focused services and modules.
 - `vm`: Hyprland desktop + SDDM, mirrors the laptop Home Manager profile for testing.
-- `default`: legacy/placeholder config (KDE Plasma 6), not used in flake outputs.
 
 ## Shared Config
 - `modules/nixos/`: reusable NixOS modules (services, apps, infra).
