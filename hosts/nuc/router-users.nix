@@ -14,7 +14,6 @@
     isNormalUser = true;
     description = "john";
     extraGroups = [
-      "networkmanager"
       "wheel"
       "media"
     ];
@@ -24,10 +23,6 @@
     #packages = with pkgs; [
     #];
   };
-
-  # Enable automatic login for the user.
-  services.displayManager.autoLogin.enable = true;
-  services.displayManager.autoLogin.user = "john";
 
   home-manager = {
     # Make HM use the same pkgs as the system
