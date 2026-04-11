@@ -7,6 +7,7 @@
 
 let
   myDomain = "vault.goobhub.org";
+  myZoneName = "goobhub.org";
   myAcmeEmail = "viridianveil@protonmail.com";
   backupDir = "/data/vaultwarden/backups";
 in
@@ -98,6 +99,15 @@ in
     # ensure nginx can bind
     enable = true;
   };
+
+  # Keep the public Vaultwarden hostname pointed at the current WAN IP.
+  services.ddns.cloudflare.records = [
+    {
+      name = "vaultwarden";
+      zoneName = myZoneName;
+      recordName = myDomain;
+    }
+  ];
 
   #####################################################################
   # 5. CLI helpers (generate admin_token hash)

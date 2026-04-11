@@ -148,8 +148,8 @@ in
       locations = {
         "= /.well-known/matrix/client".extraConfig = mkWellKnown clientConfig;
         # MatrixRTC auth resolves homeserver OpenID APIs via the Matrix server name.
-        # Keep the server discovery document published even while federation itself
-        # remains blocked by the empty federation whitelist.
+        # Keep the server discovery document published so clients and helpers can
+        # resolve the homeserver endpoint without requiring port 8448.
         "= /.well-known/matrix/server".extraConfig = mkWellKnown serverConfig;
       };
     };
@@ -157,17 +157,32 @@ in
     virtualHosts.${matrixDomain} = {
       enableACME = true;
       forceSSL = true;
-      locations."/" = {
-        proxyPass = "http://127.0.0.1:8008";
-        extraConfig = ''
-          proxy_set_header Host $host;
-          proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-          proxy_set_header X-Forwarded-Proto $scheme;
-          client_max_body_size 100M;
-        '';
+      locations = {
+        "/" = {
+          proxyPass = "http://127.0.0.1:8008";
+          extraConfig = ''
+            proxy_set_header Host $host;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+            client_max_body_size 100M;
+          '';
+        };
       };
     };
   };
+
+  services.ddns.cloudflare.records = [
+    {
+      name = "matrix-root";
+      zoneName = domain;
+      recordName = domain;
+    }
+    {
+      name = "matrix";
+      zoneName = domain;
+      recordName = matrixDomain;
+    }
+  ];
 
   security.acme = {
     acceptTerms = true;
