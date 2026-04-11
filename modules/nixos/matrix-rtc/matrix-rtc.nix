@@ -48,11 +48,13 @@ in
       };
       # MatrixRTC media flows through LiveKit, so use its embedded TURN
       # instead of a separate coturn service.
-      turn = {
-        enabled = true;
-        domain = turnDomain;
-        udp_port = 3478;
-      };
+      # Disabling this restores element call functionality.
+      # We can revisit TURN later with a more explicit configuration.
+      #turn = {
+      #  enabled = true;
+      #  domain = turnDomain;
+      #  udp_port = 3478;
+      #};
     };
   };
 
