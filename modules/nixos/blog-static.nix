@@ -1,6 +1,8 @@
 { config, pkgs, ... }:
 
 let
+  domain = "blog.goobhub.org";
+  zoneName = "goobhub.org";
   blogSrc = "/var/www/blog-src";
   blogOut = "/var/www/blog";
 
@@ -182,6 +184,14 @@ in
       index index.html;
     '';
   };
+
+  services.ddns.cloudflare.records = [
+    {
+      name = "blog";
+      inherit zoneName;
+      recordName = domain;
+    }
+  ];
 
   #####################################################################
   # Markdown -> HTML build

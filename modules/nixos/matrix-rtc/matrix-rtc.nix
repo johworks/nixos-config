@@ -107,6 +107,19 @@ in
     };
   };
 
+  services.ddns.cloudflare.records = [
+    {
+      name = "matrix-rtc";
+      zoneName = domain;
+      recordName = matrixRtcDomain;
+    }
+    {
+      name = "turn";
+      zoneName = domain;
+      recordName = turnDomain;
+    }
+  ];
+
   security.acme = {
     acceptTerms = true;
     defaults.email = myAcmeEmail;

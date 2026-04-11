@@ -2,6 +2,7 @@
 
 let
   myDomain = "stream.goobhub.org";
+  myZoneName = "goobhub.org";
   stremioPort = 11470;
   configDir = "/var/lib/stremio";
 in
@@ -38,4 +39,12 @@ in
       };
     };
   };
+
+  services.ddns.cloudflare.records = [
+    {
+      name = "stremio";
+      zoneName = myZoneName;
+      recordName = myDomain;
+    }
+  ];
 }
