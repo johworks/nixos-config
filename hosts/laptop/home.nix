@@ -38,6 +38,7 @@ in
   gtk = {
     enable = true;
     theme = config.theme.gtk.theme;
+    gtk4.theme = config.theme.gtk.theme;
     iconTheme = config.theme.gtk.iconTheme;
     font = {
       name = config.theme.fonts.sansSerif;

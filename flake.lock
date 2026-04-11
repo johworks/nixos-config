@@ -109,11 +109,11 @@
     "shared-nvim": {
       "flake": false,
       "locked": {
-        "lastModified": 1775868882,
-        "narHash": "sha256-/EjoLFIlIth7aG0k/vob3sOum3/lwV1LNynNo2xj6fg=",
+        "lastModified": 1775869482,
+        "narHash": "sha256-0OLJdn5xAEtxrXpkeIzFJsNFd/I5DNpo09SbYJvWAzw=",
         "owner": "johworks",
         "repo": "shared-nvim",
-        "rev": "28d5c551dcf985ab96a0353ff50b12cd9bcaf19e",
+        "rev": "53212403107e6fc0b90054deb372f1ea9b7e0046",
         "type": "github"
       },
       "original": {

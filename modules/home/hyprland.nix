@@ -24,7 +24,7 @@ in
     wallpaper = mkOption {
       type = with types; nullOr str;
       default = null;
-      description = "Wallpaper path for swww; null disables wallpaper management.";
+      description = "Wallpaper path for awww; null disables wallpaper management.";
     };
 
     terminal = mkOption {
@@ -75,7 +75,7 @@ in
         libnotify
         networkmanagerapplet
         brightnessctl
-        swww
+        awww
       ] ++ cfg.extraPackages;
 
       services.dunst = {
@@ -358,7 +358,7 @@ in
           exec-once =
             [ "${pkgs.networkmanagerapplet}/bin/nm-applet --indicator" ]
             ++ lib.optional (cfg.wallpaper != null)
-              ''${pkgs.swww}/bin/swww-daemon && ${pkgs.swww}/bin/swww img ${lib.escapeShellArg cfg.wallpaper}''
+              ''${pkgs.awww}/bin/awww-daemon && ${pkgs.awww}/bin/awww img ${lib.escapeShellArg cfg.wallpaper}''
             ++ cfg.extraExecOnce;
         };
       };
