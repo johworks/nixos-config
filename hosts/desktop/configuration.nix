@@ -1,12 +1,5 @@
 { config, pkgs, inputs, ... }:
 
-let
-  latestPkgs = import inputs.nixpkgs-latest {
-    inherit (pkgs) system;
-    config.allowUnfree = true;
-  };
-in
-
 {
   imports = [
     ./hardware-configuration.nix
@@ -35,6 +28,11 @@ in
   # Enable networking
   networking.networkmanager.enable = true;
 
+  environment.sessionVariables = {
+    # Prefer the display-attached AMD GPU first for KWin/Wayland DRM probing.
+    KWIN_DRM_DEVICES = "/dev/dri/card1:/dev/dri/card0";
+  };
+
   # Set your time zone.
   time.timeZone = "America/New_York";
 
@@ -56,6 +54,12 @@ in
   # Enable the X11 windowing system.
   # You can disable this if you're only using the Wayland session.
   services.xserver.enable = true;
+  services.xserver.videoDrivers = [ "amdgpu" ];
+
+  hardware.graphics = {
+    enable = true;
+    enable32Bit = true;
+  };
 
   # Enable the KDE Plasma Desktop Environment.
   services.displayManager.sddm.enable = true;
@@ -69,6 +73,14 @@ in
 
   # Enable CUPS to print documents.
   services.printing.enable = true;
+
+  # Should help with electon app compatibility? (Like element)
+  xdg.portal = {
+    enable = true;
+    extraPortals = [
+      pkgs.xdg-desktop-portal-gtk
+    ];
+  };
 
   # Enable sound with pipewire.
   services.pulseaudio.enable = false;
@@ -91,6 +103,7 @@ in
   };
 
   home-manager = {
+    useGlobalPkgs = true;
     extraSpecialArgs = { inherit inputs; };
     users = {
       "john" = import ./home.nix;
@@ -107,7 +120,7 @@ in
   environment.systemPackages = with pkgs; [
     vim
     git
-    latestPkgs.element-desktop
+    element-desktop
   ];
 
   # Enable the OpenSSH daemon.

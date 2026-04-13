@@ -17,7 +17,7 @@
 
     home-manager = {
       url = "github:nix-community/home-manager";
-      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.nixpkgs.follows = "nixpkgs-latest";
     };
 
     firefox-addons = {
@@ -112,7 +112,7 @@
         };
 
         # Desktop host with KDE Plasma
-        desktop = nixpkgs.lib.nixosSystem {
+        desktop = nixpkgs-latest.lib.nixosSystem {
           inherit system;
           specialArgs = {
             inherit inputs stablePkgs;
