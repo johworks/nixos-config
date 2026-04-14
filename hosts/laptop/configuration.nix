@@ -14,6 +14,13 @@ let
     url = "https://gruvbox-wallpapers.pages.dev/wallpapers/photography/DKoRY7F.jpeg";
     sha256 = "15vvx30kzjk4pfzaa50b42p24z5s7wki10v4jq0wdvgr862a7sdd";
   };
+  catppuccin-sddm-theme = pkgs.catppuccin-sddm.override {
+    flavor = "mocha";
+    font = "Noto Sans";
+    fontSize = "9";
+    background = "${sddm-background}";
+    loginBackground = true;
+  };
 in
 {
   imports = [
@@ -58,8 +65,9 @@ in
     sddm = {
       enable = true;
       wayland.enable = true;
-      theme = "catppuccin-mocha";
+      theme = "catppuccin-mocha-mauve";
       package = pkgs.kdePackages.sddm;
+      extraPackages = [ catppuccin-sddm-theme ];
     };
     defaultSession = "hyprland";
   };
@@ -132,13 +140,7 @@ in
 
     #sddm-astronaut
 
-    (catppuccin-sddm.override {
-      flavor = "mocha";
-      font = "Noto Sans";
-      fontSize = "9";
-      background = "${sddm-background}";
-      loginBackground = true;
-    })
+    catppuccin-sddm-theme
 
   ];
 

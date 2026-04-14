@@ -281,8 +281,6 @@ in
             };
           };
 
-          gestures.workspace_swipe = false;
-
           device = {
             name = "epic-mouse-v1";
             sensitivity = -0.5;
@@ -351,14 +349,14 @@ in
           ];
 
           windowrule = [
-            "suppressevent maximize, class:.*"
-            "nofocus, class:^$, title:^$, xwayland:1, floating:1, fullscreen:0, pinned:0"
+            "match:class .*, suppress_event maximize"
+            "match:class ^$, match:title ^$, match:xwayland true, match:float true, match:fullscreen false, match:pin false, no_initial_focus true"
           ];
 
           exec-once =
             [ "${pkgs.networkmanagerapplet}/bin/nm-applet --indicator" ]
             ++ lib.optional (cfg.wallpaper != null)
-              ''${pkgs.awww}/bin/awww-daemon && ${pkgs.awww}/bin/awww img ${lib.escapeShellArg cfg.wallpaper}''
+              ''${pkgs.bash}/bin/bash -lc "${pkgs.awww}/bin/awww-daemon & sleep 1; ${pkgs.awww}/bin/awww img ${lib.escapeShellArg cfg.wallpaper}"''
             ++ cfg.extraExecOnce;
         };
       };
