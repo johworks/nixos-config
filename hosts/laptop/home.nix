@@ -6,6 +6,7 @@ in
 
   imports = [
     ../../modules/home/profiles/base.nix
+    ../../modules/home/profiles/desktop.nix
     ../../modules/home/profiles/wayland.nix
     (inputs.shared-nvim + "/home-manager/nvim.nix")
     ../../modules/home/firefox.nix
