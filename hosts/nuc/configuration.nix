@@ -21,6 +21,7 @@
     ../../modules/nixos/vaultwarden/vaultwarden.nix
     ../../modules/nixos/blog-static.nix
     ../../modules/nixos/ddns/ddns.nix
+    ../../modules/nixos/searxng.nix
     ../../modules/nixos/stremio/stremio.nix
     ../../modules/nixos/matrix/matrix.nix
     ../../modules/nixos/matrix-rtc/matrix-rtc.nix

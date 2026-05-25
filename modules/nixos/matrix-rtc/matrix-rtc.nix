@@ -85,19 +85,15 @@ in
       forceSSL = true;
 
       locations."/livekit/jwt/" = {
-        proxyPass = "http://127.0.0.1:8080";
+        proxyPass = "http://127.0.0.1:8080/";
         recommendedProxySettings = true;
-        extraConfig = ''
-          rewrite ^/livekit/jwt/(.*)$ /$1 break;
-        '';
       };
 
       locations."/livekit/sfu/" = {
-        proxyPass = "http://127.0.0.1:7880";
+        proxyPass = "http://127.0.0.1:7880/";
         proxyWebsockets = true;
         recommendedProxySettings = true;
         extraConfig = ''
-          rewrite ^/livekit/sfu/(.*)$ /$1 break;
           proxy_send_timeout 120s;
           proxy_read_timeout 120s;
           proxy_buffering off;
