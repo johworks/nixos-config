@@ -24,11 +24,13 @@ K.I.S.S (Keep It Simple Stupid)
 ## Workflow (Before / During / After)
 - Pick a single goal; apply it in the most local place (host first, shared only if reused).
 - Keep diffs small; if touching multiple hosts, say why in the commit.
+- For new files referenced by the flake, use `git add -N <path>` so Nix can see them during eval/build without staging contents.
+- Do not run plain `git add` unless explicitly asked to stage changes.
 - After edits: run formatting, then a quick eval/check.
 
 ## Commands
 - Format (if defined): `nix fmt`; otherwise `nix run nixpkgs#nixfmt-rfc-style -- .`
-- Evaluate/check: `nix flake check`; quick view `nix flake show`.
+- Evaluate/check: use `nix --store daemon eval --no-write-lock-file ...` for sandbox-friendly read-only evals; `nix flake check`; quick view `nix --store daemon flake metadata --no-write-lock-file`.
 - Build host (no switch): `nix build .#nixosConfigurations.<host>.config.system.build.toplevel`
 - Switch host: `sudo nixos-rebuild switch --flake .#<host>`
 

@@ -53,6 +53,50 @@
       prefix=${config.home.homeDirectory}/.npm-global
     '';
 
+    home.file.".codex/config.toml" = {
+      force = true;
+      text = ''
+        personality = "pragmatic"
+        model = "gpt-5.5"
+        model_reasoning_effort = "medium"
+        approvals_reviewer = "user"
+        default_permissions = "nix-workspace"
+
+        [permissions.nix-workspace.filesystem]
+        ":minimal" = "read"
+        "/nix/store" = "read"
+        "${config.home.homeDirectory}/.npm-global" = "read"
+        "${config.home.homeDirectory}/.cache/nix" = "write"
+        "/nix/var/nix/daemon-socket" = "read"
+
+        [permissions.nix-workspace.filesystem.":workspace_roots"]
+        "." = "write"
+
+        [permissions.nix-workspace.network]
+        enabled = true
+
+        [permissions.nix-workspace.network.unix_sockets]
+        "/nix/var/nix/daemon-socket/socket" = "allow"
+
+        [projects."${config.home.homeDirectory}/projects/super_secret_project"]
+        trust_level = "trusted"
+
+        [projects."${config.home.homeDirectory}/projects/updating_nixos-config"]
+        trust_level = "trusted"
+
+        [projects."${config.home.homeDirectory}/nixos-config"]
+        trust_level = "trusted"
+
+        [projects."${config.home.homeDirectory}"]
+        trust_level = "trusted"
+
+        [plugins."github@openai-curated"]
+        enabled = true
+      '';
+    };
+
+    home.file.".codex/rules/default.rules".source = ../codex/default.rules;
+
     # Add ~/.npm-global/bin to PATH for your user
     home.sessionPath = [
       "${config.home.homeDirectory}/.npm-global/bin"
