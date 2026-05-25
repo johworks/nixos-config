@@ -55,10 +55,20 @@
 
       # --- Search engines ---
       search = {
-        default = "ddg";   # make DuckDuckGo primary
+        default = "SearXNG";
         force = true;      # enforce our defaults (prevents Firefox from changing them)
 
         engines = {
+          "SearXNG" = {
+            urls = [{
+              template = "https://search.goobhub.org/search";
+              params = [
+                { name = "q"; value = "{searchTerms}"; }
+              ];
+            }];
+            definedAliases = [ "@sx" ];
+          };
+
           "ddg".metaData.hidden = false; # ensure visible even if Firefox tries to hide it
 
           "Nix Packages" = {
@@ -75,7 +85,7 @@
         };
 
         # Optional: set explicit order in the search menu
-        order = [ "ddg" "Nix Packages" ];
+        order = [ "SearXNG" "ddg" "Nix Packages" ];
       };
 
       # --- Extensions ---
