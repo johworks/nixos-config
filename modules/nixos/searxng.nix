@@ -72,9 +72,7 @@ in
     forceSSL = true;
     enableACME = true;
     locations."/" = {
-      proxyPass = "http://127.0.0.1:8888";
-      proxyWebsockets = true;
-      recommendedProxySettings = true;
+      return = "403";
     };
     extraConfig = ''
       access_log off;
