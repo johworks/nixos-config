@@ -1,5 +1,6 @@
 {
   config,
+  lib,
   pkgs,
   pkgsUnstable,
   inputs,
@@ -12,17 +13,33 @@
     ../../modules/nixos/common/maintenance.nix
   ];
 
-  # Bootloader.
-  boot.loader.systemd-boot.enable = false;
+  # Lanzaboote signs the NixOS boot chain for UEFI Secure Boot.
+  boot.loader.systemd-boot.enable = lib.mkForce false;
   boot.loader.efi.canTouchEfiVariables = true;
-
-  # Use GRUB instead to support dual-boot
-  boot.loader.grub = {
+  boot.lanzaboote = {
     enable = true;
-    devices = [ "nodev" ];
-    efiSupport = true;
-    useOSProber = true;
+    configurationLimit = 5;
+    pkiBundle = "/var/lib/sbctl";
+    settings.timeout = "menu-force";
   };
+
+  system.activationScripts.windows-boot-entry = ''
+    install -D -m0644 ${pkgs.edk2-uefi-shell}/shell.efi /boot/efi/edk2-uefi-shell/shell.efi.unsigned
+    ${pkgs.sbsigntool}/bin/sbsign \
+      --key /var/lib/sbctl/keys/db/db.key \
+      --cert /var/lib/sbctl/keys/db/db.pem \
+      --output /boot/efi/edk2-uefi-shell/shell.efi \
+      /boot/efi/edk2-uefi-shell/shell.efi.unsigned
+    rm -f /boot/efi/edk2-uefi-shell/shell.efi.unsigned
+
+    rm -f /boot/loader/entries/edk2-uefi-shell.conf
+    install -D -m0644 ${pkgs.writeText "windows.conf" ''
+      title Windows
+      efi /efi/edk2-uefi-shell/shell.efi
+      options -nointerrupt -nomap -noversion FS0:EFI\Microsoft\Boot\Bootmgfw.efi
+      sort-key m_windows
+    ''} /boot/loader/entries/windows.conf
+  '';
 
   # Fix for the r8125 NIC issue
   boot.extraModulePackages = [ config.boot.kernelPackages.r8125 ]; # official realtek one
@@ -87,6 +104,7 @@
   environment.systemPackages = with pkgs; [
     vim
     git
+    sbctl
     pkgsUnstable.element-desktop
   ];
 

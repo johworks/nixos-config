@@ -31,6 +31,11 @@
       inputs.nixpkgs.follows = "nixpkgsUnstable";
     };
 
+    lanzaboote = {
+      url = "github:nix-community/lanzaboote/v1.1.0";
+      inputs.nixpkgs.follows = "nixpkgsUnstable";
+    };
+
     # Your Neovim repo as a non-flake input (works fine even if it has no flake)
     shared-nvim = {
       url = "github:johworks/shared-nvim";
@@ -123,7 +128,10 @@
         desktop = mkHost {
           hostName = "desktop";
           nixpkgsInput = nixpkgsUnstable;
-          extraModules = [ home-manager.nixosModules.home-manager ];
+          extraModules = [
+            home-manager.nixosModules.home-manager
+            inputs.lanzaboote.nixosModules.lanzaboote
+          ];
         };
 
       };
