@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Finance Prototype</title>
+    <link rel="stylesheet" href="/styles.css">
+  </head>
+  <body>
+    <header class="topbar">
+      <div>
+        <h1>Finance</h1>
+        <p data-teller-status>Teller status unknown</p>
+      </div>
+      <div class="actions">
+        <button data-connect>Connect</button>
+        <button data-import>Import</button>
+        <span data-import-status></span>
+      </div>
+    </header>
+
+    <main>
+      <section class="metrics">
+        <article>
+          <span>Accounts</span>
+          <strong data-account-count>0</strong>
+        </article>
+        <article>
+          <span>Transactions</span>
+          <strong data-transaction-count>0</strong>
+        </article>
+        <article>
+          <span>30d Spending</span>
+          <strong data-spending>$0.00</strong>
+        </article>
+        <article>
+          <span>30d Income</span>
+          <strong data-income>$0.00</strong>
+        </article>
+      </section>
+
+      <section class="layout">
+        <aside>
+          <h2>Accounts</h2>
+          <div data-accounts></div>
+
+          <h2 class="enrollment-heading">Enrollments</h2>
+          <div data-enrollments></div>
+        </aside>
+
+        <section class="transactions">
+          <h2>Recent Transactions</h2>
+          <table>
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Description</th>
+                <th>Category</th>
+                <th>Status</th>
+                <th>Amount</th>
+              </tr>
+            </thead>
+            <tbody data-transactions></tbody>
+          </table>
+        </section>
+      </section>
+    </main>
+
+    <script src="https://cdn.teller.io/connect/connect.js"></script>
+    <script type="module" src="/app.js"></script>
+  </body>
+</html>

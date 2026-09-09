@@ -80,6 +80,17 @@
       pkgsUnstable = mkPkgs nixpkgsUnstable;
       pkgsStable = mkPkgs nixpkgsStable;
 
+      # The finance/Teller prototype is retained in experiments but is not
+      # included in the flake derivations.
+      # financePrototype = pkgsUnstable.writeShellApplication {
+      #   name = "finance-prototype";
+      #   runtimeInputs = [ pkgsUnstable.nodejs_22 ];
+      #   text = ''
+      #     export FINANCE_PUBLIC_DIR="${./experiments/finance-prototype/public}"
+      #     exec node ${./experiments/finance-prototype/src/server.mjs} "$@"
+      #   '';
+      # };
+
       mkHost =
         {
           hostName,
@@ -135,6 +146,18 @@
         };
 
       };
+
+      # packages.${system} = {
+      #   finance-prototype = financePrototype;
+      #   default = financePrototype;
+      # };
+      #
+      # devShells.${system}.finance-prototype = pkgsUnstable.mkShell {
+      #   packages = with pkgsUnstable; [
+      #     nodejs_22
+      #     jq
+      #   ];
+      # };
     };
 
 }

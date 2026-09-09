@@ -26,6 +26,8 @@
     ../../modules/nixos/matrix/matrix.nix
     ../../modules/nixos/matrix-rtc/matrix-rtc.nix
     ../../modules/nixos/qos.nix
+    # Finance/Teller prototype retained in the repository but disabled.
+    # ../../modules/nixos/finance-prototype.nix
   ];
 
   # Make larger downloads faster
@@ -100,6 +102,13 @@
     EDITOR = "nvim";
     VISUAL = "nvim";
   };
+
+  # Finance/Teller prototype retained in the repository but disabled on NUC.
+  # services.financePrototype = {
+  #   enable = true;
+  #   bindAddress = "0.0.0.0";
+  #   openFirewall = true;
+  # };
 
   # Some programs need SUID wrappers, can be configured further or are
   # started in user sessions.

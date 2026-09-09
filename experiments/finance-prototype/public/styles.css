@@ -1,0 +1,228 @@
+:root {
+  color-scheme: light dark;
+  font-family:
+    Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    sans-serif;
+  background: #f6f5f1;
+  color: #1e2528;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+}
+
+.topbar {
+  align-items: center;
+  background: #ffffff;
+  border-bottom: 1px solid #d9dedb;
+  display: flex;
+  justify-content: space-between;
+  min-height: 80px;
+  padding: 18px 28px;
+}
+
+h1,
+h2,
+h3,
+p {
+  margin: 0;
+}
+
+h1 {
+  font-size: 26px;
+  font-weight: 720;
+}
+
+h2 {
+  font-size: 17px;
+  margin-bottom: 14px;
+}
+
+h3 {
+  font-size: 15px;
+}
+
+p,
+span,
+td,
+th {
+  color: #5c6764;
+}
+
+button {
+  background: #1f6f5f;
+  border: 0;
+  border-radius: 6px;
+  color: white;
+  cursor: pointer;
+  font: inherit;
+  font-weight: 650;
+  min-height: 38px;
+  padding: 0 16px;
+}
+
+button:disabled {
+  cursor: wait;
+  opacity: 0.6;
+}
+
+.actions {
+  align-items: center;
+  display: flex;
+  gap: 12px;
+}
+
+main {
+  margin: 0 auto;
+  max-width: 1240px;
+  padding: 24px;
+}
+
+.metrics {
+  display: grid;
+  gap: 14px;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  margin-bottom: 24px;
+}
+
+.metrics article {
+  background: #ffffff;
+  border: 1px solid #d9dedb;
+  border-radius: 8px;
+  padding: 18px;
+}
+
+.metrics span {
+  display: block;
+  font-size: 13px;
+  margin-bottom: 8px;
+}
+
+.metrics strong {
+  font-size: 25px;
+}
+
+.layout {
+  align-items: start;
+  display: grid;
+  gap: 20px;
+  grid-template-columns: 320px minmax(0, 1fr);
+}
+
+aside,
+.transactions {
+  background: #ffffff;
+  border: 1px solid #d9dedb;
+  border-radius: 8px;
+  padding: 18px;
+}
+
+.account,
+.enrollment {
+  align-items: start;
+  border-top: 1px solid #e7ebe8;
+  display: flex;
+  gap: 12px;
+  justify-content: space-between;
+  padding: 14px 0;
+}
+
+.account:first-child,
+.enrollment:first-child {
+  border-top: 0;
+  padding-top: 0;
+}
+
+.account p,
+.enrollment p {
+  font-size: 13px;
+  margin-top: 4px;
+}
+
+.account > span,
+.enrollment > span {
+  background: #e7f0ed;
+  border-radius: 999px;
+  color: #285b4f;
+  font-size: 12px;
+  padding: 4px 9px;
+}
+
+.enrollment-heading {
+  margin-top: 26px;
+}
+
+table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+th {
+  font-size: 12px;
+  font-weight: 700;
+  text-align: left;
+}
+
+td,
+th {
+  border-bottom: 1px solid #e7ebe8;
+  padding: 11px 8px;
+  vertical-align: top;
+}
+
+td strong {
+  color: #1e2528;
+  display: block;
+  font-size: 14px;
+}
+
+td span {
+  display: block;
+  font-size: 12px;
+  margin-top: 3px;
+}
+
+td:last-child,
+th:last-child {
+  text-align: right;
+}
+
+.negative {
+  color: #9b2f21;
+  font-weight: 650;
+}
+
+.positive {
+  color: #1f6f5f;
+  font-weight: 650;
+}
+
+.empty {
+  color: #7d8582;
+  padding: 10px 0;
+}
+
+@media (max-width: 860px) {
+  .topbar {
+    align-items: start;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .metrics,
+  .layout {
+    grid-template-columns: 1fr;
+  }
+
+  main {
+    padding: 16px;
+  }
+
+  table {
+    font-size: 13px;
+  }
+}
