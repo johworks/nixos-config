@@ -98,6 +98,7 @@
     #};
 
     home.file.".codex/rules/default.rules".source = ../codex/default.rules;
+    home.file.".codex/skills/blog-entry".source = ../codex/skills/blog-entry;
 
     # Add ~/.npm-global/bin to PATH for your user
     home.sessionPath = [

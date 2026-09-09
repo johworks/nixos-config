@@ -1,0 +1,4 @@
+interface:
+  display_name: Blog Entry
+  short_description: Write and publish a small blog entry from completed repo work
+  default_prompt: Write a concise, first-person blog entry for the completed feature and publish it to the static blog.
