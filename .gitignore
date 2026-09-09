@@ -1,6 +1,8 @@
 # Just transfer the bedrock server images manually
 *.zip
+__pycache__/
 efi-backups
 experiments/qos-tune/
 .codex
 /result
+/.ha-ac-analysis/

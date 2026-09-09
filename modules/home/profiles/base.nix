@@ -20,6 +20,7 @@
         sops
         nodejs
         bubblewrap
+        mcp-proxy
       ];
     };
   };

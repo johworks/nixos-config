@@ -1,106 +1,35 @@
-{config, pkgs, ...}: 
+{ config, ... }:
+
 let
-  myDomain = "home.goobhub.org";
-in 
+  configDir = "/var/lib/home-assistant";
+  configurationFile = ./home-assistant/configuration.yaml;
+  dashboardsDir = ./home-assistant/dashboards;
+  packagesDir = ./home-assistant/packages;
+in
 {
+  virtualisation.podman.enable = true;
 
-  services.home-assistant = {
-    enable = true;
-    extraComponents = [
-      #"analytics"
-      "default_config"
-      "esphome"
-      #"my"
-      "met"
-      "radio_browser"
-      "google_translate"  # Adding this because default_config needs it (remove later)
-      #"shopping_list"
-      #"wled"
+  virtualisation.oci-containers.containers.home-assistant = {
+    image = "ghcr.io/home-assistant/home-assistant:stable";
+    autoStart = true;
+    pull = "newer";
+    privileged = true;
+    environment.TZ = config.time.timeZone;
+    volumes = [
+      "${configDir}:/config"
+      "${configurationFile}:/config/configuration.yaml:ro"
+      "${dashboardsDir}:/config/dashboards:ro"
+      "${packagesDir}:/config/packages:ro"
+      "/run/dbus:/run/dbus:ro"
     ];
-
-    config = {
-      default_config = {};
-
-      # Turn W -> kWh
-      sensor = [
-        {
-          platform = "integration";
-          source = "sensor.ac_john_kauf_plug_power";
-          name = "John AC Energy kWh";
-          unit_prefix = "k";
-          round = 3;
-          method = "trapezoidal";
-          unit_time = "h";
-        }
-      ];
-
-      # Culumative counters
-      utility_meter = {
-        john_ac_energy_monthly = {
-          source = "sensor.john_ac_energy_kwh";
-          cycle = "monthly";
-        };
-
-        john_ac_energy_yearly = {
-          source = "sensor.john_ac_energy_kwh";
-          cycle = "yearly";
-        };
-      };
-
-
-    };
-
-    openFirewall = true;
-
+    extraOptions = [
+      "--network=host"
+    ];
   };
 
-  # Let it through the firewall
-  networking.firewall.allowedTCPPorts = [
-    config.services.home-assistant.config.http.server_port
+  systemd.tmpfiles.rules = [
+    "d ${configDir} 0755 286 286 - -"
   ];
 
-
-  ######################################################################
-  ## Nginx reverse‑proxy with ACME
-  ######################################################################
-  #services.nginx = {
-  #  enable = true;
-
-  #  virtualHosts."${myDomain}" = {
-  #    forceSSL   = true;
-  #    enableACME = true;
-
-  #    locations."/" = {
-  #      proxyPass       = "http://127.0.0.1:8223";
-  #      proxyWebsockets = true;
-  #    };
-  #  };
-
-  #};
-
-
-  ######################################################################
-  ## ACME global settings
-  ######################################################################
-  #security.acme = {
-  #  acceptTerms = true;
-  #  # globally used for any host with enableACME = true
-  #  defaults = {
-  #    email  = "${myAcmeEmail}";
-  #  };
-  #};
-
-  ######################################################################
-  ## Firewall
-  ######################################################################
-  #networking.firewall = {
-  #  allowedTCPPorts = [ 80 443 ];
-  #  enable = true;
-  #};
-
-
-  # Make sure that we're connected before trying to start
-  systemd.services.home-assistant.after = [ "network-online.target" ];
-  systemd.services.home-assistant.wants = [ "network-online.target" ];
-
+  networking.firewall.allowedTCPPorts = [ 8123 ];
 }

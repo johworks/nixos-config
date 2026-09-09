@@ -1,0 +1,83 @@
+title: AC Costs
+views:
+  - title: AC Costs
+    path: overview
+    icon: mdi:air-conditioner
+    cards:
+      - type: vertical-stack
+        cards:
+          - type: entities
+            title: Summary
+            show_header_toggle: false
+            entities:
+              - entity: input_number.ac_cost_per_kwh
+                name: Cost per kWh
+              - entity: sensor.ac_total_power
+                name: Total Power
+              - entity: sensor.ac_total_daily_energy
+                name: Total Daily Energy
+              - entity: sensor.ac_daily_cost
+                name: Total Daily Cost
+              - entity: sensor.ac_monthly_energy
+                name: Total Monthly Energy
+              - entity: sensor.ac_monthly_cost
+                name: Total Monthly Cost
+
+          - type: entities
+            title: Conditions
+            show_header_toggle: false
+            entities:
+              - entity: sensor.ac_outdoor_temperature
+                name: Outdoor Temperature
+              - entity: sensor.ac_weather_condition
+                name: Weather
+              - entity: sensor.ac_cloud_coverage
+                name: Cloud Coverage
+              - entity: sensor.ac_sun_elevation
+                name: Sun Elevation
+              - entity: sensor.ac_sun_azimuth
+                name: Sun Azimuth
+
+          - type: grid
+            title: Rooms
+            columns: 2
+            square: false
+            cards:
+              - type: entities
+                title: Julias Room
+                show_header_toggle: false
+                entities:
+                  - entity: sensor.julias_room_ac_power
+                    name: Power
+                  - entity: binary_sensor.julias_room_ac_sun_exposure
+                    name: West Sun Exposure
+                  - entity: sensor.julias_room_ac_daily_energy
+                    name: Daily Energy
+                  - entity: sensor.julias_room_ac_daily_cost
+                    name: Daily Cost
+                  - entity: sensor.julias_room_ac_monthly_energy
+                    name: Monthly Energy
+                  - entity: sensor.julias_room_ac_monthly_cost
+                    name: Monthly Cost
+
+              - type: entities
+                title: Johns Room
+                show_header_toggle: false
+                entities:
+                  - entity: sensor.johns_room_ac_power
+                    name: Power
+                  - entity: binary_sensor.johns_room_ac_sun_exposure
+                    name: East Sun Exposure
+                  - entity: sensor.johns_room_ac_daily_energy
+                    name: Daily Energy
+                  - entity: sensor.johns_room_ac_daily_cost
+                    name: Daily Cost
+                  - entity: sensor.johns_room_ac_monthly_energy
+                    name: Monthly Energy
+                  - entity: sensor.johns_room_ac_monthly_cost
+                    name: Monthly Cost
+
+          - type: iframe
+            title: Analysis
+            url: http://192.168.10.1:8091
+            aspect_ratio: 75%

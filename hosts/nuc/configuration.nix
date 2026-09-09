@@ -21,6 +21,10 @@
     ../../modules/nixos/vaultwarden/vaultwarden.nix
     ../../modules/nixos/blog-static.nix
     ../../modules/nixos/ddns/ddns.nix
+    ../../modules/nixos/esphome.nix
+    ../../modules/nixos/home-assistant-analysis.nix
+    ../../modules/nixos/home-assistant.nix
+    ../../modules/nixos/home-assistant-mcp.nix
     ../../modules/nixos/searxng.nix
     ../../modules/nixos/stremio/stremio.nix
     ../../modules/nixos/matrix/matrix.nix
@@ -109,6 +113,11 @@
   #   bindAddress = "0.0.0.0";
   #   openFirewall = true;
   # };
+
+  services.homeAssistantAnalysis = {
+    enable = true;
+    baseUrl = "http://192.168.10.1:8123";
+  };
 
   # Some programs need SUID wrappers, can be configured further or are
   # started in user sessions.

@@ -1,0 +1,20 @@
+default_config:
+
+frontend:
+  themes: !include_dir_merge_named themes
+
+homeassistant:
+  packages: !include_dir_named packages
+
+lovelace:
+  dashboards:
+    ac-costs-managed:
+      mode: yaml
+      filename: dashboards/ac_costs.yaml
+      title: AC Costs
+      icon: mdi:air-conditioner
+      show_in_sidebar: true
+
+automation: !include automations.yaml
+script: !include scripts.yaml
+scene: !include scenes.yaml

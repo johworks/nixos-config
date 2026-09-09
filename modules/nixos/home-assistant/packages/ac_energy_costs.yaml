@@ -1,0 +1,309 @@
+input_number:
+  ac_cost_per_kwh:
+    name: AC Cost per kWh
+    min: 0
+    max: 2
+    step: 0.001
+    unit_of_measurement: "$/kWh"
+    mode: box
+
+homeassistant:
+  customize:
+    sensor.ac_total_daily_energy:
+      suggested_display_precision: 4
+    sensor.ac_daily_cost:
+      suggested_display_precision: 4
+    sensor.ac_monthly_energy:
+      suggested_display_precision: 2
+    sensor.ac_monthly_cost:
+      suggested_display_precision: 2
+    sensor.julias_room_ac_daily_energy:
+      suggested_display_precision: 4
+    sensor.julias_room_ac_daily_cost:
+      suggested_display_precision: 4
+    sensor.julias_room_ac_monthly_energy:
+      suggested_display_precision: 2
+    sensor.julias_room_ac_monthly_cost:
+      suggested_display_precision: 2
+    sensor.johns_room_ac_daily_energy:
+      suggested_display_precision: 4
+    sensor.johns_room_ac_daily_cost:
+      suggested_display_precision: 4
+    sensor.johns_room_ac_monthly_energy:
+      suggested_display_precision: 2
+    sensor.johns_room_ac_monthly_cost:
+      suggested_display_precision: 2
+
+sensor:
+  # Build our own kWh counters from live power so old plug counters do not
+  # contaminate daily/monthly billing estimates.
+  - platform: integration
+    source: sensor.julias_room_ac_power
+    name: Julias Room AC Energy
+    unique_id: julias_room_ac_energy
+    unit_prefix: k
+    unit_time: h
+    method: left
+    round: 4
+    max_sub_interval:
+      minutes: 1
+
+  - platform: integration
+    source: sensor.johns_room_ac_power
+    name: Johns Room AC Energy
+    unique_id: johns_room_ac_energy
+    unit_prefix: k
+    unit_time: h
+    method: left
+    round: 4
+    max_sub_interval:
+      minutes: 1
+
+  - platform: integration
+    source: sensor.ac_total_power
+    name: AC Energy
+    unique_id: ac_energy
+    unit_prefix: k
+    unit_time: h
+    method: left
+    round: 4
+    max_sub_interval:
+      minutes: 1
+
+template:
+  - sensor:
+      - name: AC Outdoor Temperature
+        unique_id: ac_outdoor_temperature
+        default_entity_id: sensor.ac_outdoor_temperature
+        unit_of_measurement: "°F"
+        device_class: temperature
+        state_class: measurement
+        state: >
+          {{ state_attr('weather.forecast_home', 'temperature') | float(0) | round(1) }}
+
+      - name: AC Cloud Coverage
+        unique_id: ac_cloud_coverage
+        default_entity_id: sensor.ac_cloud_coverage
+        unit_of_measurement: "%"
+        state_class: measurement
+        state: >
+          {{ state_attr('weather.forecast_home', 'cloud_coverage') | float(0) | round(1) }}
+
+      - name: AC Weather Condition
+        unique_id: ac_weather_condition
+        default_entity_id: sensor.ac_weather_condition
+        state: >
+          {{ states('weather.forecast_home') }}
+
+      - name: AC Sun Elevation
+        unique_id: ac_sun_elevation
+        default_entity_id: sensor.ac_sun_elevation
+        unit_of_measurement: "°"
+        state_class: measurement
+        state: >
+          {{ state_attr('sun.sun', 'elevation') | float(0) | round(1) }}
+
+      - name: AC Sun Azimuth
+        unique_id: ac_sun_azimuth
+        default_entity_id: sensor.ac_sun_azimuth
+        unit_of_measurement: "°"
+        state_class: measurement
+        state: >
+          {{ state_attr('sun.sun', 'azimuth') | float(0) | round(1) }}
+
+      - name: Julias Room AC Power
+        unique_id: julias_room_ac_power
+        default_entity_id: sensor.julias_room_ac_power
+        unit_of_measurement: W
+        device_class: power
+        state_class: measurement
+        state: >
+          {{ states('sensor.bedroom_kauf_plug_julias_ac_power') | float(0) | round(1) }}
+
+      - name: Julias Room AC Daily Energy
+        unique_id: julias_room_ac_daily_energy
+        default_entity_id: sensor.julias_room_ac_daily_energy
+        unit_of_measurement: kWh
+        device_class: energy
+        state_class: total
+        state: >
+          {{ states('sensor.julias_room_ac_daily_meter') | float(0) | round(4) }}
+
+      - name: Julias Room AC Daily Cost
+        unique_id: julias_room_ac_daily_cost
+        default_entity_id: sensor.julias_room_ac_daily_cost
+        unit_of_measurement: "$"
+        device_class: monetary
+        state_class: total
+        state: >
+          {{
+            (
+              (states('sensor.julias_room_ac_daily_energy') | float(0))
+              * (states('input_number.ac_cost_per_kwh') | float(0))
+            ) | round(4)
+          }}
+
+      - name: Julias Room AC Monthly Cost
+        unique_id: julias_room_ac_monthly_cost
+        default_entity_id: sensor.julias_room_ac_monthly_cost
+        unit_of_measurement: "$"
+        device_class: monetary
+        state_class: total
+        state: >
+          {{
+            (
+              (states('sensor.julias_room_ac_monthly_energy') | float(0))
+              * (states('input_number.ac_cost_per_kwh') | float(0))
+            ) | round(4)
+          }}
+
+      - name: Johns Room AC Power
+        unique_id: johns_room_ac_power
+        default_entity_id: sensor.johns_room_ac_power
+        unit_of_measurement: W
+        device_class: power
+        state_class: measurement
+        state: >
+          {{ states('sensor.james_and_johns_room_kauf_plug_johns_ac_power') | float(0) | round(1) }}
+
+      - name: Johns Room AC Daily Energy
+        unique_id: johns_room_ac_daily_energy
+        default_entity_id: sensor.johns_room_ac_daily_energy
+        unit_of_measurement: kWh
+        device_class: energy
+        state_class: total
+        state: >
+          {{ states('sensor.johns_room_ac_daily_meter') | float(0) | round(4) }}
+
+      - name: Johns Room AC Daily Cost
+        unique_id: johns_room_ac_daily_cost
+        default_entity_id: sensor.johns_room_ac_daily_cost
+        unit_of_measurement: "$"
+        device_class: monetary
+        state_class: total
+        state: >
+          {{
+            (
+              (states('sensor.johns_room_ac_daily_energy') | float(0))
+              * (states('input_number.ac_cost_per_kwh') | float(0))
+            ) | round(4)
+          }}
+
+      - name: Johns Room AC Monthly Cost
+        unique_id: johns_room_ac_monthly_cost
+        default_entity_id: sensor.johns_room_ac_monthly_cost
+        unit_of_measurement: "$"
+        device_class: monetary
+        state_class: total
+        state: >
+          {{
+            (
+              (states('sensor.johns_room_ac_monthly_energy') | float(0))
+              * (states('input_number.ac_cost_per_kwh') | float(0))
+            ) | round(4)
+          }}
+
+      - name: AC Total Power
+        unique_id: ac_total_power
+        default_entity_id: sensor.ac_total_power
+        unit_of_measurement: W
+        device_class: power
+        state_class: measurement
+        state: >
+          {{
+            [
+              states('sensor.julias_room_ac_power'),
+              states('sensor.johns_room_ac_power')
+            ] | map('float', 0) | sum | round(1)
+          }}
+
+      - name: AC Total Daily Energy
+        unique_id: ac_total_daily_energy
+        default_entity_id: sensor.ac_total_daily_energy
+        unit_of_measurement: kWh
+        device_class: energy
+        state_class: total
+        state: >
+          {{ states('sensor.ac_total_daily_meter') | float(0) | round(4) }}
+
+      - name: AC Daily Cost
+        unique_id: ac_daily_cost
+        default_entity_id: sensor.ac_daily_cost
+        unit_of_measurement: "$"
+        device_class: monetary
+        state_class: total
+        state: >
+          {{
+            (
+              (states('sensor.ac_total_daily_energy') | float(0))
+              * (states('input_number.ac_cost_per_kwh') | float(0))
+            ) | round(4)
+          }}
+
+      - name: AC Monthly Cost
+        unique_id: ac_monthly_cost
+        default_entity_id: sensor.ac_monthly_cost
+        unit_of_measurement: "$"
+        device_class: monetary
+        state_class: total
+        state: >
+          {{
+            (
+              (states('sensor.ac_monthly_energy') | float(0))
+              * (states('input_number.ac_cost_per_kwh') | float(0))
+            ) | round(4)
+          }}
+
+  - binary_sensor:
+      - name: Johns Room AC Sun Exposure
+        unique_id: johns_room_ac_sun_exposure
+        default_entity_id: binary_sensor.johns_room_ac_sun_exposure
+        state: >
+          {% set elevation = states('sensor.ac_sun_elevation') | float(0) %}
+          {% set azimuth = states('sensor.ac_sun_azimuth') | float(0) %}
+          {{ elevation > 0 and 45 <= azimuth <= 180 }}
+
+      - name: Julias Room AC Sun Exposure
+        unique_id: julias_room_ac_sun_exposure
+        default_entity_id: binary_sensor.julias_room_ac_sun_exposure
+        state: >
+          {% set elevation = states('sensor.ac_sun_elevation') | float(0) %}
+          {% set azimuth = states('sensor.ac_sun_azimuth') | float(0) %}
+          {{ elevation > 0 and 180 < azimuth <= 315 }}
+
+utility_meter:
+  ac_total_daily_meter:
+    source: sensor.ac_energy
+    name: AC Total Daily Meter
+    cycle: daily
+    periodically_resetting: false
+
+  ac_monthly_energy:
+    source: sensor.ac_energy
+    name: AC Monthly Energy
+    cycle: monthly
+    periodically_resetting: false
+
+  julias_room_ac_daily_meter:
+    source: sensor.julias_room_ac_energy
+    name: Julias Room AC Daily Meter
+    cycle: daily
+    periodically_resetting: false
+
+  julias_room_ac_monthly_energy:
+    source: sensor.julias_room_ac_energy
+    name: Julias Room AC Monthly Energy
+    cycle: monthly
+    periodically_resetting: false
+
+  johns_room_ac_daily_meter:
+    source: sensor.johns_room_ac_energy
+    name: Johns Room AC Daily Meter
+    cycle: daily
+    periodically_resetting: false
+
+  johns_room_ac_monthly_energy:
+    source: sensor.johns_room_ac_energy
+    name: Johns Room AC Monthly Energy
+    cycle: monthly
+    periodically_resetting: false
