@@ -55,18 +55,17 @@
 
       # --- Search engines ---
       search = {
-        default = "SearXNG";
+        default = "Brave Search";
         force = true;      # enforce our defaults (prevents Firefox from changing them)
 
         engines = {
-          "SearXNG" = {
+          "Brave Search" = {
             urls = [{
-              template = "https://search.goobhub.org/search";
+              template = "https://search.brave.com/search";
               params = [
                 { name = "q"; value = "{searchTerms}"; }
               ];
             }];
-            definedAliases = [ "@sx" ];
           };
 
           "ddg".metaData.hidden = false; # ensure visible even if Firefox tries to hide it
@@ -85,7 +84,7 @@
         };
 
         # Optional: set explicit order in the search menu
-        order = [ "SearXNG" "ddg" "Nix Packages" ];
+        order = [ "Brave Search" "ddg" "Nix Packages" ];
       };
 
       # --- Extensions ---

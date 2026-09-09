@@ -25,7 +25,6 @@
     ../../modules/nixos/home-assistant-analysis.nix
     ../../modules/nixos/home-assistant.nix
     ../../modules/nixos/home-assistant-mcp.nix
-    ../../modules/nixos/searxng.nix
     ../../modules/nixos/stremio/stremio.nix
     ../../modules/nixos/matrix/matrix.nix
     ../../modules/nixos/matrix-rtc/matrix-rtc.nix
