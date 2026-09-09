@@ -44,3 +44,8 @@ K.I.S.S (Keep It Simple Stupid)
 ## Commits & PRs
 - Use concise, sentence-style summaries noting scope/host when relevant (e.g., “Update DDNS for nuc”).
 - One logical change per commit. Include what changed, why, and commands run (`nix flake check`, build/switch target). Add screenshots only if UI-facing. 
+
+## Working With Git
+- Create a feat/ branch for implementing new features
+- Rebase onto main, and merge without a PR (for now)
+- Make sure to stay up to date with main so we don't drift (shouldn't be an issue if we keep features well scoped)
