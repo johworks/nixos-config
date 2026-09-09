@@ -29,7 +29,6 @@ K.I.S.S (Keep It Simple Stupid)
 - After edits: run formatting, then a quick eval/check.
 
 ## Commands
-- Format (if defined): `nix fmt`; otherwise `nix run nixpkgs#nixfmt-rfc-style -- .`
 - Evaluate/check: use `nix --store daemon eval --no-write-lock-file ...` for sandbox-friendly read-only evals; `nix flake check`; quick view `nix --store daemon flake metadata --no-write-lock-file`.
 - Build host (no switch): `nix build .#nixosConfigurations.<host>.config.system.build.toplevel`
 - Switch host: `sudo nixos-rebuild switch --flake .#<host>`
