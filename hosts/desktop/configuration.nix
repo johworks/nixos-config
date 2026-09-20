@@ -100,6 +100,9 @@
   # Install firefox.
   programs.firefox.enable = true;
 
+  # Steam also enables the 32-bit Mesa drivers needed by older games.
+  programs.steam.enable = true;
+
   # List packages installed in system profile.
   environment.systemPackages = with pkgs; [
     vim
