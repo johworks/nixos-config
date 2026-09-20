@@ -11,6 +11,11 @@
       url = "github:nixos/nixpkgs/nixos-25.11";
     };
 
+    # Update Vaultwarden independently of the hosts' system packages.
+    nixpkgsVaultwarden = {
+      url = "github:nixos/nixpkgs/nixos-unstable";
+    };
+
     home-manager = {
       url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgsUnstable";

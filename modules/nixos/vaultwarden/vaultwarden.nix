@@ -2,6 +2,7 @@
   config,
   lib,
   pkgs,
+  inputs,
   ...
 }:
 
@@ -25,6 +26,8 @@ in
 
   services.vaultwarden = {
     enable = true;
+    package = inputs.nixpkgsVaultwarden.legacyPackages.${pkgs.stdenv.hostPlatform.system}.vaultwarden;
+    webVaultPackage = config.services.vaultwarden.package.webvault;
     dbBackend = "sqlite";
     backupDir = "${backupDir}";
     config = {
@@ -113,7 +116,7 @@ in
   # 5. CLI helpers (generate admin_token hash)
   #####################################################################
   environment.systemPackages = with pkgs; [
-    vaultwarden
+    config.services.vaultwarden.package
     restic
     sqlite
     coreutils
