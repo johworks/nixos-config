@@ -10,6 +10,7 @@
   imports = [
     ../../modules/home/profiles/base.nix
     ../../modules/home/profiles/desktop.nix
+    ../../modules/home/codex/playwright.nix
     ../../modules/home/firefox.nix
     ../../modules/home/git.nix
     ../../modules/home/ssh.nix

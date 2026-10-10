@@ -1,5 +1,6 @@
-"""Install Nix permissions while preserving Codex's writable user settings."""
+"""Merge Nix permissions and MCP servers into Codex's writable user settings."""
 
+import json
 import os
 from pathlib import Path
 import sys
@@ -33,6 +34,24 @@ environment.setdefault("set", tomlkit.table())["NIX_REMOTE"] = "daemon"
 if "permissions" not in document:
     document["permissions"] = tomlkit.table()
 document["permissions"]["nix-workspace"] = defaults["permissions"]["nix-workspace"]
+
+# Track field ownership, not values, so removals work without copying credentials.
+state = codex / "nix-managed-mcp-servers.json"
+previous = json.loads(state.read_text()) if state.exists() else {}
+managed = defaults.get("mcp_servers", {})
+servers = (
+    document.setdefault("mcp_servers", tomlkit.table()) if managed or previous else {}
+)
+for name in previous:
+    if name not in managed:
+        servers.pop(name, None)
+for name, fields in managed.items():
+    server = servers.setdefault(name, tomlkit.table())
+    for key in previous.get(name, []):
+        if key not in fields:
+            server.pop(key, None)
+    for key, value in fields.items():
+        server[key] = value
 updated = tomlkit.dumps(document)
 
 if updated != original or config.is_symlink():
@@ -44,6 +63,16 @@ if updated != original or config.is_symlink():
         output.write(updated)
         temporary = Path(output.name)
     os.replace(temporary, config)
+
+ownership = (
+    json.dumps({name: list(fields) for name, fields in managed.items()}, sort_keys=True)
+    + "\n"
+)
+if not state.exists() or state.read_text() != ownership:
+    with tempfile.NamedTemporaryFile(mode="w", dir=codex, delete=False) as output:
+        output.write(ownership)
+        temporary = Path(output.name)
+    os.replace(temporary, state)
 
 # Migrate only the former Home Manager symlink, preserving learned user rules.
 rules = codex / "rules" / "default.rules"
