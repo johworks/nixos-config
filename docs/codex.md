@@ -2,7 +2,7 @@
 
 `modules/home/codex/default.nix` owns the shared Nix permission profile and the
 `codex.mcpServers` Home Manager option. Host `home.nix` files select integrations;
-`modules/home/codex/playwright.nix` is enabled only on desktop. Keep reusable
+`modules/home/codex/playwright.nix` is enabled on desktop and nuc. Keep reusable
 integration declarations next to the Codex module rather than in NixOS service
 modules. A service module can still own the server and its runtime secrets.
 
@@ -42,17 +42,30 @@ Codex's OAuth login for credentials. Do not put tokens in `env` or `http_headers
 When adopting a manually added server with the same name, remove any conflicting
 connection fields first (for example an old `url` when declaring `command`).
 
-## Playwright on desktop
+## Playwright on desktop and NUC
 
 Nixpkgs' `playwright-mcp` supplies matching, patched browsers, so no npm global
 install or `playwright install` step is needed. The server runs headless with an
 isolated in-memory browser profile, suitable for local development and screenshots.
 This controls browser pages; it does not provide native desktop Computer Use.
 
-After building and switching desktop, restart Codex and check the integration:
+The shared declaration sets `default_tools_approval_mode = "approve"` so
+Playwright tools are always allowed on both hosts. Home Manager reapplies this
+setting at activation. Per-tool `tools.<tool>.approval_mode` overrides take
+precedence; remove any saved overrides to use the server default.
+
+The desktop browser can test NUC-hosted pages through their public or LAN URLs.
+Running Codex on the NUC also lets its browser reach services bound to NUC
+loopback, such as `http://127.0.0.1:8123`. On desktop, `127.0.0.1` refers to the
+desktop itself.
+
+After building and switching the relevant host, restart Codex and check the
+integration:
 
 ```sh
 sudo nixos-rebuild switch --flake .#desktop
+# On the NUC:
+sudo nixos-rebuild switch --flake .#nuc
 codex mcp list
 codex
 # In Codex: /mcp

@@ -10,5 +10,6 @@
       "--isolated"
     ];
     startup_timeout_sec = 30;
+    default_tools_approval_mode = "approve";
   };
 }

@@ -9,6 +9,7 @@
   imports = [
     ../../modules/home/profiles/base.nix
     ../../modules/home/profiles/server.nix
+    ../../modules/home/codex/playwright.nix
     (inputs.shared-nvim + "/home-manager/nvim.nix") # moved to a flake
     ../../modules/home/git.nix
   ];
