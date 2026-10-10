@@ -17,6 +17,8 @@
   # environment.
   home.packages = config.profiles.basePackages;
 
+  beads.localServer = true;
+
   ## Needed for npm/codex as well
   #programs.bash = {
   #  enable = true;

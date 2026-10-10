@@ -1,0 +1,5 @@
+# Only connection metadata belongs in Git; the NUC owns all task data.
+*
+!.gitignore
+!config.yaml
+!metadata.json

@@ -37,6 +37,15 @@ K.I.S.S (Keep It Simple Stupid)
 - Run `nix flake check` before switching; fix evaluation errors first.
 - For new services/modules, ensure `systemd` targets make sense and the module is intentionally enabled.
 
+## Task Tracking
+- Use Beads (`bd`) for project tasks; state lives in the NUC's shared Dolt database.
+- Start with `bd ready --json`; claim work with `bd update <id> --claim` before editing.
+- Record findings and handoffs in the task, and close it only after verification.
+- Run `bd dolt commit` after a completed unit of work to checkpoint task history.
+- Clients share live state: do not run `bd dolt push`, `bd dolt pull`, or `bd bootstrap` for this repo.
+- If the server is unavailable, restore the SSH tunnel instead of initializing a local database.
+- Connection, actor identity, and recovery instructions are in `docs/beads.md`.
+
 ## Secrets
 - `.sops.yaml` encrypts `secrets/*.env` and `secrets/secrets.yaml` with age key `age18t746d…w4jy`.
 - Encrypt/edit: `sops secrets/<name>.env`. Never commit plaintext; use `sops-nix` references.

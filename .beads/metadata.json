@@ -1,0 +1,9 @@
+{
+  "database": "dolt",
+  "backend": "dolt",
+  "dolt_mode": "server",
+  "dolt_server_host": "127.0.0.1",
+  "dolt_server_port": 13307,
+  "dolt_database": "nixos_config",
+  "project_id": "683662d2-03d2-4d48-875e-e9f1191d7152"
+}

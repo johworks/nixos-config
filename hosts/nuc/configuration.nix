@@ -15,6 +15,7 @@
     ./hardware-configuration.nix
     ../../modules/nixos/common/base.nix
     ../../modules/nixos/common/maintenance.nix
+    ../../modules/nixos/beads-dolt.nix
     ./router-hardware.nix
     ./router-networking.nix
     ./router-users.nix
@@ -117,6 +118,8 @@
     enable = true;
     baseUrl = "http://192.168.10.1:8123";
   };
+
+  services.beadsDolt.enable = true;
 
   # Some programs need SUID wrappers, can be configured further or are
   # started in user sessions.

@@ -5,7 +5,10 @@
   ...
 }:
 {
-  imports = [ ../codex ];
+  imports = [
+    ../codex
+    ../beads
+  ];
 
   # Shared Home Manager defaults for every host. Override with lib.mkForce
   # in downstream profiles or host modules when a machine needs a different

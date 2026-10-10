@@ -1,0 +1,9 @@
+# The NUC owns task state; Git contains only project connection metadata.
+issue-prefix: nixos
+no-git-ops: true
+export:
+  auto: false
+backup:
+  enabled: false
+dolt:
+  auto-commit: "off"
