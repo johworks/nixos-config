@@ -11,18 +11,6 @@ prefix_rule(
 )
 
 prefix_rule(
-    pattern = ["nix", "flake", "metadata"],
-    decision = "allow",
-    justification = "Read-only flake metadata inspection is routine validation.",
-)
-
-prefix_rule(
-    pattern = ["nix", "flake", "check"],
-    decision = "prompt",
-    justification = "Flake checks can build or run checks, so keep an explicit approval gate.",
-)
-
-prefix_rule(
     pattern = ["nix", "derivation", "show"],
     decision = "allow",
     justification = "Derivation show is read-only inspection used to debug Nix evaluation outputs.",
@@ -44,12 +32,6 @@ prefix_rule(
     pattern = ["nix", "--store", "daemon", "derivation", "show"],
     decision = "allow",
     justification = "Daemon-backed derivation show is read-only inspection used to debug Nix evaluation outputs.",
-)
-
-prefix_rule(
-    pattern = ["nix", "build"],
-    decision = "prompt",
-    justification = "Nix builds can realize store paths, so keep an explicit approval gate.",
 )
 
 prefix_rule(

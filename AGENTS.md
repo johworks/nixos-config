@@ -25,12 +25,12 @@ K.I.S.S (Keep It Simple Stupid)
 - Pick a single goal; apply it in the most local place (host first, shared only if reused).
 - Keep diffs small; if touching multiple hosts, say why in the commit.
 - For new files referenced by the flake, use `git add -N <path>` so Nix can see them during eval/build without staging contents.
-- Do not run plain `git add` unless explicitly asked to stage changes.
 - After edits: run formatting, then a quick eval/check.
 
 ## Commands
-- Evaluate/check: use `nix --store daemon eval --no-write-lock-file ...` for sandbox-friendly read-only evals; `nix flake check`; quick view `nix --store daemon flake metadata --no-write-lock-file`.
-- Build host (no switch): `nix build .#nixosConfigurations.<host>.config.system.build.toplevel`
+- Evaluate/check: use `nix --store daemon eval --no-write-lock-file ...`; `nix --store daemon flake check --no-write-lock-file`; quick view `nix --store daemon flake metadata --no-write-lock-file`.
+- Build host (no switch): `nix --store daemon build --no-write-lock-file .#nixosConfigurations.<host>.config.system.build.toplevel`
+- Routine Nix evaluation, checks, and builds use the daemon without sudo. Codex's `nix-workspace` permission profile allows the user cache, daemon socket, and workspace `.git` writes; restart Codex after changing its permissions.
 - Switch host: `sudo nixos-rebuild switch --flake .#<host>`
 
 ## Testing & Validation
