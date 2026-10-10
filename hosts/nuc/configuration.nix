@@ -18,6 +18,7 @@
     ../../modules/nixos/beads-dolt.nix
     ./router-hardware.nix
     ./router-networking.nix
+    ./router-monitoring.nix
     ./router-users.nix
     ../../modules/nixos/vaultwarden/vaultwarden.nix
     ../../modules/nixos/blog-static.nix
