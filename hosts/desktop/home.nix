@@ -14,6 +14,7 @@
     ../../modules/home/firefox.nix
     ../../modules/home/git.nix
     ../../modules/home/ssh.nix
+    ./cellular-wallpaper.nix
     (inputs.shared-nvim + "/home-manager/nvim.nix")
   ];
 

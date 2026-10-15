@@ -1,0 +1,12 @@
+{
+  "KPackageStructure": "Plasma/Wallpaper",
+  "KPlugin": {
+    "Id": "org.nixos.cellular",
+    "Name": "Cellular Life",
+    "Description": "Conway's Game of Life with random worlds and fading trails",
+    "Icon": "preferences-desktop-wallpaper",
+    "License": "MIT",
+    "Version": "1.0"
+  },
+  "X-Plasma-API-Minimum-Version": "6.0"
+}

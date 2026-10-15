@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kcfg xmlns="http://www.kde.org/standards/kcfg/1.0">
+  <kcfgfile name=""/>
+  <group name="General">
+    <entry name="CellSize" type="Int">
+      <default>12</default>
+    </entry>
+    <entry name="Speed" type="Int">
+      <default>8</default>
+    </entry>
+    <entry name="ReseedSeconds" type="Int">
+      <default>120</default>
+    </entry>
+  </group>
+</kcfg>
