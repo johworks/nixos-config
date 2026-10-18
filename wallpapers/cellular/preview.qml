@@ -1,6 +1,7 @@
 import QtQuick
 import QtQuick.Window
 import "contents/ui"
+import "contents/ui/controls.js" as Controls
 
 Window {
     id: root
@@ -19,10 +20,18 @@ Window {
     WeatherScene {
         id: landscape
         anchors.fill: parent
-        weather: Number(root.option("--weather", "0"))
+        controls: {
+            var knobs = Controls.preset(root.option("--preset", "sunny"));
+            for (var i = 0; i < Controls.keys.length; i++) {
+                var key = Controls.keys[i];
+                knobs[key] = Number(root.option("--" + key, String(knobs[key])));
+            }
+            return knobs;
+        }
         cellSize: Number(root.option("--cell", "2"))
         paused: Qt.application.arguments.indexOf("--capture") >= 0
         time: 12
+        windTime: 12
     }
     Timer {
         interval: 1500

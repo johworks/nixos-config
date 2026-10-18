@@ -30,23 +30,36 @@ test('fine output reveals substantially more source samples; source density stay
   assert.deepEqual(landscape.sourceSize(1280, 720), landscape.sourceSize(3840, 2160));
 });
 
-test('weather grades warm pixels toward cool muted cloud and terrain tones', () => {
-  const cloudy = landscape.gradePixel(230, 96, 73, 1, false);
-  const rainy = landscape.gradePixel(230, 96, 73, 2, false);
-  assert.ok(cloudy[0] < 230 && rainy[0] < cloudy[0]);
-  const sum = a => a.reduce((total, channel) => total + channel, 0);
-  assert.ok(sum(rainy) < sum(cloudy));
-  for (const weather of [1, 2]) {
-    const cloud = landscape.gradePixel(230, 96, 73, weather, true);
-    assert.ok(Math.max(...cloud) - Math.min(...cloud) < 30);
+test('lighting and cloud grades interpolate continuously instead of selecting looks', () => {
+  const sums=[];
+  for (const brightness of [0, 0.25, 0.5, 0.75, 1, 1.5]) {
+    const pixel=landscape.gradePixel(230,96,73,brightness,0,false,0);
+    sums.push(pixel.reduce((a,b)=>a+b,0));
   }
+  for (let i=1;i<sums.length;i++) assert.ok(sums[i]>sums[i-1]);
+  const colors=new Set();
+  for (const warmth of [-1,-0.5,0,0.5,1])
+    colors.add(JSON.stringify(landscape.gradePixel(230,96,73,1,warmth,false,0)));
+  assert.equal(colors.size,5);
+  const light=landscape.gradePixel(230,96,73,1,-1,true,0);
+  const dark=landscape.gradePixel(230,96,73,1,-1,true,1);
+  assert.ok(dark[0]<light[0] && Math.max(...dark)-Math.min(...dark)<24);
 });
 
-test('oversized cloud drift covers the view throughout its bounded oscillation', () => {
-  for (const time of [0, 12, 200, 1000, 10000]) {
-    const rect = landscape.cloudPlacement(1280, 720, time);
-    assert.ok(rect.x <= 0 && rect.y <= 0);
-    assert.ok(rect.x + rect.width >= 1280 && rect.y + rect.height >= 720);
+test('cloud crossfades cover the view with continuous wrap weights in either direction', () => {
+  for (const phase of [-10000,0,12,75,200,1000,10000]) {
+    const layers=landscape.cloudPlacements(1280,720,phase);
+    assert.ok(Math.abs(layers[0].opacity+layers[1].opacity-1)<1e-10);
+    for (const rect of layers) {
+      assert.ok(rect.x<=0 && rect.y<=0);
+      assert.ok(rect.x+rect.width>=1280 && rect.y+rect.height>=720);
+    }
+  }
+  for (const phase of [10,70,150,220,310]) {
+    const before=landscape.cloudPlacements(1280,720,phase);
+    const after=landscape.cloudPlacements(1280,720,phase+0.01);
+    for(let i=0;i<2;i++)
+      if(before[i].opacity>0.01 && after[i].opacity>0.01) assert.ok(after[i].x>before[i].x);
   }
 });
 

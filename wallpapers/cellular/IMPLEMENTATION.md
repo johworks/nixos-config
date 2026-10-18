@@ -391,3 +391,264 @@ diff check and desktop Nix daemon wallpaper-source evaluation passed using
 --no-write-lock-file and XDG_CACHE_HOME=/home/john/.cache. No full system build,
 switch, shell restart, main merge or push. Runtime resource use was not measured.
 README documents active preview selection and previous/original restore routes.
+
+## Revision 4: independent atmosphere knobs — 2026-10-18
+
+Project nixos-cmd; claimed child nixos-cmd.5 remains open for review.
+Lead obligation qitem-20261018213218-d6644630fb98e185.
+Builder assignment qitem-20261018213306-a61485d6cf42c937.
+
+John approved the reference-led artwork and requested independent layer knobs.
+The source PNG bytes/hashes and ARTWORK provenance are unchanged. No tree/cliff/
+river splitting, new artwork, foliage/parallax animation or live weather added.
+
+### Controls and migration
+
+controls.js defines explicit integer persistent knobs and one clamped normalized
+state: brightness0–150, warmth−100–100, sunX/Y/strength0–100, cloud amount/darkness
+0–100, wind−100–100 and rain0–100. Brightness/warmth/color grading interpolates
+continuously; renderer functions have no categorical Weather argument or branch.
+The settings form groups lighting/sun/clouds/wind-rain/animation. Existing grid,
+speed and pause keys remain unchanged. README records ranges and defaults.
+
+Sunny/cloudy/rainy are preset writers, used only by buttons/context actions,
+legacy migration and preview setup. They write atmosphere values, leave grid/
+speed/pause alone, and permit later independent edits. Sun positions reset to
+73/34 when applying a preset. Legacy Weather0/1/2 migrates via ControlsVersion0
+into those knob values and writes ControlsVersion1 last. Both WallpaperItem and
+settings form call the same helper; form migration is deferred until the host
+has injected cfg_* values. User spinbox edits also mark the version initialized,
+including after Reset Defaults. It stores the version so manual values are honored
+on later loads. Old Weather remains solely for migration; no renderer reads it.
+
+### Cache and motion behavior
+
+Scenery grading depends only on brightness/warmth; cloud grading additionally
+uses cloud darkness. Sun position/strength, cloud amount, wind and rain are
+composited without needlessly regrading terrain or clouds. Source-aspect/image
+changes still rebuild affected caches. Latest independent values are read when
+asynchronous image loads complete. All original alpha is preserved.
+
+Rain vertical phase uses the global clock; horizontal motion and cloud drift use
+an accumulated signed wind phase. Zero wind holds clouds/horizontal rain while
+rain falls vertically. Reversing wind preserves positions. Two cloud copies use
+sin-squared crossfade weights at invisible wrap points, each moving consistently
+with the signed phase through bounded offsets within the existing112% overscan.
+This avoids the original sine path eventually reversing a positive wind. Both
+copies reuse the same cache; no extra pixel grading or source artwork is needed.
+
+The default phase12 Qt capture remains byte-identical to the approved prior
+sunny capture: SHA256 d9641397bd3079c2960bc05291018a1bbaf2819a5ba29af06d7e8b2c0bd4694b.
+Sun position changes the sky sun; baked terrain highlight direction is unchanged.
+Cloud amount controls visible layer density. Brightness clips naturally at RGB
+limits at the high end. These choices keep the approved artwork intact.
+
+### Actual validation for revision 4
+
+- Node current model/controls/migration plus legacy tests: **13 passed,0 failed**.
+  Covers clamping/missing/invalid inputs, mixed raw knobs, preset/manual edits,
+  untouched global settings, one-time migration/reload, continuous intermediate
+  grades, source/grid bounds, cloud crossfade weights/coverage/direction, clock.
+- Actual Qt6.11 offscreen/software qmltestrunner: **21 passed,0 failed**, including
+  framework setup/cleanup, no warnings. Real loaded form aliases, preset/manual
+  changes, form migration and no reset after initialization/Reset Defaults (real
+  key interaction); mixed sun showers,
+  dark dry, clear cool, warm overcast; intermediate light levels; selective cache
+  invalidation; wind-zero/reversal/rain independence/no position reset; latest
+  custom knobs during image load; alpha/order/sampling, pause/speed/hidden and
+  portrait/8K checks from prior revisions.
+- qmllint all production/preview/test QML: exit0,no warnings. Changed QML
+  formatted with qmlformat. Feature-scoped git diff --check passes.
+- Original PNG SHA256 hashes still match ARTWORK.md. No Nix files changed.
+
+Generated and visually inspected **1280 × 720 actual Qt captures**:
+preview-sunny.png (unchanged approved default), preview-sunshower.png,
+preview-dark-dry.png, preview-clear-cool.png and preview-warm-overcast.png.
+Exact mixed values are in README; reproduce with preview.qml -- --capture
+--preset=sunny --Key=value --output=PATH, using installed tools/imports above.
+Older preset/coarse images are historical captures, not alternate render sources.
+
+### Remaining native checks
+
+Offscreen tests exercise the real rendering/form and persistent configuration
+logic using serializable maps. Plasma's own KConfig injection timing, on-disk
+version flag/knob persistence and grouped-form scrolling need native verification.
+Lead owns a fresh-ID preview after review (current live preview3 is untouched).
+For migration, seed legacy Weather2/ControlsVersion0, confirm rainy knobs/version1,
+then change independent values and reload to ensure they survive without another
+preset. Also check custom settings before activation, presets/manual edits,
+context actions and GPU rendering. README records preview/restore.
+
+No native desktop changes, dependency/harness installs, source PNG edits, branch
+changes, Git commits, merging or publication were performed by the builder.
+
+### Reviewed P2 follow-up: preset version persistence after reset
+
+Review qitem-20261018214737-05f1864e requested changes. Fix assignment
+qitem-20261018214818-7a16b9d9 remains under nixos-cmd.5 and the original lead
+obligation qitem-20261018213218-d6644630fb98e185.
+
+Confirmed the defect with a focused regression before editing the helper:
+Weather0/ControlsVersion0 -> context-equivalent rainy preset left version0, so
+reload/migrate could overwrite it with legacy Sunny. The regression failed at
+version0 versus expected1 before the fix.
+
+Controls.writePreset now writes all atmosphere knobs followed by ControlsVersion1
+as its final write, for both unprefixed configuration and cfg_ form targets.
+Migration delegates that commit to the same helper. Removed the redundant
+form-specific version write, so context, form and migration preset paths use the
+same implementation. User knob edits still mark initialization after Reset
+Defaults as before. No artwork, rendering, preview or controls/default values
+changed in this follow-up.
+
+The regression records exact write order with a Proxy for both prefixes, then
+serializes/reloads/migrates the chosen preset and later custom brightness/wind
+edits. Both survive, and grid/speed/pause remain unchanged.
+
+Actual checks after the fix: Node **14 passed,0 failed**; actual Qt offscreen
+**21 passed,0 failed** (including setup/cleanup), with no runtime warnings;
+qmllint production/preview/tests clean; changed form formatted; feature-scoped
+git diff --check passes. Prior full-size mixed evidence remains applicable
+because this fix changes persistence only. No native Reset Defaults/context-menu
+sequence was performed; that remains a lead-owned native check after review.
+Child nixos-cmd.5 remains open pending independent re-review and lead acceptance.
+
+### Native save-boundary follow-up
+
+Builder assignment qitem-20261018215408-12ea0541, child nixos-cmd.5;
+lead obligation qitem-20261018213218-d6644630fb98e185 remains open.
+Lead's fresh preview4 native acceptance established a live/disk difference:
+legacy Weather2/ControlsVersion0 became rainy/version1 in the live wallpaper
+map, but the actual appletsrc group retained version0 with no atmosphere keys,
+even after delay/unload. The prior serializable-map checks did not establish
+native write-through. Lead restored preview3 before this follow-up.
+
+Verified the wallpaper's configuration API read-only: installed libplasma6.6.4
+plasmoidplugin.qmltypes declares WallpaperItem.configuration as KConfigPropertyMap;
+installed kconfig6.25.0 KF6ConfigQml.qmltypes declares its writeConfig method.
+Installed Plasma AppletConfiguration.qml uses configuration.writeConfig() after
+copying form values. The [official KConfigPropertyMap API](https://api.kde.org/kconfigpropertymap.html)
+also documents this QML-invokable method as saving the map's state to disk.
+
+New contents/ui/LiveConfig.qml owns the runtime save boundary, used directly by
+main.qml. It saves once after successful one-time migration, each user context
+preset, or each pause toggle. The existing pure helper still writes knobs and
+ControlsVersion1 last before that save. Repeated initialization at version1
+does not save, and rendering/frame evaluation has no save calls. The settings
+form continues using pure controls.js helpers; Plasma Apply owns its saves.
+No renderer, artwork, preset/default values or configuration schema changed.
+
+New tests/tst_live_config.qml instantiates the actual LiveConfig component with
+a deliberately non-autosaving test map. writeConfig snapshots the complete
+map; destroying the wrapper and reloading from that snapshot checks migration,
+reset/context preset and pause survival without another migration/save. Assertions
+check one save per transaction, version1/complete knob values at save time,
+unchanged grid/speed, and no persistence from unapplied form helper edits.
+This is a save-contract regression using a test double, not native KConfig or
+disk proof. No builder native desktop mutation was performed.
+
+Actual checks: Node **14 passed,0 failed**; full Qt6.11 offscreen/software suite
+**26 passed,0 failed/skipped**, including setup/cleanup, no runtime warnings;
+qmllint all production/preview/test QML exits0 with no diagnostics. Changed QML
+formatted with qmlformat. Feature-scoped git diff --check passes. Existing
+mixed/default captures remain applicable because rendering is unchanged.
+
+After independent review, lead must use a fresh preview ID and repeat actual
+live-map versus appletsrc-group checks, unload/reload, custom controls,
+context presets/pause, and settings Apply/reopen. Native persistence remains
+unverified for this fix until that acceptance. Child/outcome stay open.
+
+### Native form initial-property compatibility follow-up
+
+Assignment qitem-20261018220540-5500cb78 under child nixos-cmd.5; original lead
+obligation qitem-20261018213218-d6644630fb98e185 remains open.
+Lead reports native preview5 now immediately persists migrated rainy knobs and
+ControlsVersion1 to appletsrc. Custom Brightness112/Warmth55/Sun68,29/strength80/
+CloudAmount40/darkness25/Wind-30/Rain65 survives unload/reload with matching live
+map and disk. This is lead-observed native evidence, not a builder desktop test.
+
+Lead's actual settings dialog then revealed missing initial root properties:
+configDialog and wallpaperConfiguration. Read the installed Plasma shell's
+ConfigurationContainmentAppearance.qml loadSourceFile() (around179–204): it
+passes configDialog and a Qt.binding for the live wallpaper configuration,
+probes a temporary form for supported cfg_* keys, and creates the final form
+with the same initial properties plus saved values.
+
+config.qml now declares both supplied properties as nullable var values. This
+accepts the host's QObject-backed dialog/map and its changing binding without
+adding module/type dependencies. Existing cfg_* aliases, migration and runtime
+save logic are unchanged. No renderer, defaults, schema or artwork changes.
+
+tst_config.qml now loads the actual form with host-shaped initial properties,
+including dialog/configuration objects, the live binding, and saved cfg_* values.
+New assertions check identities, saved brightness/warmth/version preservation,
+and the binding following a replacement configuration object. Before the form
+declarations, this regression failed with an undefined configDialog; afterward
+all focused actual Qt6.11 offscreen/software form checks pass: **6 passed,0
+failed/skipped**, including setup/cleanup, no runtime warnings. Focused qmllint
+on form/test exits0 without diagnostics; qmlformat applied; feature-scoped
+git diff --check passes. Unchanged rendering/Node suites and artwork captures
+were not rerun for this property-declaration fix.
+
+Independent review and lead's final native form reopen/log verification remain.
+Child/outcome stay open; no builder desktop mutation or Git commit performed.
+
+### Lead final native acceptance for independent controls
+
+Accepted final review qitem-20261018220728-7b7d56a6 after the initial P2 and
+native-save findings were corrected and independently re-reviewed. Original
+independent rendering review established Node13/13 and Qt21/21; after the first
+fix reviewer ran Node14/14 and focused form5/5. Save-boundary reviewer verified
+the actual installed native API and independently ran boundary5/5 and form5/5;
+builder's full post-save suite was Node14/14 and Qt26/26. Final host-property
+review independently ran form6/6 with clean lint/diff. Unchanged rendering was
+not repeatedly retested for form declarations. Default image and source asset
+hashes remain identical to the approved baseline.
+
+The first native preview4 test caught the real save gap: wallpaper(0) exposed
+migrated values/version1 while scripting readConfig and appletsrc stayed at
+version0/no knobs, even after unloading. It was restored to stable preview3
+while LiveConfig was developed. Do not treat that earlier test as passing.
+
+Fresh preview5 with LiveConfig passed the same actual test. Seeded legacy
+Weather2/version0; immediately after load, both native wallpaper(0) and the
+actual appletsrc group held version1/Brightness65/Warmth−80/SunStrength0/
+CloudDarkness85/RainIntensity100/Wind60. Default-valued keys may be omitted by
+KConfig; live readback supplies those defaults. The explicit save fixed the
+live/disk discrepancy without a shell restart.
+
+Changed independent values to Brightness112,Warmth55,SunX68,SunY29,
+SunStrength80,CloudAmount40,CloudDarkness25,Wind−30,RainIntensity65 via Plasma
+configuration. Unloaded/reloaded preview5; wallpaper(0), scripting and disk
+retained those exact values, despite legacy Weather still being2. The native
+mixed-condition capture /tmp/weather-native-knobs-mixed.png showed the combined
+warm light, partial clouds and rain around existing windows. This confirms
+native composition and independent persisted settings, not unobstructed art.
+
+Opening the actual desktop settings exposed missing configDialog and
+wallpaperConfiguration properties; final form declarations were fixed/reviewed.
+Installed the final source as fresh org.nixos.pixelweather.preview6, named
+Pixel Weather Preview 6, copying current independent settings with version1.
+Prior previews and original Home Manager package remain untouched. Only
+connected desktop id1 changed; disconnected desktop id2 remained unchanged.
+
+Reopened native settings using desktop.showConfigurationInterface and inspected
+the active-window capture. The final form shows preview6 and correct saved
+lighting/sun/cloud values with grouped sections and scrollbar. A safe screenshot
+containing only this dialog is saved as preview-controls.png. Its Apply button
+was disabled on reopen, consistent with no unsaved changes. The dialog was left
+open for John. Journal inspection after the final reopen found no preview6,
+configDialog, wallpaperConfiguration or nonexistent-property errors; stock
+Folder View messages from the earlier dialog open are outside this feature.
+
+Native API/disk/reload checks establish migration and custom persistence.
+Interactive Reset Defaults/context-preset/pause button clicks, actual scrolling,
+Apply/reopen edits, pre-activation configuration and physical display resizing
+were not automated. Their model/form/save contracts and rendered resize bounds
+are covered by Qt checks; no claim of full native interaction coverage or
+measured CPU/GPU/memory use is made. Native full-desktop captures include private
+windows and stay in /tmp; only the controls-only screenshot is in the repo.
+
+Final source evaluation with Nix daemon/--no-write-lock-file and the permitted
+cache passed; feature diff checks pass. No system build/switch, shell restart,
+main merge or push. README records active preview, controls and restore route.

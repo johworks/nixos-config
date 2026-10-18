@@ -1,108 +1,136 @@
 # Pixel Weather
 
-A native Plasma 6 wallpaper with a richly textured pixel-art canyon vista: a
-broad tree and rocky overlook on the left, layered violet terrain, and a winding
-river toward the center-right. The original generated scenery and cloud assets
-were guided by John's visual reference; provenance is in [ARTWORK.md](ARTWORK.md).
+One dynamic pixel-art canyon scene with a broad tree/overlook on the left,
+receding violet terrain, and a winding river. One original scenery PNG and one
+original cloud PNG feed the compositor; artwork/provenance is in
+[ARTWORK.md](ARTWORK.md). Lighting, sun, clouds, wind, and rain are independently
+adjustable. There is no live weather/location integration.
 
-Simulated **Sunny**, **Cloudy**, and **Rainy** weather changes the whole scene.
-Sunny has coral/gold light and violet depth. Cloudy desaturates and cools the
-terrain and turns clouds white-grey. Rainy darkens terrain and clouds and adds
-falling rain. Sky, sun, drifting textured clouds, scenery, and rain are separate
-layers. This prototype does not fetch weather or use a location.
+## Controls
 
-The plugin keeps ID `org.nixos.cellular` and installation through
-`hosts/desktop/cellular-wallpaper.nix`. Its displayed name is **Pixel Weather**.
-Unused legacy Life code/tests remain. There is one composed landscape; obsolete
-Scene/ReseedSeconds entries are ignored.
+In **Desktop and Wallpaper → Wallpaper type → Pixel Weather**, the form groups
+controls by lighting, sun, clouds, wind/rain, and animation:
 
-## Controls and rendering
+| Control | Range | Default |
+| --- | --- | --- |
+| Scene brightness | 0–150% | 100 |
+| Color warmth | −100 cool to +100 warm | +100 |
+| Sun horizontal / vertical position | 0–100%; vertical 0 is top | 73 / 34 |
+| Sun strength | 0 hidden to 100 | 100 |
+| Cloud amount | 0 clear to 100 dense | 100 |
+| Cloud darkness | 0 light to 100 dark grey | 0 |
+| Wind | −100 left to +100 right; 0 still | +35 |
+| Rain intensity | 0 dry to 100 | 0 |
 
-In **Desktop and Wallpaper → Wallpaper type → Pixel Weather**, select weather,
-cell size (2–20), speed (1–20; 10 is normal), and pause. Right-click the desktop
-for weather and pause/resume actions. Existing CellSize/Speed/Weather/Paused keys
-and their per-desktop Plasma persistence route are unchanged. Fresh default is
-2-pixel cells; existing saved values are retained.
+Cell size remains 2–20 (smaller is finer), global speed 1–20 (10 normal), and
+pause is persistent. Sun/clouds stay behind terrain; rain stays in front. Cloud
+amount adjusts the cloud layer's visible density. Wind zero stops cloud drift
+and horizontal rain movement while rain can still fall vertically. Wind changes
+retain motion phase. Two cached cloud copies crossfade through bounded offsets
+so either direction continues without exposed image edges or position resets.
 
-ArtworkLayer.qml explicitly loads each PNG into Canvas's image cache. When its
-image, source size, or weather changes, it draws and grades the source pixels
-once, retaining alpha. Animation waits for both graded caches to be ready, and
-loading completion uses the latest weather. The original PNGs are never edited.
+Sunny, Cloudy, and Rainy buttons/context actions **write the atmosphere knobs**
+as convenient starting points. Any knob can then be edited independently. A
+preset resets all atmosphere knobs, including sun position, while retaining grid
+detail, pause, and global speed. Presets do not select images or render modes.
 
-Each frame composes cached sky/sun, drifting cloud artwork, cached scenery, and
-rain. One final Canvas samples the **complete composition** onto the adjustable
-pixel grid, then scales it without smoothing. Finer detail reveals the existing
-artwork; it does not regenerate geometry. Animation and detail changes do not
-run the per-pixel grading/readback step.
+The approved warm default is retained: the current default Qt capture matches
+the preceding approved sunny capture byte-for-byte. Sun position moves the sky
+sun; painted terrain highlights retain their source direction. Tree, cliff and
+river remain a single source artwork layer.
 
-The PNG aspect is preserved by fitting its width and anchoring terrain to the
-bottom. Taller screens extend the sky; wider screens crop vertically. Source
-Canvases and image decoding are bounded at 1600 × 1000; the final grid is bounded
-uniformly at 960 × 600. At 16:9 the composition source stays 1280 × 720 even on
-8K displays. Clouds drift slowly within an oversized 112% layer, so image edges
-remain outside the viewport throughout the bounded motion.
+## Persistence and migration
 
-Animation runs at a fixed 20 FPS; speed changes motion. It stops while paused,
-hidden, minimized, or waiting for assets. A wallpaper covered by another app may
-remain visible to Qt and keep animating. A capped clock avoids jumps on resume.
+Plugin ID/install route remain `org.nixos.cellular` through
+`hosts/desktop/cellular-wallpaper.nix`. Existing CellSize, Speed and Paused keys
+are unchanged. New atmosphere keys are Brightness, Warmth, SunX, SunY,
+SunStrength, CloudAmount, CloudDarkness, Wind and RainIntensity.
 
-## Full-size evidence and local preview
+Legacy Weather is read **once** when ControlsVersion is 0/missing. Its old
+sunny/cloudy/rainy condition initializes the knobs, then ControlsVersion becomes
+1. The shared preset writer commits that version after all knobs, including
+context presets after a reset. The runtime wrapper explicitly calls the native
+configuration map's `writeConfig()` once after migration, a context preset, or
+a pause toggle. Settings-form edits remain unsaved until Plasma's Apply action.
+Later loads honor independent saved values, regardless of the old Weather
+value. The wallpaper wrapper and settings form both use the same migration
+helper; form initialization defers until saved cfg_* values are injected, so
+configuration before activation can migrate too. Preset buttons mark the form
+as initialized, and user knob edits do too (including after Reset Defaults).
+Obsolete Scene/ReseedSeconds are ignored. Legacy Life code and
+its tests remain unused.
 
-These **1280 × 720 captures use the actual Qt asset, grading, composition, and
-final sampling path**: [sunny/fine](preview-sunny.png),
-[cloudy/fine](preview-cloudy.png), [rainy/fine](preview-rainy.png), and
-[sunny/coarse](preview-coarse.png). They supersede the procedural revision's
-captures. The old [six-way preview](preview.png) remains historical.
+## Rendering and evidence
+
+ArtworkLayer.qml explicitly caches each PNG and regrades only for properties
+that affect it: brightness/warmth for scenery, plus darkness for clouds. Sun
+position/strength, cloud amount, wind and rain changes reuse those source caches.
+Animation/detail changes never run per-pixel image processing. Asset loading
+uses the latest independent values and preserves alpha. Original PNGs are intact.
+
+Each frame composes sky/sun, textured moving clouds, scenery, then rain before
+one final grid sampling pass. Source/decode bounds remain 1600 × 1000, with a
+1280 × 720 source at 16:9; final grid is capped uniformly at 960 × 600. Artwork
+fits width and anchors to the bottom: tall views extend sky, wide views crop
+vertically. Animation is 20 FPS, bounded across stalls, and stops while paused,
+hidden/minimized or waiting for assets. A wallpaper covered by another app may
+still be visible to Qt.
+
+Actual **1280 × 720** captured settings examples:
+
+- [Approved default](preview-sunny.png).
+- [Sun shower](preview-sunshower.png): rain 65, wind 0, cloud amount 35; warm light and sun remain.
+- [Dark dry sky](preview-dark-dry.png): brightness 45, warmth −70, sun 0, cloud amount 60/darkness 75; rain 0.
+- [Clear cool light](preview-clear-cool.png): brightness 110, warmth −75, sun at 55/25 with strength 50, clouds 0.
+- [Warm overcast](preview-warm-overcast.png): brightness 105, warmth 80, sun 0, cloud darkness 65, wind −35.
+
+Earlier cloudy/rainy/coarse/six-way PNGs are historical captures, not image
+choices used by the live renderer.
 
 ```sh
 node --test wallpapers/cellular/*.test.cjs
 QT_QPA_PLATFORM=offscreen QT_QUICK_BACKEND=software \
   qmltestrunner -input wallpapers/cellular/tests
 QT_QPA_PLATFORM=offscreen QT_QUICK_BACKEND=software \
-  qml wallpapers/cellular/preview.qml -- --capture --weather=0 --cell=2 \
-  --output=/tmp/pixel-weather-preview.png
+  qml wallpapers/cellular/preview.qml -- --capture --preset=sunny \
+  --RainIntensity=65 --Wind=0 --CloudAmount=35 --cell=2 \
+  --output=/tmp/pixel-weather-sunshower.png
 ```
 
-Weather is 0 sunny, 1 cloudy, 2 rainy. Use `--cell=10` for the coarse comparison.
-Omit `--capture` for an animated preview window. Capture waits for cached assets
-and exits with an error if loading fails or times out. On NixOS, use
-qtdeclarative's tools and set QML_IMPORT_PATH to the Qt, system, and Kirigami QML
-directories; exact installed paths are in [IMPLEMENTATION.md](IMPLEMENTATION.md).
+Any atmosphere key above can be overridden as `--Key=value`. Omit `--capture`
+for an animated preview. Capture waits for ready caches and reports loading
+error/timeout. Installed Qt tools/import paths, actual checks and historical
+native evidence are in [IMPLEMENTATION.md](IMPLEMENTATION.md).
 
-Offscreen tests cover actual image loading, alpha and weather grading, weather
-changes before/after loading, composition order, cloud motion, caching, final
-sampling, controls, and bounds. They do not establish native Plasma hosting,
-GPU behavior, settings reload, or interactive context actions for this revision.
+## Native preview and restore
 
-## Desktop preview and restore
+The reviewed independent-control version is active as **Pixel Weather Preview 6**
+(`org.nixos.pixelweather.preview6`), and its native settings dialog was left open
+for adjustment. [Native control form](preview-controls.png). The current scene
+demonstrates a custom sun shower: brightness112, warmth55, sun68/29 at strength80,
+cloud amount40/darkness25, wind−30 and rain65, cell size2/speed10/unpaused. Press
+Sunny for the approved baseline, or edit individual controls and Apply.
 
-The reviewed asset-based revision is active as **Pixel Weather Preview 3**
-(`org.nixos.pixelweather.preview3`) on the connected desktop. It uses sunny
-weather, cell size 2, speed 10, and animation enabled. Select that preview in
-Desktop and Wallpaper settings to adjust it. Native asset rendering, the rainy
-transition, and settings persistence across plugin reload were verified; manual
-menu clicks and the settings dialog Apply/reopen flow were not exercised.
+Native legacy migration saves all converted values/version to disk. Custom
+controls survived unload/reload, and the final form reopened with correct saved
+values and no plugin-specific initial-property errors. Interactive preset/reset/
+pause clicks, scrolling, and Apply/reopen were not automated; Qt tests cover the
+form/helper/save contracts. IMPLEMENTATION.md records the verification limits.
 
-The lead updates the authorized native preview **after review**. Use a **fresh
-preview plugin ID** for this asset pipeline; Plasma cached prior QML across
-reloads. Copy the package to a distinct preview directory and change only that
-copy's metadata ID/name. Keep the Home Manager `org.nixos.cellular` package and
-previous preview copy untouched. Save the active plugin and per-desktop settings
-before selecting the fresh preview.
+Lead owns native activation **after review**, using a fresh preview plugin ID
+because Plasma cached earlier QML across reloads. Preserve the original Home
+Manager package and prior preview copies. Copy the package to a distinct
+preview directory, change only its metadata ID/name, save active plugin/settings,
+and select it. Verify controls, grouped form/scrolling, presets/manual edits,
+legacy migration, Apply/reopen, pause/speed, context actions and persistence
+across reload. Restore the saved plugin/settings to return to the prior preview.
 
-Verify weather, coarse/fine detail, loading, pause/speed, settings Apply/reopen,
-context actions, and persistence across reload. Restore the saved plugin/settings
-to return to the previous preview or original wallpaper. Do not replace the
-whole Plasma configuration or edit store contents. Earlier native acceptance in
-IMPLEMENTATION.md is historical and does not verify this asset pipeline.
-
-Select **Pixel Weather Preview 2** to return to the preceding procedural
-landscape, or restore the original installed wallpaper with:
+The builder's offscreen checks are supplemented by the lead's native acceptance
+above. Earlier native acceptance applies to earlier revisions. No Nix module
+changes or system rebuild were needed. Original Home Manager wallpaper and prior
+previews remain available. To restore the original installed wallpaper:
 
 ```sh
 qdbus org.kde.plasmashell /PlasmaShell org.kde.PlasmaShell.evaluateScript \
   'desktops().filter(function (d) { return d.screen >= 0; }).forEach(function (d) { d.wallpaperPlugin = "org.nixos.cellular"; });'
 ```
-
-The Nix install still selects the original plugin at Plasma login. No Nix module
-change or rebuild is needed for the separate local preview workflow.

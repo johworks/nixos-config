@@ -2,6 +2,7 @@ import QtQuick
 import QtQuick.Window
 import QtTest
 import "../contents/ui"
+import "../contents/ui/controls.js" as Controls
 
 Item {
     id: container
@@ -23,7 +24,8 @@ Item {
             scene.paused = true;
             scene.speed = 10;
             scene.time = 12;
-            scene.weather = 0;
+            scene.controls = Controls.preset("sunny");
+            scene.windTime = 12;
             scene.cellSize = 2;
             tryCompare(scene, "assetsReady", true, 10000);
             wait(150);
@@ -101,6 +103,139 @@ Item {
             compare(scene.staticPaintCount, cached, "weather motion must reuse cached sky and scenery");
             compare(scene.gradePaintCount, grades, "no pixel grading/readback during animation or detail changes");
         }
+        function setKnobs(changes) {
+            var knobs = Controls.preset("sunny");
+            for (var key in changes)
+                knobs[key] = changes[key];
+            scene.controls = knobs;
+            tryCompare(scene, "assetsReady", true, 10000);
+            wait(100);
+        }
+        function test_mixed_controls_and_intermediates() {
+            var images = [];
+            var combinations = [
+                {
+                    RainIntensity: 65,
+                    Wind: 0,
+                    CloudAmount: 35
+                },
+                {
+                    Brightness: 45,
+                    Warmth: -70,
+                    SunStrength: 0,
+                    CloudAmount: 60,
+                    CloudDarkness: 75,
+                    RainIntensity: 0
+                },
+                {
+                    Brightness: 110,
+                    Warmth: -75,
+                    SunX: 55,
+                    SunY: 25,
+                    SunStrength: 50,
+                    CloudAmount: 0
+                },
+                {
+                    Brightness: 105,
+                    Warmth: 80,
+                    SunStrength: 0,
+                    CloudAmount: 100,
+                    CloudDarkness: 65,
+                    Wind: -35
+                }
+            ];
+            for (var i = 0; i < combinations.length; i++) {
+                setKnobs(combinations[i]);
+                var image = grabImage(scene);
+                for (var j = 0; j < images.length; j++)
+                    verify(!image.equals(images[j]), "mixed conditions remain distinct");
+                images.push(image);
+            }
+            var previous = -1;
+            for (var level = 0; level <= 100; level += 25) {
+                setKnobs({
+                    Brightness: level,
+                    SunStrength: 0,
+                    CloudAmount: 0,
+                    RainIntensity: 0
+                });
+                var color = grabImage(scene).pixel(100, 600);
+                var sum = color.r + color.g + color.b;
+                verify(sum > previous, "intermediate light values visibly interpolate");
+                previous = sum;
+            }
+        }
+        function test_layer_cache_invalidation() {
+            var terrain = findChild(scene, "sceneryCache"), clouds = findChild(scene, "cloudCache");
+            var terrainGrades = terrain.gradeCount, cloudGrades = clouds.gradeCount;
+            setKnobs({
+                SunX: 30,
+                SunY: 20,
+                SunStrength: 50,
+                CloudAmount: 40,
+                Wind: -40,
+                RainIntensity: 50
+            });
+            compare(terrain.gradeCount, terrainGrades);
+            compare(clouds.gradeCount, cloudGrades);
+            setKnobs({
+                CloudDarkness: 70
+            });
+            compare(terrain.gradeCount, terrainGrades, "cloud darkness cannot regrade terrain");
+            verify(clouds.gradeCount > cloudGrades);
+            cloudGrades = clouds.gradeCount;
+            setKnobs({
+                Brightness: 120,
+                Warmth: 10,
+                CloudDarkness: 70
+            });
+            verify(terrain.gradeCount > terrainGrades && clouds.gradeCount > cloudGrades, "lighting invalidates the affected assets");
+        }
+        function test_wind_and_rain_independence() {
+            setKnobs({
+                Wind: 0,
+                RainIntensity: 100
+            });
+            var still = scene.windTime, falling = scene.time;
+            var before = grabImage(scene);
+            scene.paused = false;
+            wait(200);
+            scene.paused = true;
+            compare(scene.windTime, still, "zero wind holds cloud phase");
+            verify(scene.time > falling, "rain still falls");
+            verify(!before.equals(grabImage(scene)));
+            setKnobs({
+                Wind: 0,
+                RainIntensity: 0
+            });
+            before = grabImage(scene);
+            scene.paused = false;
+            wait(150);
+            scene.paused = true;
+            verify(before.equals(grabImage(scene)), "zero rain and zero wind leave a still frame");
+            setKnobs({
+                Wind: 50,
+                RainIntensity: 0
+            });
+            before = grabImage(scene);
+            var phase = scene.windTime;
+            scene.paused = false;
+            wait(150);
+            scene.paused = true;
+            verify(scene.windTime > phase);
+            before = grabImage(scene);
+            phase = scene.windTime;
+            setKnobs({
+                Wind: -50,
+                RainIntensity: 0
+            });
+            compare(scene.windTime, phase);
+            verify(before.equals(grabImage(scene)), "wind changes do not reset positions");
+            scene.paused = false;
+            wait(150);
+            scene.paused = true;
+            verify(scene.windTime < phase, "negative wind reverses motion");
+        }
         function test_resize() {
             container.width = 1080;
             container.height = 1920;
@@ -132,7 +267,7 @@ Item {
             var images = [];
             var brightness = [];
             for (var weather = 0; weather < 3; weather++) {
-                scene.weather = weather;
+                scene.controls = Controls.preset(["sunny", "cloudy", "rainy"][weather]);
                 wait(150);
                 var image = grabImage(scene);
                 compare(image.width, 1280);

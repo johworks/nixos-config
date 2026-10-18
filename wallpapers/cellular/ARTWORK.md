@@ -60,3 +60,12 @@ preview-coarse.png. The builder inspected the reference and these actual Qt
 captures; the reviewer must independently judge their visual correspondence.
 Historical procedural/native evidence does not establish this pipeline's native
 Plasma behavior. Lead owns a fresh-ID native preview after review.
+
+## Independent controls (nixos-cmd.5)
+
+The same unchanged scenery/cloud PNGs now feed continuous brightness/warmth,
+sun, cloud density/darkness, signed wind and rain controls. Named presets only
+write knobs; no enum selects artwork or render branches. Cache grading depends
+only on lighting for scenery and lighting/darkness for clouds. Two weighted
+copies of the cached cloud image crossfade through bounded drift offsets.
+No source images were regenerated, split, recolored on disk, or otherwise edited.

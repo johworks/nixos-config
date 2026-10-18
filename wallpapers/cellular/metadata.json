@@ -3,10 +3,10 @@
   "KPlugin": {
     "Id": "org.nixos.cellular",
     "Name": "Pixel Weather",
-    "Description": "A detailed pixel-art canyon overlook with independent reactive weather layers",
+    "Description": "Independent light, sun, clouds, wind and rain over a detailed pixel-art canyon",
     "Icon": "preferences-desktop-wallpaper",
     "License": "MIT",
-    "Version": "2.2"
+    "Version": "2.3"
   },
   "X-Plasma-API-Minimum-Version": "6.0"
 }

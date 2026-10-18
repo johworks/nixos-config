@@ -1,6 +1,7 @@
 import QtQuick
 import QtTest
 import "../contents/ui"
+import "../contents/ui/controls.js" as Controls
 
 Item {
     id: container
@@ -27,7 +28,8 @@ Item {
         name: "ArtworkAssets"
         when: windowShown
         function init() {
-            scene.weather = 0;
+            scene.controls = Controls.preset("sunny");
+            scene.windTime = 12;
             scene.time = 12;
             tryCompare(scene, "assetsReady", true, 10000);
             wait(100);
@@ -52,10 +54,10 @@ Item {
                     cloud++;
             }
             verify(gaps > 100 && cloud > 100, "cloud artwork contains both clouds and alpha gaps");
-            scene.weather = 2;
+            scene.controls = Controls.preset("rainy");
             tryCompare(scene, "assetsReady", true, 10000);
             var after = pixels(scene, "sceneryCache");
-            verify(after[(600 * width + 100) * 4] < red * 0.7, "rain really grades asset pixels");
+            verify(after[(600 * width + 100) * 4] < red * 0.8, "rain really grades asset pixels");
             var cloudAfter = pixels(scene, "cloudCache");
             var muted = 0;
             for (var j = 0; j < before.length; j += 116) {
@@ -77,13 +79,19 @@ Item {
             var late = createTemporaryObject(deferredArtwork, container);
             verify(late !== null);
             verify(!late.assetsReady);
-            late.weather = 1;
+            late.controls = Controls.preset("cloudy");
             late.scenerySource = scene.scenerySource;
             late.cloudSource = scene.cloudSource;
-            late.weather = 2;
+            var custom = Controls.preset("rainy");
+            custom.Brightness = 118;
+            custom.Warmth = -23;
+            custom.CloudDarkness = 51;
+            custom.SunStrength = 63;
+            late.controls = custom;
+            late.windTime = 12;
             verify(!late.assetsReady, "no graded canvas has painted yet");
             tryCompare(late, "assetsReady", true, 10000);
-            scene.weather = 2;
+            scene.controls = custom;
             tryCompare(scene, "assetsReady", true, 10000);
             wait(100);
             verify(grabImage(late).equals(grabImage(scene)), "latest weather before load matches grading after load");
@@ -92,7 +100,7 @@ Item {
             var before = grabImage(scene);
             var artwork = pixels(scene, "sceneryCache");
             var cached = scene.staticPaintCount, grades = scene.gradePaintCount;
-            scene.time = 87;
+            scene.windTime = 87;
             wait(100);
             var after = grabImage(scene);
             var treePixels = 0, skyChanges = 0;
