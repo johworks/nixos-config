@@ -3,6 +3,9 @@
 Learn the existing tool before building the idea notebook. This is a local
 OpenRig experiment with one researcher, an example idea, and a context pack.
 
+For the everyday conversation and assignment paths, start with
+[How to talk to OpenRig](INTERFACE.md).
+
 OpenRig **0.6.11**, source commit
 `379f0a0d106e65164c615818927267c2082ebcb4`, is pinned for this investigation.
 The lab uses Node 24.14.1, tmux 3.6a from the repository's locked unstable
