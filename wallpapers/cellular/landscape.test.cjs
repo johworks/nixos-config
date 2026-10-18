@@ -30,11 +30,24 @@ test('fine output reveals substantially more source samples; source density stay
   assert.deepEqual(landscape.sourceSize(1280, 720), landscape.sourceSize(3840, 2160));
 });
 
-test('foreground contour anchors the tree to a hill falling into the valley', () => {
-  const treeBase = landscape.hilltop(303);
-  assert.ok(treeBase > 470 && treeBase < 500);
-  assert.ok(landscape.hilltop(0) < treeBase);
-  assert.ok(landscape.hilltop(700) > 640);
+test('weather grades warm pixels toward cool muted cloud and terrain tones', () => {
+  const cloudy = landscape.gradePixel(230, 96, 73, 1, false);
+  const rainy = landscape.gradePixel(230, 96, 73, 2, false);
+  assert.ok(cloudy[0] < 230 && rainy[0] < cloudy[0]);
+  const sum = a => a.reduce((total, channel) => total + channel, 0);
+  assert.ok(sum(rainy) < sum(cloudy));
+  for (const weather of [1, 2]) {
+    const cloud = landscape.gradePixel(230, 96, 73, weather, true);
+    assert.ok(Math.max(...cloud) - Math.min(...cloud) < 30);
+  }
+});
+
+test('oversized cloud drift covers the view throughout its bounded oscillation', () => {
+  for (const time of [0, 12, 200, 1000, 10000]) {
+    const rect = landscape.cloudPlacement(1280, 720, time);
+    assert.ok(rect.x <= 0 && rect.y <= 0);
+    assert.ok(rect.x + rect.width >= 1280 && rect.y + rect.height >= 720);
+  }
 });
 
 test('clock scales weather speed and bounds suspend/resume gaps', () => {

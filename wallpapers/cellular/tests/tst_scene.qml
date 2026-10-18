@@ -25,6 +25,7 @@ Item {
             scene.time = 12;
             scene.weather = 0;
             scene.cellSize = 2;
+            tryCompare(scene, "assetsReady", true, 10000);
             wait(150);
         }
         function test_clock_controls() {
@@ -73,6 +74,7 @@ Item {
         function test_cached_source_and_final_sampling() {
             verify(scene.staticPaintCount >= 2);
             var cached = scene.staticPaintCount;
+            var grades = scene.gradePaintCount;
             var sourceWidth = scene.sourceSize.columns;
             var sourceHeight = scene.sourceSize.rows;
             var fine = grabImage(scene);
@@ -97,6 +99,7 @@ Item {
                 return scene.compositePaintCount > composites;
             });
             compare(scene.staticPaintCount, cached, "weather motion must reuse cached sky and scenery");
+            compare(scene.gradePaintCount, grades, "no pixel grading/readback during animation or detail changes");
         }
         function test_resize() {
             container.width = 1080;
@@ -135,8 +138,8 @@ Item {
                 compare(image.width, 1280);
                 compare(image.height, 720);
                 verify(image.pixel(300, 365) !== image.pixel(50, 50), "left tree canopy must render");
-                verify(image.pixel(1000, 220) !== image.pixel(50, 50), "distant snow peak must render");
-                verify(image.pixel(100, 600) !== image.pixel(900, 600), "foreground meadow and open lake must differ");
+                verify(image.pixel(1000, 220) !== image.pixel(50, 50), "textured sky must render");
+                verify(image.pixel(100, 600) !== image.pixel(900, 600), "foreground overlook and river valley must differ");
                 images.push(image);
                 var color = image.pixel(100, 600);
                 brightness.push(color.r + color.g + color.b);

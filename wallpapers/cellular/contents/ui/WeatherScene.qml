@@ -7,22 +7,27 @@ Item {
     clip: true
 
     property int weather: 0
-    property int cellSize: 4
+    property int cellSize: 2
     property int speed: 10
     property bool paused: false
     property bool animationEnabled: true
     property real time: 0
     property double lastTick: 0
+    property url scenerySource: Qt.resolvedUrl("../images/canyon-scenery-v1.png")
+    property url cloudSource: Qt.resolvedUrl("../images/canyon-clouds-v1.png")
+    readonly property bool assetsReady: terrain.cached && clouds.cached
+    readonly property bool assetError: terrain.imageError || clouds.imageError
     readonly property var grid: Landscape.grid(width, height, cellSize)
     readonly property var sourceSize: Landscape.sourceSize(width, height)
     readonly property bool windowVisible: Window.window !== null && Window.window.visible && Window.window.visibility !== Window.Minimized
-    readonly property bool animating: visible && windowVisible && animationEnabled && !paused && width > 0 && height > 0
-    property int staticPaintCount: 0
+    readonly property bool animating: visible && windowVisible && assetsReady && animationEnabled && !paused && width > 0 && height > 0
+    property int skyPaintCount: 0
+    readonly property int staticPaintCount: skyPaintCount + terrain.paintCount + clouds.paintCount
     property int compositePaintCount: 0
+    readonly property int gradePaintCount: terrain.gradeCount + clouds.gradeCount
 
     function repaintStatic() {
         sky.requestPaint();
-        terrain.requestPaint();
     }
     onWeatherChanged: repaintStatic()
     onSourceSizeChanged: repaintStatic()
@@ -31,8 +36,7 @@ Item {
     onVisibleChanged: if (visible)
         composition.requestPaint()
 
-    // Offscreen source canvases keep rich artwork cached, independent of the
-    // final grid. Canvas drawImage's nine-argument overload samples their images.
+    // Cached source images stay independent of the final sampling grid.
     Item {
         opacity: 0
         Canvas {
@@ -41,18 +45,27 @@ Item {
             height: root.sourceSize.rows
             onPaint: {
                 Landscape.sky(getContext("2d"), width, height, root.weather);
-                root.staticPaintCount++;
+                root.skyPaintCount++;
             }
             onPainted: composition.requestPaint()
         }
-        Canvas {
+        ArtworkLayer {
             id: terrain
+            objectName: "sceneryCache"
             width: root.sourceSize.columns
             height: root.sourceSize.rows
-            onPaint: {
-                Landscape.scenery(getContext("2d"), width, height, root.weather);
-                root.staticPaintCount++;
-            }
+            imageSource: root.scenerySource
+            weather: root.weather
+            onPainted: composition.requestPaint()
+        }
+        ArtworkLayer {
+            id: clouds
+            objectName: "cloudCache"
+            width: root.sourceSize.columns
+            height: root.sourceSize.rows
+            imageSource: root.cloudSource
+            weather: root.weather
+            cloud: true
             onPainted: composition.requestPaint()
         }
         Canvas {
@@ -63,8 +76,8 @@ Item {
                 var ctx = getContext("2d");
                 ctx.reset();
                 ctx.drawImage(sky, 0, 0, width, height, 0, 0, width, height);
-                Landscape.clouds(ctx, width, height, root.weather, root.time);
-                ctx.resetTransform();
+                var drift = Landscape.cloudPlacement(width, height, root.time);
+                ctx.drawImage(clouds, 0, 0, width, height, drift.x, drift.y, drift.width, drift.height);
                 ctx.drawImage(terrain, 0, 0, width, height, 0, 0, width, height);
                 Landscape.rain(ctx, width, height, root.weather, root.time);
                 root.compositePaintCount++;

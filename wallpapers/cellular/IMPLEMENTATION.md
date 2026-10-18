@@ -254,3 +254,140 @@ unrelated notifications QString/int warning seen earlier. Final desktop Nix
 daemon wallpaper-source evaluation passed with --no-write-lock-file and
 XDG_CACHE_HOME=/home/john/.cache. No system build/switch, main merge or push.
 README records the active preview and original-wallpaper restore command.
+
+## Revision 3: reference-led original asset pipeline — 2026-10-18
+
+This section supersedes the active procedural renderer described above.
+Earlier native acceptance remains historical. No native activation was performed
+by the builder for this asset pipeline.
+
+Project nixos-cmd; claimed implementation child nixos-cmd.4 remains open.
+Lead obligation qitem-20261018161135-f90c02e56ed6dfd2.
+Builder assignment qitem-20261018161549-03cb6f49f80c367c.
+
+### Visual result and implementation
+
+Inspected /tmp/weather-style-reference.jpg and the two original project-bound
+PNGs supplied by the lead. Preserved those PNG bytes and provenance/prompts in
+ARTWORK.md; the downloaded reference is not shipped. Replaced the procedural
+mountain/tree/ground geometry and blob clouds with the dense textured canyon
+scenery and separate cloud artwork. The left foreground tree/overlook, deep
+violet valley and winding river now follow the reference-led art direction.
+
+Sunny uses vivid coral/gold sky with violet scenic depth. Cloudy makes the sky,
+scenery and clouds cooler/muted, and rainy makes them darker with falling rain.
+Actual asset RGB changes, including warm highlights, rather than leaving a
+sunset painted under storm clouds. The sun and moving clouds remain behind the
+scenery; rain stays in front. Original translucent edges/gaps are preserved.
+
+ArtworkLayer.qml owns explicit Canvas.loadImage loading, image/error/cache-ready
+state, asynchronous completion and cached grading. Its paint reads current
+weather, so changes before load completion yield the latest condition. Image
+reload unloads the old Canvas image entry. Decoding and source caches are bounded
+at 1600 × 1000. Aspect remains 1672:941, fitting width and anchoring scenery at
+the bottom. Tall views extend sky; wide views crop vertically.
+
+The composition draws cached sky/sun, oversized cloud cache, scenery cache,
+and rain, then samples the full frame to the existing bounded final grid.
+Cloud drift uses bounded slow sine motion within 112% overscan; image boundaries
+never enter the viewport. Grid/pause/speed/visibility controls and settings keys
+are unchanged. Animation waits for graded assets and stops when hidden/paused.
+Per-pixel image readback/grading only runs for source/weather/load changes.
+
+### Runtime issues found and corrected
+
+- An Image.Ready flag alone did not prove Canvas had drawn the PNG. The initial
+  Image-item draw path produced blank source caches. Explicit Canvas.loadImage
+  plus cache pixel checks fixed that loading boundary.
+- On installed Qt 6.11, the short putImageData call did not update cached pixels.
+  Passing the full dirty rectangle produced the actual graded result.
+- Writing graded pixels over the original frame accumulated alpha at thin cloud
+  boundaries. Clearing the cache before the write preserves original alpha;
+  sampled scenery/cloud alpha values now match before and after grading.
+- These generated PNGs contain many near-opaque interior pixels (often alpha252),
+  rather than uniformly alpha255. Tests preserve their alpha and allow only the
+  corresponding tiny background contribution through near-opaque tree samples.
+- Qt test file order initially triggered toolkit URL-registration warnings;
+  placing artwork tests after the existing settings/scene tests leaves the final
+  complete run clean. No production warning suppression was added.
+
+### Actual checks for revision 3
+
+- node --test wallpapers/cellular/*.test.cjs: **10 passed, 0 failed** (5 current
+  sizing/grade/drift/clock tests plus 5 legacy Life tests).
+- Qt 6.11.0 offscreen/software qmltestrunner: **16 passed, 0 failed**, including
+  framework setup/cleanup, with no runtime warnings in the final run.
+- Actual Qt cache/output pixels cover loading, alpha gaps and near-opaque
+  scenery, RGB changes and grey storm clouds, unchanged alpha after grading,
+  weather changes during pending load versus after load, cloud movement behind
+  the tree, foreground rain, final whole-frame 10-pixel sampling and finer
+  detail, stable cache/grade counts during animation and detail changes, loaded
+  settings, pause/speed/hidden-window behavior, portrait/8K source/output bounds.
+- qmllint on all production, preview and test QML: clean with the installed
+  Qt/KDE imports recorded above. Changed QML formatted with qmlformat.
+- Feature-scoped git diff --check passes. No Nix file changes or system rebuild.
+
+Regenerated and visually inspected the actual **1280 × 720** Qt captures:
+preview-sunny.png, preview-cloudy.png, preview-rainy.png (cell2) and
+preview-coarse.png (sunny, cell10). They replace the previous procedural preview
+files; earlier source/native evidence remains in this note and Git history.
+The current captures show rich foliage/rock, coral/violet sunny light, cool grey
+cloudy light, darker rain, alpha-safe sky and readable coarse/fine composition.
+
+Reproduce with the same tools/import paths above, tests directory, and
+preview.qml -- --capture --weather=N --cell=N --output=PATH. Capture now waits
+for ready graded caches and reports failure on error/timeout.
+
+### Remaining native verification
+
+This asset loading/grading/composition path has not yet been checked inside
+Plasma's GPU scene graph. Historical native evidence applies to older renderers.
+Lead must use a fresh preview plugin ID after independent review because Plasma
+cached earlier QML across reloads. Check native loading, controls/menu, settings
+reload, weather transitions and rendering there. README has preview/restore
+steps. The original Home Manager wallpaper and live previews remain untouched.
+No assets were raster-edited by scripts, dependencies installed, branches
+changed, Git commits made, or desktop state activated by the builder. Lead's
+existing ARTWORK/PNG changes were preserved and integrated.
+
+### Lead native acceptance for revision 3
+
+Accepted independent review qitem-20261018210206-b01739ab after inspecting
+current full-sized sunny/cloudy/rainy captures. Reviewer independently ran
+10 Node tests, 16 actual Qt checks and clean QML lint and inspected the reference,
+original artwork and all rendered variants. No blocking defects were found.
+
+The earlier stalled-work finding qitem-recovery-ff6e71eb8cf115e4 is resolved:
+the builder handed off, review completed and returned a verdict. Its queue row
+was confirmed done; no restart or duplicate implementation assignment was needed.
+
+Saved active preview2 settings in /tmp/weather-before-revision3.json. Staged the
+reviewed package with only metadata ID/name changed and installed it through
+kpackagetool6 into /home/john/.local/share/plasma/wallpapers under fresh ID
+org.nixos.pixelweather.preview3, displayed as Pixel Weather Preview 3. Original
+Home Manager wallpaper and earlier preview packages/settings remain available.
+Only connected desktop id 1 changed; disconnected desktop id 2 was not changed.
+
+Inspected native screenshots /tmp/weather-native-revision3-sunny.png and
+/tmp/weather-native-revision3-rainy.png. The new PNG scenery/cloud assets load,
+the reference-led scene renders through the real Plasma scene graph, and a
+weather transition changes the exposed terrain/cloud RGB to darker cool tones
+with rain. No opaque black/checkerboard background or obvious magenta boundary
+artifact was visible. User windows obscure much of these captures, so complete
+composition is established by the full-sized actual Qt previews plus visible
+native regions. Native screenshots include private windows and are excluded
+from repository artifacts. No unobstructed native full-frame claim is made.
+
+Set Weather=2, CellSize=4, Speed=7, Paused=true via native Plasma configuration,
+selected the original wallpaper, then reloaded preview3. All four settings
+read back unchanged and were confirmed on disk. Returned to Weather=0,
+CellSize=2, Speed=10, Paused=false for John's visual feedback. This checks
+native configuration/reload, not interactive context-menu or settings-dialog
+Apply/reopen clicks. Those and physical display resizing remain unclaimed;
+Qt checks cover loaded control aliases, clock/pause, resizing and image caches.
+
+Plasmashell journal since review/activation showed no entries. Final feature
+diff check and desktop Nix daemon wallpaper-source evaluation passed using
+--no-write-lock-file and XDG_CACHE_HOME=/home/john/.cache. No full system build,
+switch, shell restart, main merge or push. Runtime resource use was not measured.
+README documents active preview selection and previous/original restore routes.
