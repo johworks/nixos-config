@@ -3,6 +3,7 @@ import QtQuick.Window
 import QtTest
 import "../contents/ui"
 import "../contents/ui/controls.js" as Controls
+import "../contents/ui/rain.js" as Rain
 
 Item {
     id: container
@@ -12,6 +13,15 @@ Item {
         id: scene
         anchors.fill: parent
         cellSize: 2
+    }
+    Component {
+        id: independentScene
+        WeatherScene {
+            width: 1280
+            height: 720
+            paused: true
+            visible: false
+        }
     }
     TestCase {
         name: "WeatherScene"
@@ -25,12 +35,17 @@ Item {
             scene.speed = 10;
             scene.time = 12;
             scene.controls = Controls.preset("sunny");
+            scene.rainRandom = Rain.seededRandom(19);
             scene.windTime = 12;
             scene.cellSize = 2;
             tryCompare(scene, "assetsReady", true, 10000);
             wait(150);
         }
         function test_clock_controls() {
+            setKnobs({
+                RainIntensity: 70,
+                Wind: 0
+            });
             var start = scene.time;
             scene.paused = false;
             tryVerify(function () {
@@ -38,16 +53,20 @@ Item {
             });
             scene.paused = true;
             var stopped = scene.time;
+            var particles = JSON.stringify(scene.rainState.drops);
             wait(150);
             compare(scene.time, stopped);
+            compare(JSON.stringify(scene.rainState.drops), particles);
             scene.paused = false;
             tryVerify(function () {
                 return scene.time > stopped;
             });
             scene.visible = false;
             stopped = scene.time;
+            particles = JSON.stringify(scene.rainState.drops);
             wait(150);
             compare(scene.time, stopped);
+            compare(JSON.stringify(scene.rainState.drops), particles);
             scene.visible = true;
             tryVerify(function () {
                 return scene.time > stopped;
@@ -58,6 +77,9 @@ Item {
             compare(scene.time, stopped);
         }
         function test_hidden_window() {
+            setKnobs({
+                RainIntensity: 70
+            });
             var start = scene.time;
             scene.paused = false;
             tryVerify(function () {
@@ -67,8 +89,10 @@ Item {
             window.visible = false;
             try {
                 var stopped = scene.time;
+                var particles = JSON.stringify(scene.rainState.drops);
                 wait(150);
                 compare(scene.time, stopped);
+                compare(JSON.stringify(scene.rainState.drops), particles);
             } finally {
                 window.visible = true;
             }
@@ -191,6 +215,55 @@ Item {
             });
             verify(terrain.gradeCount > terrainGrades && clouds.gradeCount > cloudGrades, "lighting invalidates the affected assets");
         }
+        function test_particle_ownership_density_and_detail() {
+            setKnobs({
+                RainIntensity: 70,
+                Wind: 0
+            });
+            var state = scene.rainState;
+            var other = createTemporaryObject(independentScene, container);
+            verify(other !== null);
+            other.rainRandom = Rain.seededRandom(19);
+            other.controls = scene.controls;
+            verify(other.rainState !== state);
+            verify(other.rainState.drops !== state.drops);
+            compare(JSON.stringify(other.rainState.drops), JSON.stringify(state.drops), "injected seed reproduces the initial field");
+            var frozenOther = JSON.stringify(other.rainState.drops);
+            var first = state.drops[0];
+            first.x = 0.5;
+            first.y = 0.5;
+            var cached = scene.staticPaintCount, grades = scene.gradePaintCount;
+            scene.paused = false;
+            tryVerify(function () {
+                return first.y > 0.5;
+            });
+            scene.paused = true;
+            compare(first.x, 0.5, "still wind gives vertical motion");
+            compare(JSON.stringify(other.rainState.drops), frozenOther, "one scene cannot advance another scene's state");
+            var y = first.y;
+            setKnobs({
+                RainIntensity: 90,
+                Wind: -50
+            });
+            compare(scene.rainState, state);
+            compare(state.drops.length, 216);
+            compare(state.drops[0], first, "density changes retain existing particles");
+            compare(first.y, y);
+            var particles = JSON.stringify(state.drops);
+            scene.cellSize = 10;
+            wait(100);
+            compare(JSON.stringify(state.drops), particles, "sampling changes do not reseed particles");
+            compare(scene.staticPaintCount, cached);
+            compare(scene.gradePaintCount, grades);
+            container.width = 1080;
+            container.height = 1920;
+            compare(scene.rainState, state);
+            compare(JSON.stringify(state.drops), particles, "resize retains normalized positions");
+            setKnobs({
+                RainIntensity: 0
+            });
+            compare(state.drops.length, 0);
+        }
         function test_wind_and_rain_independence() {
             setKnobs({
                 Wind: 0,
@@ -250,18 +323,28 @@ Item {
             compare(scene.sourceSize.rows, 720);
         }
         function test_speed() {
+            setKnobs({
+                RainIntensity: 70,
+                Wind: 0
+            });
+            var first = scene.rainState.drops[0];
+            first.x = 0.5;
+            first.y = 0.5;
             scene.speed = 2;
             scene.time = 0;
             scene.paused = false;
             wait(300);
             scene.paused = true;
             var slow = scene.time;
+            var slowFall = first.y - 0.5;
             scene.time = 0;
+            first.y = 0.5;
             scene.speed = 20;
             scene.paused = false;
             wait(300);
             scene.paused = true;
             verify(scene.time > slow * 4);
+            verify(first.y - 0.5 > slowFall * 4, "global speed scales the particle simulation too");
         }
         function test_composed_weather() {
             var images = [];
@@ -282,7 +365,8 @@ Item {
             verify(brightness[0] > brightness[1] && brightness[1] > brightness[2], "weather changes terrain lighting");
             verify(!images[0].equals(images[1]) && !images[1].equals(images[2]));
             var rainy = images[2];
-            scene.time += 0.15;
+            scene.advanceAnimation(0.1);
+            scene.advanceAnimation(0.05);
             wait(150);
             var falling = grabImage(scene);
             var rainChanges = 0;

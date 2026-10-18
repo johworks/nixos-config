@@ -101,16 +101,3 @@ function cloudPlacements(width, height, phase) {
     }
     return layers;
 }
-function rain(ctx, width, height, intensity, wind, time, windTime) {
-    if (intensity <= 0) return;
-    ctx.strokeStyle = "rgba(179,203,220," + (0.5*intensity) + ")";
-    ctx.lineWidth = Math.max(0.8,width/1280); ctx.beginPath();
-    for (var drop=0; drop<Math.ceil(240*intensity); drop++) {
-        // Signed phase remains continuous when wind changes; vertical fall uses
-        // the independent clock, including during still weather.
-        var x = ((drop*127.7 + windTime*31) % (width+20) + width+20) % (width+20) - 10;
-        var y = ((drop*79.3 + time*235) % (height+20)) - 10;
-        ctx.moveTo(x,y); ctx.lineTo(x+wind*4.57,y+7+drop%3*2);
-    }
-    ctx.stroke();
-}

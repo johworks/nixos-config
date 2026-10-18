@@ -34,6 +34,35 @@ as convenient starting points. Any knob can then be edited independently. A
 preset resets all atmosphere knobs, including sun position, while retaining grid
 detail, pause, and global speed. Presets do not select images or render modes.
 
+### Try the rain
+
+The native wallpaper form starts with Apply/scroll guidance. Changes in this
+form take effect when you press **Apply**; Cancel discards unapplied edits.
+Scroll down for **Wind and rain** and **Detail and animation**.
+[Guidance in the actual Qt form](preview-controls-guidance.png) (offscreen preview).
+
+1. Choose Sunny, set Rain intensity to **70**, Wind to **0**, speed to **10**,
+   and uncheck Pause animation. Press Apply to see vertical rain in warm light.
+2. Set Wind to **−60**, then **+60**, applying each time to compare left/right
+   drift and cloud movement. Set it back to 0 for still clouds and vertical rain.
+3. Vary Rain intensity (0 is dry; higher values add drops) and Animation speed
+   (affects rain and clouds), then Apply. Lighting and rain remain independent.
+4. Check Pause animation and Apply to inspect a frozen frame. Uncheck it and
+   Apply to resume from the same positions.
+5. Choose Sunny and Apply to return to the warm, dry baseline. Presets retain
+   pause, speed and detail: unpause and set speed10/cell size2 if needed.
+
+This is one composed scene, with independent sky/sun, clouds and foreground
+rain. Brightness/warmth grade the artwork; the tree/cliff/river and painted
+highlight direction remain baked into one scenery image.
+
+Rain uses at most 240 particles with random birth positions, fall speeds,
+lengths and opacity. Initial drops fill the view; offscreen drops respawn above
+it with fresh values. Positions persist between frames, so repainting does not
+flicker or replay a fixed wrap pattern. Density changes retain surviving drops;
+changing pixel detail does not reseed them. Compare [start](preview-rain-start.png)
+and [5.5 seconds later](preview-rain-later.png), with rain70/wind0/seed73.
+
 The approved warm default is retained: the current default Qt capture matches
 the preceding approved sunny capture byte-for-byte. Sun position moves the sky
 sun; painted terrain highlights retain their source direction. Tree, cliff and
@@ -85,7 +114,8 @@ Actual **1280 × 720** captured settings examples:
 - [Warm overcast](preview-warm-overcast.png): brightness 105, warmth 80, sun 0, cloud darkness 65, wind −35.
 
 Earlier cloudy/rainy/coarse/six-way PNGs are historical captures, not image
-choices used by the live renderer.
+choices used by the live renderer. Mixed captures above predate randomized
+rain; the temporal pair in Try the rain shows the new drops.
 
 ```sh
 node --test wallpapers/cellular/*.test.cjs
@@ -102,11 +132,18 @@ for an animated preview. Capture waits for ready caches and reports loading
 error/timeout. Installed Qt tools/import paths, actual checks and historical
 native evidence are in [IMPLEMENTATION.md](IMPLEMENTATION.md).
 
+For repeatable rain captures, add `--seed=73` (normal wallpaper instances use
+fresh randomness). `--capture --frames=12 --output=/tmp/pixel-weather-rain`
+writes `/tmp/pixel-weather-rain-01.png` through `-12.png`, advancing half a
+simulation second between frames. Frames are bounded to 40. These options are
+preview tools; there is no seed field to manage in the native settings form.
+
 ## Native preview and restore
 
-The reviewed independent-control version is active as **Pixel Weather Preview 6**
-(`org.nixos.pixelweather.preview6`), and its native settings dialog was left open
-for adjustment. [Native control form](preview-controls.png). The current scene
+The reviewed randomized-rain version is active as **Pixel Weather Preview 7**
+(`org.nixos.pixelweather.preview7`). Its native settings dialog was reopened with
+the Apply/scroll instructions visible: [current native form](preview-controls-native-guidance.png).
+Your previous independent-control values were preserved. The current scene
 demonstrates a custom sun shower: brightness112, warmth55, sun68/29 at strength80,
 cloud amount40/darkness25, wind−30 and rain65, cell size2/speed10/unpaused. Press
 Sunny for the approved baseline, or edit individual controls and Apply.

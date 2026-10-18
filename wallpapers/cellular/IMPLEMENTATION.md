@@ -652,3 +652,134 @@ windows and stay in /tmp; only the controls-only screenshot is in the repo.
 Final source evaluation with Nix daemon/--no-write-lock-file and the permitted
 cache passed; feature diff checks pass. No system build/switch, shell restart,
 main merge or push. README records active preview, controls and restore route.
+
+## Randomized rain and understandable experiments — 2026-10-18
+
+Project nixos-cmd; claimed implementation child nixos-cmd.6 remains open.
+Lead obligation qitem-20261018223954-68db8a493abae1ca;
+builder assignment qitem-20261018224043-140b248d1e10d5bf.
+Base approved commit06913b5. John could see the deterministic rain pattern and
+asked for random spawn positions and an understandable way to experiment.
+
+### Particle behavior and controls
+
+Replaced Landscape.rain's index/modulo lattice with contents/ui/rain.js and a
+per-WeatherScene particle state. Production births consume Math.random; tests
+and optional preview captures inject a local seeded generator. There is no
+shared particle array or user-facing seed field. Painting consumes no random
+values and does not advance the simulation.
+
+Density is ceil(240 * normalized intensity), bounded0–240. Increasing density
+adds independently populated drops throughout the view; decreasing it retains
+survivors. Initial positions are independent across x/y. Each offscreen exit
+chooses a fresh x, spawn height above the screen, fall speed0.28–0.44 view heights
+per simulation second, length0.009–0.018 heights and opacity0.3–0.6. Different
+fall speeds and entry delays break a single repeated lifecycle. There is no
+visible-position wrap or per-frame jitter. Side exits also respawn above view.
+
+Positions/lengths are normalized independently of the sampling grid. Signed wind
+changes horizontal velocity and streak tilt without replacing positions; zero
+wind leaves vertical rain. Resize retains normalized positions. The existing
+bounded clock supplies elapsed time/speed through advanceAnimation(), used by
+the live20FPS timer and captures. Model steps cap at0.2s (fastest scaled tick),
+and at most240 drops advance/draw. Pause/hidden/unready/animation-disabled gates
+still stop the timer without catch-up. Source grading remains independent.
+
+The top of config.qml now visibly explains preset/edit -> Apply and scrolling
+to wind/rain/speed/pause. No Apply/Cancel semantics or persistence code changed.
+README includes a hands-on rain70/wind0 recipe, left/right wind, density/speed,
+pause inspection and Sunny/unpause return. The actual offscreen form was loaded
+with host-shaped properties, captured and inspected: preview-controls-guidance.png
+shows the guidance above presets. This is a Qt preview, not native Plasma proof.
+
+### Actual checks and temporal evidence
+
+Node command node --test wallpapers/cellular/*.test.cjs: **19 passed,0 failed**.
+Five new model tests use explicit sample streams or fixed seed73, not chance:
+independent birth attributes, continuous motion/no RNG before exit, fresh values
+on bottom/side respawn, zero/density/survivor behavior, draw purity and wind tilt,
+bounded resume steps, and1000-step reproducibility/bounds/state independence.
+
+Actual Qt6.11 offscreen/software qmltestrunner -input wallpapers/cellular/tests:
+**28 passed,0 failed/skipped**, including setup/cleanup, no runtime warnings.
+Extended actual scene tests verify seeded equality with separate state owners,
+one scene advancing without mutating another, retained particles on density,
+detail and resize changes, speed scaling actual fall distance, zero-wind fall,
+pause/resume/hidden-window/asset-readiness gating and unchanged grade caches.
+Seed injection keeps the existing before/after asset-loading image comparison
+meaningful. Existing form/migration/native-save contracts pass unchanged.
+
+Full production/preview/test qmllint: exit0,no diagnostics; changed QML formatted
+with qmlformat. Feature-scoped git diff --check passes. No Nix module changes.
+Source PNG hashes still match ARTWORK.md. Regenerated actual sunny dry capture
+/tmp/weather-dry-preserved.png matches approved preview-sunny.png byte-for-byte:
+d9641397bd3079c2960bc05291018a1bbaf2819a5ba29af06d7e8b2c0bd4694b.
+
+Used the installed Qt tools/import paths documented above, with offscreen/software:
+
+```sh
+qml wallpapers/cellular/preview.qml -- --capture --preset=sunny \
+  --RainIntensity=70 --Wind=0 --seed=73 --frames=12 \
+  --output=/tmp/weather-rain-vertical
+qml wallpapers/cellular/preview.qml -- --capture --preset=sunny \
+  --RainIntensity=100 --Wind=-75 --seed=73 --frames=8 \
+  --output=/tmp/weather-rain-left
+```
+
+Each sequence advances five bounded0.1s steps between actual1280×720 Qt captures.
+Inspected vertical frames01/02/06/12 (relative0/0.5/2.5/5.5s) and left-wind frames
+01/08 (0/3.5s). Irregular vertical/drop spacing changes over a complete lifecycle;
+left wind visibly tilts drops while artwork remains stable. This is temporal
+snapshot inspection, not an observation of native GPU playback smoothness.
+Full sequences are temporary /tmp/weather-rain-{vertical,left}-NN.png files;
+durable preview-rain-start.png and preview-rain-later.png copy vertical01/12.
+First two seeded captures reproduced byte-for-byte after capture timer cleanup.
+Preview --seed is optional and --frames clamps1–40; normal production has fresh
+randomness. Existing mixed captures retain earlier rain and are labeled as such.
+
+Independent review and lead's fresh-ID native update/controls demonstration
+remain. Existing preview6/user settings were not touched. No source artwork,
+defaults, migration/save schema, dependency/harness, branch, Git commit, publish,
+merge, system rebuild or desktop mutation by builder. Resource use is bounded by
+code/test counts; actual CPU/GPU/memory use and native interaction remain unmeasured.
+
+### Lead native acceptance for randomized rain and guidance
+
+Accepted review qitem-20261018230906-477e8d56: reviewer independently ran
+Node19/19, actual Qt28/28, clean lint/diff, reproduced the 12-frame vertical
+sequence endpoints, and inspected vertical/left-wind frames and form guidance.
+Lead also inspected durable rain start/later images and the offscreen form.
+The regular lattice has been replaced by fresh per-birth/respawn particle values;
+the approved dry image and original artwork hashes remain unchanged.
+
+Installed the reviewed package as fresh org.nixos.pixelweather.preview7, named
+Pixel Weather Preview 7. Captured the current preview6 configuration before
+selection and copied every existing atmosphere/version/detail/speed/pause value.
+Original Home Manager wallpaper and previous previews are preserved; only
+connected desktop id1 changed.
+
+For a short native test, temporarily selected rain70/wind0/unpaused and captured
+two desktop frames three seconds apart at /tmp/weather-native-random-start.png
+and /tmp/weather-native-random-later.png. Visible drop positions/spacing changed
+with stable artwork; the later capture exposed the full desktop scene. The
+normal production RNG was used, not the preview seed. This is native temporal
+snapshot evidence, not a measured smoothness benchmark or complete tracking of
+every drop. Reviewer/model/Qt evidence establishes continuous lifecycle motion
+and respawning. Native signed-wind/pause values were accepted and read back;
+their full visual interaction behavior rests on Qt tests and reviewed code.
+
+Restored every preserved control value: brightness112/warmth55, sun68/29 at80,
+cloud40/darkness25, wind−30/rain65, cell2/speed10/unpaused, version1/legacyWeather2.
+Native wallpaper(0) and the appletsrc preview7 group matched the restored values.
+The native settings dialog reopened on preview7 with correct values and the
+new instructions visible above presets; its scrollbar remains available.
+Only-dialog screenshot saved as preview-controls-native-guidance.png. Desktop
+captures include private windows and stay in /tmp, outside repository artifacts.
+
+Journal inspection since activation found no preview7 or JS type/reference/
+syntax errors. Final feature diff check and Nix daemon source eval with
+--no-write-lock-file and permitted cache passed. No system build/switch,
+shell restart, main merge or push. Manual GUI Apply/preset/reset/pause clicks
+and scrolling were not automated; the workflow is documented for John's own
+experiments and form/save contracts remain covered by actual Qt checks. No
+CPU/GPU/memory measurement or native playback smoothness claim is made.

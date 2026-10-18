@@ -2,6 +2,7 @@ import QtQuick
 import QtTest
 import "../contents/ui"
 import "../contents/ui/controls.js" as Controls
+import "../contents/ui/rain.js" as Rain
 
 Item {
     id: container
@@ -22,6 +23,7 @@ Item {
             cloudSource: ""
             paused: true
             time: 12
+            rainRandom: Rain.seededRandom(19)
         }
     }
     TestCase {
@@ -29,6 +31,7 @@ Item {
         when: windowShown
         function init() {
             scene.controls = Controls.preset("sunny");
+            scene.rainRandom = Rain.seededRandom(19);
             scene.windTime = 12;
             scene.time = 12;
             tryCompare(scene, "assetsReady", true, 10000);
@@ -79,7 +82,16 @@ Item {
             var late = createTemporaryObject(deferredArtwork, container);
             verify(late !== null);
             verify(!late.assetsReady);
+            late.controls = Controls.preset("rainy");
+            late.paused = false;
+            var particles = JSON.stringify(late.rainState.drops);
+            wait(150);
+            compare(late.animating, false, "unready assets gate the particle timer too");
+            compare(late.time, 12);
+            compare(JSON.stringify(late.rainState.drops), particles);
+            late.paused = true;
             late.controls = Controls.preset("cloudy");
+            late.rainRandom = Rain.seededRandom(19);
             late.scenerySource = scene.scenerySource;
             late.cloudSource = scene.cloudSource;
             var custom = Controls.preset("rainy");

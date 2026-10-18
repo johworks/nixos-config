@@ -2,6 +2,7 @@ import QtQuick
 import QtQuick.Window
 import "landscape.js" as Landscape
 import "controls.js" as Controls
+import "rain.js" as Rain
 
 Item {
     id: root
@@ -15,6 +16,9 @@ Item {
     property bool animationEnabled: true
     property real time: 0
     property real windTime: 0
+    // Tests/captures may inject a seeded generator; production births are fresh.
+    property var rainRandom: Math.random
+    readonly property var rainState: Rain.create(rainRandom)
     property double lastTick: 0
     property url scenerySource: Qt.resolvedUrl("../images/canyon-scenery-v1.png")
     property url cloudSource: Qt.resolvedUrl("../images/canyon-clouds-v1.png")
@@ -29,7 +33,20 @@ Item {
     property int compositePaintCount: 0
     readonly property int gradePaintCount: terrain.gradeCount + clouds.gradeCount
 
-    onAtmosphereChanged: composition.requestPaint()
+    function syncRain() {
+        Rain.setIntensity(rainState, atmosphere.rain);
+        composition.requestPaint();
+    }
+    function advanceAnimation(seconds) {
+        var next = Landscape.advance(time, seconds, speed);
+        var elapsed = next - time;
+        Rain.advance(rainState, elapsed, atmosphere.wind, width, height);
+        // Integrating wind preserves cloud positions on stop/reversal.
+        windTime += elapsed * atmosphere.wind / 0.35;
+        time = next;
+    }
+    onRainStateChanged: syncRain()
+    onAtmosphereChanged: syncRain()
     onTimeChanged: composition.requestPaint()
     onWindTimeChanged: composition.requestPaint()
     onGridChanged: output.requestPaint()
@@ -97,7 +114,7 @@ Item {
                 }
                 ctx.globalAlpha = 1;
                 ctx.drawImage(terrain, 0, 0, width, height, 0, 0, width, height);
-                Landscape.rain(ctx, width, height, root.atmosphere.rain, root.atmosphere.wind, root.time, root.windTime);
+                Rain.draw(ctx, width, height, root.rainState, root.atmosphere.wind);
                 root.compositePaintCount++;
             }
             onPainted: output.requestPaint()
@@ -126,11 +143,7 @@ Item {
         onRunningChanged: root.lastTick = Date.now()
         onTriggered: {
             var now = Date.now();
-            var next = Landscape.advance(root.time, (now - root.lastTick) / 1000, root.speed);
-            // Wind 35 keeps the original calm rate; integrate so reversing or
-            // stopping wind preserves positions instead of resetting the phase.
-            root.windTime += (next - root.time) * root.atmosphere.wind / 0.35;
-            root.time = next;
+            root.advanceAnimation((now - root.lastTick) / 1000);
             root.lastTick = now;
         }
     }

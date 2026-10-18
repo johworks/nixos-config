@@ -38,6 +38,12 @@ Kirigami.FormLayout {
         Controls.writePreset(root, name, "cfg_");
     }
 
+    Label {
+        Layout.fillWidth: true
+        Layout.maximumWidth: 440
+        text: "Choose a preset or edit individual controls, then press Apply to see the result. Scroll down for wind, rain, speed and pause."
+        wrapMode: Text.WordWrap
+    }
     RowLayout {
         Kirigami.FormData.label: "Convenience presets:"
         Button {
