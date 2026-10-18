@@ -1,0 +1,23 @@
+name: wallpaper-team
+version: "1.0"
+description: Coordinate a bounded wallpaper change with a lead, builder, and reviewer.
+defaults:
+  runtime: codex
+profiles:
+  default:
+    uses:
+      skills: []
+      guidance: [wallpaper-team]
+      subagents: []
+      plugins: []
+      runtime_resources: []
+resources:
+  guidance:
+    - id: wallpaper-team
+      path: roles.md
+startup:
+  files:
+    - path: roles.md
+      delivery_hint: send_text
+      required: true
+  actions: []

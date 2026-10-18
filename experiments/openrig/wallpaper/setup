@@ -1,0 +1,36 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+team_dir=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)
+lab_dir=$(cd -- "$team_dir/.." && pwd)
+repo_dir=$(cd -- "$lab_dir/../.." && pwd)
+worktree="$lab_dir/.local/wallpaper-worktree"
+git_dir=$(git -C "$repo_dir" rev-parse --path-format=absolute --git-common-dir)
+cache_dir="${XDG_CACHE_HOME:-$HOME/.cache}/nix"
+
+"$lab_dir/lab" --version
+if [[ ! -e $worktree ]]; then
+  git -C "$repo_dir" worktree add -b feat/weather-wallpaper "$worktree" main
+fi
+if [[ $(git -C "$worktree" branch --show-current) != feat/weather-wallpaper ]]; then
+  echo 'The wallpaper worktree must be on feat/weather-wallpaper.' >&2
+  exit 1
+fi
+chmod 700 "$worktree/.beads"
+
+# Keep this profile inside the lab provider home. A named profile also avoids
+# OpenRig's default shared-workspace scaffold in the production worktree.
+"$lab_dir/lab" exec node --input-type=module -e '
+  import fs from "node:fs";
+  const target = process.env.CODEX_HOME + "/wallpaper.config.toml";
+  if (!fs.existsSync(target)) {
+    const roots = JSON.stringify(process.argv.slice(1));
+    fs.writeFileSync(target,
+      "approval_policy = \"on-request\"\nsandbox_mode = \"workspace-write\"\n" +
+      "[sandbox_workspace_write]\nnetwork_access = true\nwritable_roots = " + roots + "\n",
+      { mode: 0o600, flag: "wx" });
+  }
+  console.log("Wallpaper profile ready: " + target);
+' "$cache_dir" "$git_dir"
+
+"$lab_dir/lab" up "$team_dir/rig.yaml" --plan

@@ -5,6 +5,11 @@ Your point of contact is an agent's conversation. In this lab that is
 role within it; an agent conversation occupies that seat. You do not need to
 address every member of a team to give the team a goal.
 
+For wallpaper development, use the new [three-agent team](wallpaper/README.md)
+and talk to `dev-lead@weather-wallpaper`. That lead records assignments and
+coordinates the builder and reviewer. The notes researcher remains a separate
+research-only conversation.
+
 ## Talk directly
 
 From the repository root:

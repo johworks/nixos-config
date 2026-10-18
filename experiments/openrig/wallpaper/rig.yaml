@@ -1,0 +1,39 @@
+version: "0.2"
+name: weather-wallpaper
+summary: A lead, builder, and reviewer for the desktop wallpaper pilot.
+pods:
+  - id: dev
+    label: Wallpaper development
+    members:
+      - id: lead
+        agent_ref: local:agent
+        runtime: codex
+        model: gpt-6.1-sol
+        codex_config_profile: wallpaper
+        profile: default
+        cwd: ../.local/wallpaper-worktree
+      - id: builder
+        agent_ref: local:agent
+        runtime: codex
+        model: gpt-6.1-sol
+        codex_config_profile: wallpaper
+        profile: default
+        cwd: ../.local/wallpaper-worktree
+      - id: reviewer
+        agent_ref: local:agent
+        runtime: codex
+        model: gpt-6.1-sol
+        codex_config_profile: wallpaper
+        profile: default
+        cwd: ../.local/wallpaper-worktree
+    edges:
+      - kind: delegates_to
+        from: lead
+        to: builder
+      - kind: delegates_to
+        from: lead
+        to: reviewer
+      - kind: delegates_to
+        from: builder
+        to: reviewer
+edges: []
