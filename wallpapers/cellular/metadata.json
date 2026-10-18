@@ -2,11 +2,11 @@
   "KPackageStructure": "Plasma/Wallpaper",
   "KPlugin": {
     "Id": "org.nixos.cellular",
-    "Name": "Cellular Life",
-    "Description": "Conway's Game of Life with random worlds and fading trails",
+    "Name": "Pixel Weather",
+    "Description": "Layered pixel-art landscapes with simulated sunny, cloudy and rainy weather",
     "Icon": "preferences-desktop-wallpaper",
     "License": "MIT",
-    "Version": "1.0"
+    "Version": "2.0"
   },
   "X-Plasma-API-Minimum-Version": "6.0"
 }
