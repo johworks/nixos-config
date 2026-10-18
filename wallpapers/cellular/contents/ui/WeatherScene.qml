@@ -4,8 +4,8 @@ import "landscape.js" as Landscape
 
 Item {
     id: root
+    clip: true
 
-    property int scene: 0
     property int weather: 0
     property int cellSize: 4
     property int speed: 10
@@ -14,32 +14,80 @@ Item {
     property real time: 0
     property double lastTick: 0
     readonly property var grid: Landscape.grid(width, height, cellSize)
+    readonly property var sourceSize: Landscape.sourceSize(width, height)
     readonly property bool windowVisible: Window.window !== null && Window.window.visible && Window.window.visibility !== Window.Minimized
     readonly property bool animating: visible && windowVisible && animationEnabled && !paused && width > 0 && height > 0
+    property int staticPaintCount: 0
+    property int compositePaintCount: 0
 
-    function repaint() {
-        surface.requestPaint();
+    function repaintStatic() {
+        sky.requestPaint();
+        terrain.requestPaint();
     }
-
-    onSceneChanged: repaint()
-    onWeatherChanged: repaint()
-    onTimeChanged: repaint()
-    onGridChanged: repaint()
+    onWeatherChanged: repaintStatic()
+    onSourceSizeChanged: repaintStatic()
+    onTimeChanged: composition.requestPaint()
+    onGridChanged: output.requestPaint()
     onVisibleChanged: if (visible)
-        repaint()
+        composition.requestPaint()
 
+    // Offscreen source canvases keep rich artwork cached, independent of the
+    // final grid. Canvas drawImage's nine-argument overload samples their images.
+    Item {
+        opacity: 0
+        Canvas {
+            id: sky
+            width: root.sourceSize.columns
+            height: root.sourceSize.rows
+            onPaint: {
+                Landscape.sky(getContext("2d"), width, height, root.weather);
+                root.staticPaintCount++;
+            }
+            onPainted: composition.requestPaint()
+        }
+        Canvas {
+            id: terrain
+            width: root.sourceSize.columns
+            height: root.sourceSize.rows
+            onPaint: {
+                Landscape.scenery(getContext("2d"), width, height, root.weather);
+                root.staticPaintCount++;
+            }
+            onPainted: composition.requestPaint()
+        }
+        Canvas {
+            id: composition
+            width: root.sourceSize.columns
+            height: root.sourceSize.rows
+            onPaint: {
+                var ctx = getContext("2d");
+                ctx.reset();
+                ctx.drawImage(sky, 0, 0, width, height, 0, 0, width, height);
+                Landscape.clouds(ctx, width, height, root.weather, root.time);
+                ctx.resetTransform();
+                ctx.drawImage(terrain, 0, 0, width, height, 0, 0, width, height);
+                Landscape.rain(ctx, width, height, root.weather, root.time);
+                root.compositePaintCount++;
+            }
+            onPainted: output.requestPaint()
+        }
+    }
     Canvas {
-        id: surface
+        id: output
         width: root.grid.columns
         height: root.grid.rows
         smooth: false
+        antialiasing: false
         transform: Scale {
-            xScale: root.width / surface.width
-            yScale: root.height / surface.height
+            xScale: root.width / output.width
+            yScale: root.height / output.height
         }
-        onPaint: Landscape.render(getContext("2d"), width, height, root.scene, root.weather, root.time)
+        onPaint: {
+            var ctx = getContext("2d");
+            ctx.reset();
+            ctx.drawImage(composition, 0, 0, composition.width, composition.height, 0, 0, width, height);
+        }
     }
-
     Timer {
         interval: 50
         running: root.animating

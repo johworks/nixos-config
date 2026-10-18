@@ -10,18 +10,12 @@ Kirigami.FormLayout {
     twinFormLayouts: parentLayout
     // qmllint enable unqualified
 
-    property alias cfg_Scene: scene.currentIndex
     property alias cfg_Weather: weather.currentIndex
     property alias cfg_CellSize: cellSize.value
     property alias cfg_Speed: speed.value
     property alias cfg_Paused: paused.checked
     property alias formLayout: root
 
-    ComboBox {
-        id: scene
-        Kirigami.FormData.label: "Landscape:"
-        model: ["Hill and tree", "Mountain lake"]
-    }
     ComboBox {
         id: weather
         Kirigami.FormData.label: "Simulated weather:"
@@ -46,7 +40,7 @@ Kirigami.FormLayout {
     Label {
         Layout.fillWidth: true
         Layout.maximumWidth: 400
-        text: "A shared pixel grid keeps every layer aligned. Detail is capped on large displays. Right-click the desktop for weather and pause actions."
+        text: "Detailed scenery and weather share one final pixel filter. Detail is capped on large displays. Right-click the desktop for weather and pause actions."
         wrapMode: Text.WordWrap
     }
 }

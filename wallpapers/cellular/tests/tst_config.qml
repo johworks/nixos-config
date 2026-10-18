@@ -18,12 +18,10 @@ Item {
             compare(settings.status, Loader.Ready);
             // Loader exposes QObject statically; aliases are checked on the actual loaded form.
             // qmllint disable missing-property
-            settings.item.cfg_Scene = 1;
             settings.item.cfg_Weather = 2;
             settings.item.cfg_CellSize = 2;
             settings.item.cfg_Speed = 20;
             settings.item.cfg_Paused = true;
-            compare(settings.item.cfg_Scene, 1);
             compare(settings.item.cfg_Weather, 2);
             compare(settings.item.cfg_CellSize, 2);
             compare(settings.item.cfg_Speed, 20);

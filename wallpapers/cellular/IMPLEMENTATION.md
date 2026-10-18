@@ -133,3 +133,124 @@ Final feature-scoped git diff --check passed. Nix daemon evaluation of the
 desktop Home Manager wallpaper source also passed with --no-write-lock-file
 and XDG_CACHE_HOME=/home/john/.cache; it resolved the feature worktree's
 wallpapers/cellular source. No full system build or switch was performed.
+
+## Revision 2: composed landscape and final sampling — 2026-10-18
+
+This section supersedes the initial separate-scene implementation above. Keep
+the earlier native-preview record as historical; no native desktop activation
+or reload has been performed for this revision by the builder.
+
+Project nixos-cmd; implementation child nixos-cmd.2 remains open for review.
+Lead obligation qitem-20261018153711-81c4eebb53f7a6ed.
+Builder assignment qitem-20261018153750-79b94b080bd0af17.
+
+John clarified that the hill/tree belongs on the left foreground with mountains
+behind it, and that the scene should be rich before applying the pixel style.
+The renderer now produces one composition with a left hill/tree and open lake
+vista on the right. It includes overlapping mountain ranges, lit/dark rock
+facets and snow gullies, atmospheric foothills, forest belts, lake reflections,
+contoured meadow, grass/flower clusters, shaded rocks, a winding path, branching
+trunk and angular canopy clusters with upper-right lighting. Geometry and
+placements are deterministic, independent of the detail setting.
+
+### Pipeline and caching
+
+Cached high-detail sky and transparent scenery Canvases feed a composition
+Canvas in order: sky, animated clouds, scenery/tree, animated rain. A final
+Canvas uses Context2D.drawImage's nine-argument Canvas-source overload to sample
+the fully composed source into a single shared output grid. That small texture
+scales with smooth:false. No custom shader or dependency is required.
+
+Qt documents the Canvas-source drawImage overload here:
+https://doc.qt.io/qt-6/qml-qtquick-context2d.html#drawImage-method-2
+The actual behavior was validated with Qt rendering and pixel reads, rather
+than assuming support from that API description.
+
+The source size depends on aspect alone, capped at 1600 × 1000; at 16:9 it is
+1280 × 720 on all display sizes. Output detail is capped uniformly at 960 × 600.
+Static sky/scenery repaint for weather or source-aspect changes. Time changes
+recompose cached images and weather, and cell size changes resample the final
+image. Tests observe cache paint counts to verify those distinctions. The
+source buffers remain bounded; no claim of measured GPU/memory usage is made.
+
+Removed Scene from settings, schema, wrapper and renderer. Old saved Scene
+entries cannot select the old separate scenes; remaining keys retain their
+names and persistence route. Fresh CellSize default is 2; saved values remain.
+Pause/speed, hidden/minimized gating, and the bounded elapsed clock are retained.
+
+### Actual validation for revision 2
+
+- node --test wallpapers/cellular/*.test.cjs: **9 passed, 0 failed** (4 updated
+  sizing/composition-model/clock checks plus 5 existing Life checks).
+- Qt 6.11.0 offscreen/software qmltestrunner -input wallpapers/cellular/tests:
+  **11 passed, 0 failed**, including framework setup/cleanup. Checks actual
+  loaded settings controls, three weather palettes on the combined scene,
+  visible tree/snow/meadow/lake regions, moving rain over foreground, pause,
+  hidden item/window, speed, portrait/8K sizing, and the final sampling path.
+- The native Qt pixel test verifies common 10 × 10 output cells across the full
+  image, a materially different finer frame, unchanged source dimensions and
+  static paint counts on detail changes, and cached scenery during animation.
+- qmllint on all production, preview and test QML with the recorded import paths:
+  exit 0, no warnings. qmlformat applied to all six QML files.
+- Feature-scoped git diff --check passed. No Nix files changed; no rebuild,
+  Git commit, branch change, publishing, install, or desktop activation.
+
+Generated and personally inspected these full **1280 × 720** Qt captures:
+
+- wallpapers/cellular/preview-sunny.png (weather 0, cell size 2)
+- wallpapers/cellular/preview-cloudy.png (weather 1, cell size 2)
+- wallpapers/cellular/preview-rainy.png (weather 2, cell size 2)
+- wallpapers/cellular/preview-coarse.png (weather 0, cell size 10)
+
+Reproduce with the same Qt tools/imports above and preview.qml -- --capture
+--weather=N --cell=N --output=PATH. The previous preview.png remains historical.
+
+### Limits and next step
+
+Qt's offscreen software backend verifies real Canvas caching, composition,
+sampling and output pixels. The new multi-Canvas path has not yet been checked
+inside Plasma or with its GPU scene graph. Historical native settings/persistence
+checks above apply to the earlier prototype only. The lead must update the
+separate org.nixos.pixelweather.preview copy after review and verify settings,
+menu actions, reload and animation there. The original Home Manager wallpaper
+and current live preview were untouched by the builder. Current preview/update
+and restore steps are in README.md.
+
+### Lead native acceptance for revision 2
+
+Accepted independent review qitem-20261018154809-e697eaa9: 9 Node tests,
+11 actual Qt checks, clean lint and source diff check; full-sized sunny,
+coarse and rainy images were also inspected by the lead against John's brief.
+
+Backed up the prior installed preview to
+/tmp/pixel-weather-preview-before-revision2 and saved active settings in
+/tmp/weather-before-revision2.json. An in-place kpackagetool6 upgrade followed
+by plugin re-selection retained the old QML in Plasma's cache, evidenced by
+the old artwork and an undefined-int warning. Installed the reviewed source
+under fresh metadata ID org.nixos.pixelweather.preview2, displayed as
+Pixel Weather Preview 2. This loaded the new composition without a shell
+restart. Only connected desktop id 1 changed; original Home Manager plugin
+and disconnected desktop id 2 remain unchanged.
+
+Inspected native capture /tmp/weather-native-revision2-fresh.png: exposed
+wallpaper regions match the revised detailed composition, including fine
+foreground marks, the lake and mountain ridges, and the new sky/clouds. The
+new multi-Canvas source/composition/final-sampling path renders in native
+Plasma. Existing user windows obscure much of the frame, so the full composition
+claim rests on the full-sized actual Qt images plus visible native regions.
+Native captures include private user windows and are excluded from the repo.
+
+Wrote Weather=2, CellSize=10, Speed=7, Paused=true through Plasma's native
+configuration API, selected the original plugin, then reloaded preview2.
+All four values read back unchanged and were confirmed in the on-disk Plasma
+configuration. Returned to Weather=0, CellSize=2, Speed=10, Paused=false for
+John's visual iteration. Interactive context-menu clicks, settings dialog
+Apply/reopen and physical display resizing remain unclaimed; Qt checks cover
+their control aliases, pause/clock behavior and resize rendering. No measured
+CPU/GPU/memory performance claim is made.
+
+Journal inspection after the fresh-ID load found no preview2 errors, only the
+unrelated notifications QString/int warning seen earlier. Final desktop Nix
+daemon wallpaper-source evaluation passed with --no-write-lock-file and
+XDG_CACHE_HOME=/home/john/.cache. No system build/switch, main merge or push.
+README records the active preview and original-wallpaper restore command.

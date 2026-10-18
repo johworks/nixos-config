@@ -3,10 +3,10 @@
   "KPlugin": {
     "Id": "org.nixos.cellular",
     "Name": "Pixel Weather",
-    "Description": "Layered pixel-art landscapes with simulated sunny, cloudy and rainy weather",
+    "Description": "A detailed foreground hill and tree against distant mountains, with simulated weather",
     "Icon": "preferences-desktop-wallpaper",
     "License": "MIT",
-    "Version": "2.0"
+    "Version": "2.1"
   },
   "X-Plasma-API-Minimum-Version": "6.0"
 }

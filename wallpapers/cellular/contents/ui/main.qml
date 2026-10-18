@@ -31,7 +31,6 @@ WallpaperItem {
 
     WeatherScene {
         anchors.fill: parent
-        scene: root.configuration.Scene
         weather: root.configuration.Weather
         cellSize: root.configuration.CellSize
         speed: root.configuration.Speed
