@@ -1,0 +1,53 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+lab_dir=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)
+repo_dir=$(cd -- "$lab_dir/../.." && pwd)
+state_dir="$lab_dir/.local"
+rig_entry="$state_dir/package/node_modules/@openrig/cli/dist/bin-wrapper.js"
+
+umask 077
+mkdir -p "$state_dir/home" "$state_dir/tmux" "$state_dir/workspace"
+chmod 700 "$state_dir"
+
+if [[ ${1:-} == install ]]; then
+  nix --store daemon build --no-write-lock-file --inputs-from "$repo_dir" \
+    nixpkgsUnstable#tmux --out-link "$state_dir/tmux-package"
+  mkdir -p "$state_dir/home/.codex"
+  if [[ ! -e $state_dir/home/.codex/config.toml ]]; then
+    install -m 600 "$lab_dir/codex.toml" "$state_dir/home/.codex/config.toml"
+  fi
+  exec npm install --prefix "$state_dir/package" \
+    --cache "$state_dir/npm-cache" --no-audit --no-fund @openrig/cli@0.6.11
+fi
+
+if [[ ! -f $rig_entry || ! -x $state_dir/tmux-package/bin/tmux ]]; then
+  echo "Run $lab_dir/lab install first." >&2
+  exit 1
+fi
+
+lab_command=(node "$rig_entry" "$@")
+if [[ ${1:-} == exec ]]; then
+  shift
+  if [[ $# == 0 ]]; then
+    echo 'Usage: lab exec <command> [args...]' >&2
+    exit 1
+  fi
+  lab_command=("$@")
+fi
+
+# OpenRig writes provider settings even without the kernel. Give the lab its
+# own home, provider state, workspace, and terminal server.
+exec env \
+  -u TMUX -u CODEX_THREAD_ID -u OPENRIG_NODE_ID -u OPENRIG_SESSION_NAME \
+  HOME="$state_dir/home" CODEX_HOME="$state_dir/home/.codex" \
+  XDG_CONFIG_HOME="$state_dir/home/.config" \
+  XDG_DATA_HOME="$state_dir/home/.local/share" \
+  XDG_CACHE_HOME="$state_dir/home/.cache" \
+  TMUX_TMPDIR="$state_dir/tmux" \
+  OPENRIG_HOME="$state_dir/state" \
+  OPENRIG_WORKSPACE_ROOT="$state_dir/workspace" \
+  OPENRIG_PORT=17433 OPENRIG_BIND_HOST=127.0.0.1 \
+  OPENRIG_URL=http://127.0.0.1:17433 \
+  PATH="$state_dir/package/node_modules/.bin:$state_dir/tmux-package/bin:$PATH" \
+  "${lab_command[@]}"

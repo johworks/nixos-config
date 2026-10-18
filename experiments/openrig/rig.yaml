@@ -1,0 +1,14 @@
+version: "0.2"
+name: notes-lab
+summary: A single agent for learning OpenRig with a disposable notes experiment.
+pods:
+  - id: notes
+    label: Notes experiment
+    members:
+      - id: researcher
+        agent_ref: local:agent
+        runtime: codex
+        model: gpt-6.1-sol
+        profile: default
+        cwd: .local/workspace
+edges: []

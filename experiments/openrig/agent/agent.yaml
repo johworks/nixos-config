@@ -1,0 +1,23 @@
+name: notes-researcher
+version: "1.0"
+description: Explore OpenRig intake, owned work, and durable findings.
+defaults:
+  runtime: codex
+profiles:
+  default:
+    uses:
+      skills: []
+      guidance: [role]
+      subagents: []
+      plugins: []
+      runtime_resources: []
+resources:
+  guidance:
+    - id: role
+      path: role.md
+startup:
+  files:
+    - path: role.md
+      delivery_hint: send_text
+      required: true
+  actions: []

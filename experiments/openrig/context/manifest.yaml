@@ -1,0 +1,8 @@
+name: notes-lab
+version: "1"
+taxonomy: mission
+purpose: The user's idea notebook goal and the scope of this learning lab.
+files:
+  - path: notes.md
+    role: reference
+    summary: Capture, connected knowledge, background experiments, and boundaries.
