@@ -9,6 +9,8 @@ rig_entry="$state_dir/package/node_modules/@openrig/cli/dist/bin-wrapper.js"
 umask 077
 mkdir -p "$state_dir/home" "$state_dir/tmux" "$state_dir/workspace"
 chmod 700 "$state_dir"
+# New tmux servers read this private configuration; keep the user's home alone.
+ln -sfn "$lab_dir/tmux.conf" "$state_dir/home/.tmux.conf"
 
 if [[ ${1:-} == install ]]; then
   nix --store daemon build --no-write-lock-file --inputs-from "$repo_dir" \

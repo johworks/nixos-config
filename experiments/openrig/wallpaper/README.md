@@ -27,6 +27,16 @@ The lead handles queue bookkeeping and specialist handoffs. You can discuss
 options and change direction in that same conversation. Detach with **Ctrl-b,
 then d**; the team stays running.
 
+To open all three agents in one terminal window:
+
+```sh
+./experiments/openrig/lab terminal open weather-wallpaper --window
+```
+
+Click a pane to focus it, or use **Alt + arrow keys** to move between panes.
+The standard **Ctrl-b, then an arrow key** also works. The lab keeps these
+settings in its own [tmux configuration](../tmux.conf).
+
 The TUI is the monitoring interface:
 
 ```sh
