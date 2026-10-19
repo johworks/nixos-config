@@ -3,6 +3,8 @@ import QtQuick.Window
 import "contents/ui"
 import "contents/ui/controls.js" as Controls
 import "contents/ui/rain.js" as Rain
+import "contents/ui/weather.js" as Weather
+import "weather-fixtures.js" as Fixtures
 
 Window {
     id: root
@@ -22,6 +24,11 @@ Window {
         id: landscape
         anchors.fill: parent
         controls: {
+            var name = root.option("--automatic-fixture", "");
+            if (name) {
+                var fixture = Fixtures.scenario(name);
+                return Weather.scene(Weather.parse(fixture.response, fixture.now), fixture.now, Weather.location(42.35843, -71.05977)).controls;
+            }
             var knobs = Controls.preset(root.option("--preset", "sunny"));
             for (var i = 0; i < Controls.keys.length; i++) {
                 var key = Controls.keys[i];

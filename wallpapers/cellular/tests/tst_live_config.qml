@@ -65,6 +65,7 @@ TestCase {
         // Reproduce an existing map being reset, then a desktop context preset.
         live.ControlsVersion = 0;
         live.Weather = 0;
+        live.Automatic = true;
         var before = storage.saves.length;
         runtime.applyPreset("rainy");
         compare(storage.saves.length, before + 1);
@@ -72,6 +73,7 @@ TestCase {
         compare(saved.RainIntensity, 100);
         compare(saved.Brightness, 65);
         compare(saved.ControlsVersion, 1);
+        compare(saved.Automatic, false, "context presets explicitly select Manual in the same save");
         compare(saved.CellSize, 3);
         compare(saved.Speed, 7);
         runtime.togglePause();
@@ -83,6 +85,7 @@ TestCase {
         compare(storage.saves.length, before + 2);
         compare(reloaded.RainIntensity, 100);
         compare(reloaded.Paused, true);
+        compare(reloaded.Automatic, false);
     }
     function test_form_edits_do_not_save_live_config() {
         var storage = storedMap();
@@ -91,5 +94,20 @@ TestCase {
         Controls.writePreset(form, "sunny");
         compare(storage.saves.length, 0, "pure form helpers leave persistence to Apply");
         compare(storage.load().ControlsVersion, 0, "unapplied edits do not change stored config");
+    }
+    function test_pause_preserves_persisted_automatic_mode() {
+        var storage = storedMap();
+        var live = storage.load();
+        var runtime = attach(live);
+        live.Automatic = true;
+        var before = storage.saves.length;
+        runtime.togglePause();
+        compare(storage.saves.length, before + 1);
+        compare(storage.load().Automatic, true);
+        compare(storage.load().Paused, true);
+        var reloaded = storage.load();
+        attach(reloaded);
+        compare(reloaded.Automatic, true, "already-migrated automatic mode survives reload");
+        compare(storage.saves.length, before + 1);
     }
 }

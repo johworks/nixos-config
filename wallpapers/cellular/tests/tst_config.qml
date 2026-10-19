@@ -1,5 +1,6 @@
 import QtQuick
 import QtTest
+import "../contents/ui"
 
 Item {
     id: host
@@ -13,14 +14,30 @@ Item {
     }
     QtObject {
         id: firstConfiguration
+        property var values: ({
+                Automatic: false,
+                LocationLatitude: "42.35843",
+                LocationLongitude: "-71.05977"
+            })
+        property int writes: 0
+        function writeConfig() {
+            writes++;
+        }
     }
     QtObject {
         id: replacementConfiguration
     }
+    AutomaticWeather {
+        id: formController
+    }
+    QtObject {
+        id: wallpaper
+        property var automaticWeather: formController
+    }
     Loader {
         id: settings
         anchors.fill: parent
-        Component.onCompleted: setSource("../contents/ui/config.qml", {
+        Component.onCompleted: setSource(Qt.resolvedUrl("../contents/ui/config.qml"), {
             configDialog: dialog,
             wallpaperConfiguration: Qt.binding(() => host.wallpaperConfiguration),
             cfg_ControlsVersion: 1,
@@ -31,6 +48,43 @@ Item {
     TestCase {
         name: "WeatherSettings"
         when: windowShown
+        function init() {
+            settings.source = "";
+            host.wallpaperConfiguration = firstConfiguration;
+            settings.setSource(Qt.resolvedUrl("../contents/ui/config.qml"), {
+                configDialog: dialog,
+                wallpaperConfiguration: Qt.binding(() => host.wallpaperConfiguration),
+                cfg_ControlsVersion: 1,
+                cfg_Brightness: 112,
+                cfg_Warmth: 55
+            });
+            tryCompare(settings, "status", Loader.Ready);
+            wait(0);
+        }
+        function test_automatic_drafts_and_manual_presets() {
+            // qmllint disable missing-property
+            settings.item.cfg_Automatic = true;
+            settings.item.cfg_LocationLabel = "Sydney";
+            settings.item.cfg_LocationLatitude = "-33.86";
+            settings.item.cfg_LocationLongitude = "151.2";
+            compare(firstConfiguration.values.Automatic, false, "form drafts leave the native map behind Apply");
+            compare(firstConfiguration.values.LocationLatitude, "42.35843");
+            compare(firstConfiguration.writes, 0);
+            compare(settings.item.cfg_Brightness, 112, "mode selection preserves saved manual values");
+            var brightness = findChild(settings.item, "brightnessControl");
+            compare(brightness.enabled, false);
+            settings.item.applyPreset("rainy");
+            compare(settings.item.cfg_Automatic, false);
+            compare(brightness.enabled, true);
+            compare(settings.item.cfg_RainIntensity, 100);
+            compare(firstConfiguration.writes, 0);
+            // Reopen without Apply: discarded drafts cannot persist.
+            init();
+            compare(settings.item.cfg_Automatic, false);
+            compare(settings.item.cfg_LocationLabel, "Boston, Massachusetts, USA");
+            compare(settings.item.cfg_LocationLatitude, "42.35843");
+            // qmllint enable missing-property
+        }
         function test_host_initial_properties() {
             compare(settings.status, Loader.Ready);
             // qmllint disable missing-property
@@ -41,6 +95,20 @@ Item {
             compare(settings.item.cfg_ControlsVersion, 1);
             host.wallpaperConfiguration = replacementConfiguration;
             compare(settings.item.wallpaperConfiguration, replacementConfiguration, "retain the host's binding when its live configuration changes");
+            // qmllint enable missing-property
+        }
+        function test_runtime_status_binding() {
+            // qmllint disable missing-property
+            settings.item.runtimeWallpaper = wallpaper;
+            compare(settings.item.liveWeather, formController);
+            var status = findChild(settings.item, "automaticStatus");
+            compare(status.text, formController.statusText);
+            formController.latitude = "";
+            formController.automatic = true;
+            compare(status.text, formController.statusText, "live status updates without a config write");
+            verify(status.text.indexOf("invalid latitude") >= 0);
+            compare(firstConfiguration.writes, 0);
+            formController.automatic = false;
             // qmllint enable missing-property
         }
         function test_legacy_form_migration() {

@@ -783,3 +783,203 @@ shell restart, main merge or push. Manual GUI Apply/preset/reset/pause clicks
 and scrolling were not automated; the workflow is documented for John's own
 experiments and form/save contracts remain covered by actual Qt checks. No
 CPU/GPU/memory measurement or native playback smoothness claim is made.
+
+## Automatic Boston weather, daylight and season — 2026-10-19
+
+Project nixos-xyc; claimed implementation child nixos-xyc.1 remains open.
+Lead obligation qitem-20261018235704-9b6899d560eab8d1;
+builder assignment qitem-20261018235755-cd48669bbd4b85ae. Base41c1689.
+John selected fixed Boston, Massachusetts, USA plus Open-Meteo. Native preview7
+and all current desktop/user settings were left untouched by the builder.
+
+### Source and design
+
+Read current official [forecast/current API documentation](https://open-meteo.com/en/docs)
+and [geocoding documentation](https://open-meteo.com/en/docs/geocoding-api).
+Lead's geocoding evidence supplied42.35843,−71.05977, America/New_York. The
+actual lead probe /tmp/weather-boston-live.json confirmed current units and
+900s accumulation interval. Runtime uses fixed numeric coordinates only, no
+geocoding/device/IP lookup. Returned weather-grid coordinates can differ from
+the requested city; solar calculations use the requested coordinates.
+
+New weather.js validates coordinates and current response/types/units/ranges,
+then maps independent cloud cover/darkness, liquid rain and signed wind.
+The query explicitly requests Celsius, km/h, mm, unix timestamps and automatic
+timezone. Current rain/showers amounts are multiplied by3600/current.interval
+before mapping density; snow remains cm over that interval and is not included
+in rain. Snow-only conditions have no rain and display unsupported snow animation.
+WMO descriptions report fog/thunder/hail without adding those particle effects.
+Unknown codes/invalid units/malformed JSON/old estimates fail visibly.
+
+New AutomaticWeather.qml owns one15min refresh timer,15s request timeout and a
+separate60s real-clock timer. It aborts on mode/location change/destruction and
+ignores stale callbacks via generation tokens. Deferred refresh coalesces native
+Apply's per-key changes into the final valid coordinates; an active request
+prevents overlap. No spin retry. Manual/invalid/unloaded makes no requests.
+The last good estimate stays in memory only for its location on errors; no disk
+cache or unrelated user files. First-load fallback is visibly assumed partly
+cloudy/dry/calm. Status includes active mode/location/source, weather/temperature,
+timezone label, phase/season, estimate/fetch age, stale/error/fallback. Newly
+received estimates over2h old are rejected; retained estimates over30min are
+labeled stale. API data is a model estimate, not a claimed station observation.
+
+Solar position follows the [NOAA approximate equations](https://gml.noaa.gov/grad/solcalc/solareqns.PDF)
+using UTC day/fractional year and coordinates, including leap years. It does not
+parse local ISO strings or rely on the computer timezone/API's fixed UTC offset;
+Boston DST cannot jump the physical sun. No civil-clock display is claimed.
+Altitude drives smooth brightness/twilight warmth and moving/hiding sun, with a
+46% night brightness floor for legibility. Projection fits the painted sky;
+terrain can occlude low sun. Polar day/night needs no sunrise/sunset events.
+Seasonal warmth interpolates four calendar tones in the location's mean solar
+calendar, shifted six months south. This is an approximate hemisphere palette,
+not regional vegetation phenology or precise astronomical season boundaries.
+
+### Configuration and rendering integration
+
+Schema adds Automatic (Bool,false) and string LocationLabel/Latitude/Longitude
+with Boston defaults. Strings preserve invalid drafts for explicit validation.
+Existing configurations remain Manual. main.qml uses Automatic's output only
+while enabled/valid; otherwise saved Manual knobs render exactly as before.
+Automatic output never writes Manual values or config. Context presets select
+Manual and save once through LiveConfig; form presets select Manual before Apply.
+Pause saves without disabling Automatic. Detail/speed/pause remain independent;
+solar time/weather continue while particle animation is paused or speed changes.
+
+config.qml retains configDialog/wallpaperConfiguration and all existing cfg_*
+aliases, adding mode/location aliases and read-only active status. Saved Manual
+weather fields are disabled in Automatic; presets offer an explicit return.
+The native status bridge uses Plasmoid.wallpaperGraphicsObject, matching installed
+ConfigurationContainmentAppearance.qml, and the main root exposes automaticWeather.
+A narrow lint annotation explains the host's dynamic Containment property beyond
+base Applet metadata. Qt tests inject that bridge shape; actual native attached
+lookup, Apply/reopen/disk/restore still require lead acceptance after review.
+The settings component creates no network controller and never saves drafts.
+
+No original PNG, grade/alpha/composition/rain/grid implementation or manual
+defaults changed. Existing cached artwork regrades only when rounded lighting/
+cloud values change, at minute/weather cadence; animation never triggers a grade
+or a weather fetch/config write. No new service/dependency/harness was added.
+
+### Actual validation and artifacts
+
+- node --test wallpapers/cellular/*.test.cjs: **25 passed,0 failed**. New pure
+  fixtures cover sunny/overcast/liquid rain/snow/high wind/zeros, units/types/
+  ranges/old/future/malformed data, coordinate bounds, Boston API sunrise/sunset
+  sanity, both2026 DST transitions, leap/date/longitude rollover, polar states,
+  opposite hemispheres, gradual palette and bounded night/sun outputs.
+  The six weather tests also pass with TZ=Pacific/Auckland, independently of
+  the Boston location and harness timezone.
+- Actual Qt6.11 offscreen/software qmltestrunner -input wallpapers/cellular/tests:
+  **38 passed,0 failed/skipped**, including setup/cleanup, no runtime warnings.
+  New tst_weather_controller.qml verifies batched native config inputs, no
+  overlap, invalid/manual exclusion, stale callbacks after location/disable,
+  unload abort, shortened real timeout/no spin retry,503/malformed errors with
+  last-good state, real solar clock separate from requests, scene rendering/
+  caches, intact saved Manual values and exact restored Manual rendering with
+  fixed wind phase. Form tests cover mode/location draft isolation and discard,
+  retained saved knobs, explicit Manual presets, live status reactivity and host
+  property compatibility. Boundary tests save/reload Automatic with pause and
+  save Manual context presets once; these use non-autosaving map test doubles.
+- Full production/preview/tests qmllint exits0,no diagnostics. Changed QML
+  qmlformat applied. Feature-scoped git diff --check passes.
+- Nix daemon source eval with --no-write-lock-file and XDG_CACHE_HOME=/home/john/.cache
+  passed for nixosConfigurations.desktop.config.home-manager.users.john.xdg.dataFile
+  plasma/wallpapers/org.nixos.cellular source. Expected dirty-tree/untrusted-store
+  warnings; no Nix module changes or system build/switch.
+- Original scenery/cloud hashes still match ARTWORK.md. Regenerated default
+  /tmp/weather-auto-manual-preserved.png matches approved preview-sunny.png exactly:
+  d9641397bd3079c2960bc05291018a1bbaf2819a5ba29af06d7e8b2c0bd4694b.
+
+New weather-fixtures.js holds documented synthetic current responses and explicit
+UTC fixture dates; preview --automatic-fixture=noon|dusk|night|autumn|winter
+uses the same weather.js mapping, with no network. Actual1280×720 captures were
+generated and visually inspected: preview-auto-noon.png (June21 16:45Z),
+preview-auto-dusk.png (October18 21:57Z), preview-auto-night.png (October19 02:00Z,
+cloud100/rain0.75mm per900s/east wind30km/h), preview-auto-autumn.png (October15
+16:45Z) and preview-auto-winter.png (January15 16:45Z). Noon sun is high, dusk
+is warm/dim, rainy night remains readable with no sun, autumn is warm and winter
+cool/desaturated. Source geometry remains visibly unchanged.
+
+Used installed Qt tools/imports above, QT_QPA_PLATFORM=offscreen and
+QT_QUICK_BACKEND=software. Example capture:
+
+```sh
+qml wallpapers/cellular/preview.qml -- --capture --automatic-fixture=night \
+  --seed=73 --output=wallpapers/cellular/preview-auto-night.png
+```
+
+Also ran the real AutomaticWeather component against HTTPS in a temporary
+offscreen window (/tmp/weather-live-qt.qml), exit0. Its actual status capture
+/tmp/weather-live-qt-status.png showed Boston/Night/Autumn, Clear sky7.2°C,
+America/New_York, estimate age9min/fetched0min. Then loaded the actual form with
+host-shaped props and a supplied runtime bridge (/tmp/weather-auto-form.qml),
+using another successful real request: preview-auto-settings.png shows actual
+Boston status and disabled saved Manual fields. This proves real Qt XHR/parsing
+and form display, not native Plasma attached lookup or actual Apply clicks.
+
+### Remaining acceptance and environment note
+
+Reviewer independently verifies code/evidence and returns to lead. Lead installs
+a fresh-ID preview, enables Automatic via native settings/Apply, verifies live
+status, actual on-disk mode/location persistence and unchanged saved Manual
+knobs, switches back to Manual, checks context presets/pause and Apply/Cancel.
+Native preview7/user settings remain unchanged; no builder native activation,
+Git commit, merge/publish/switch or CPU/GPU/memory benchmark claim. Both Beads
+remain open pending review/native acceptance.
+
+John repeatedly reported “■ failed to load workspace requirements” during this
+work and asked to note it and continue. It was not present in executed command
+output; worktree, test tools, API access and Nix source evaluation remained
+usable. Cause is unidentified; no claim of fixing that session message is made.
+
+### Lead native acceptance for Automatic mode
+
+Accepted independent review qitem-20261019002956-fbed4165: Node25/25,
+actual Qt38/38 without warnings, clean lint/diff, live HTTPS probe, exact Manual
+baseline and fixture hashes, original artwork hashes. Reviewer found no blocking
+defects. Lead inspected full-size noon, rainy night and winter captures: solar
+height/light and seasonal color response are distinct, while night remains legible.
+
+Installed the reviewed package under fresh org.nixos.pixelweather.preview8
+(Pixel Weather Preview8). Captured the latest user-edited preview7 configuration
+in /tmp/weather-before-automatic.txt and .json rather than reusing historical
+knobs. Preserved brightness100/warmth100, sun73/34 strength100, cloud100/darkness0,
+wind35/rain0, cell2/speed8/unpaused, version1/legacyWeather2. Selected Automatic
+with Boston label42.35843,−71.05977. Original Nix installation and earlier
+previews remain untouched; only the connected desktop changed.
+
+The actual native form/status bridge works. Enlarged the native dialog using a
+temporary KWin script, captured it and unloaded the script. The form visibly
+showed Automatic, Boston, Open-Meteo model estimate, Clear sky6.9°C,
+America/New_York, Night/Autumn, estimate age3min/fetched1min. A later capture
+after reload showed fetched0min. Safe dialog-only evidence is
+preview-auto-native-settings.png. Manual weather fields are disabled while
+Automatic is selected; independent cell/speed/pause remain available. This
+establishes real native controller lookup, HTTPS/parsing and status rendering.
+
+Native Plasma configuration API checks in /tmp/verify-weather-automatic.cjs
+selected Manual, unloaded/reloaded preview8, asserted every preserved Manual
+value; then selected Automatic and unloaded/reloaded again, asserting Boston
+and every Manual value. Both modes passed. Read the actual appletsrc group and
+confirmed Automatic=true plus Boston label/coordinates and unchanged Manual
+values on disk. Detailed before/after maps are saved in
+/tmp/weather-automatic-native-verification.json. The final preview is Automatic.
+
+Native desktop capture /tmp/weather-native-automatic-desktop.png exposes a small
+region of the cool/dark rocky foreground under user windows. KWin showDesktop
+did not clear those windows in this session, so no unobstructed native full-scene
+or GPU playback claim is made. Full scene visual acceptance uses the actual Qt
+captures plus native visible region and running status. Desktop captures contain
+unrelated user windows and are excluded from repository artifacts. The native
+settings dialog was returned to the foreground, open for John.
+
+Journal inspection since activation found no preview8, AutomaticWeather,
+weather.js, ReferenceError, TypeError, SyntaxError or XMLHttpRequest entries.
+Final feature-scoped diff check and Nix daemon source evaluation with
+--no-write-lock-file and permitted cache passed. No source/render changes were
+needed after review. Native GUI Apply/Cancel/preset/pause clicks were not
+automated; actual Qt form/save tests cover those contracts, while native mode
+and persistence were checked through the configuration API. No15min soak or
+CPU/GPU/memory benchmark. Seasonal changes are palette-only and snowfall is
+reported without animation. No main merge/push, full rebuild/switch or shell
+restart.

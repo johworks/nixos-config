@@ -4,10 +4,18 @@ import org.kde.plasma.plasmoid
 
 WallpaperItem {
     id: root
+    property alias automaticWeather: automaticController
 
     LiveConfig {
         id: liveConfig
         configuration: root.configuration
+    }
+    AutomaticWeather {
+        id: automaticController
+        automatic: root.configuration.Automatic === true
+        locationLabel: root.configuration.LocationLabel
+        latitude: root.configuration.LocationLatitude
+        longitude: root.configuration.LocationLongitude
     }
 
     accentColor: "#8ba27c"
@@ -18,17 +26,17 @@ WallpaperItem {
             onTriggered: liveConfig.togglePause()
         },
         PlasmaCore.Action {
-            text: "Apply sunny preset"
+            text: "Manual: apply sunny preset"
             icon.name: "weather-clear"
             onTriggered: liveConfig.applyPreset("sunny")
         },
         PlasmaCore.Action {
-            text: "Apply cloudy preset"
+            text: "Manual: apply cloudy preset"
             icon.name: "weather-clouds"
             onTriggered: liveConfig.applyPreset("cloudy")
         },
         PlasmaCore.Action {
-            text: "Apply rainy preset"
+            text: "Manual: apply rainy preset"
             icon.name: "weather-showers"
             onTriggered: liveConfig.applyPreset("rainy")
         }
@@ -36,7 +44,7 @@ WallpaperItem {
 
     WeatherScene {
         anchors.fill: parent
-        controls: ({
+        controls: automaticController.automatic && automaticController.output ? automaticController.output.controls : ({
                 Brightness: root.configuration.Brightness,
                 Warmth: root.configuration.Warmth,
                 SunX: root.configuration.SunX,

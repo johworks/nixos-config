@@ -14,6 +14,7 @@ QtObject {
     function applyPreset(name) {
         if (!configuration)
             return;
+        configuration.Automatic = false;
         Controls.writePreset(configuration, name);
         configuration.writeConfig();
     }

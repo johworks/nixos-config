@@ -4,12 +4,77 @@ One dynamic pixel-art canyon scene with a broad tree/overlook on the left,
 receding violet terrain, and a winding river. One original scenery PNG and one
 original cloud PNG feed the compositor; artwork/provenance is in
 [ARTWORK.md](ARTWORK.md). Lighting, sun, clouds, wind, and rain are independently
-adjustable. There is no live weather/location integration.
+adjustable in Manual mode. Automatic mode adds fixed-location Open-Meteo weather,
+local daylight and a gradual seasonal palette using the same composed scene.
+
+## Automatic weather
+
+In the wallpaper settings, check **Automatic (uncheck for Manual)** and press
+**Apply**. Boston, Massachusetts, USA is the default: latitude **42.35843**,
+longitude **−71.05977**. For another fixed location, edit its name and coordinates
+before Apply. The name is descriptive; coordinates determine the weather and
+sun. Latitude must be −90…90 and longitude −180…180. No device/IP geolocation,
+API key, background service or additional app is involved.
+
+The **Active status** displays the running mode/location, provider, weather,
+daylight phase, season, estimate age, fetch age and any error/fallback. It shows
+the currently applied state while edits are pending. [Actual Qt form with a live
+Boston response](preview-auto-settings.png) is an offscreen preview, not a native
+desktop screenshot. New/old configurations default to Manual until enabled.
+
+Automatic controls are derived separately from saved Manual knobs. Uncheck
+Automatic and Apply to restore those knobs; none are overwritten by weather
+updates. Manual form presets select Manual, taking effect on Apply. Desktop
+context presets select Manual and save immediately. Detail, speed and pause
+work in either mode. Pause freezes cloud/drop motion; Automatic's real solar
+clock and weather refresh continue independently of animation speed/pause.
+
+[Open-Meteo](https://open-meteo.com/) supplies **model-based current estimates**,
+not a local weather-station observation. Refresh is approximately every15min,
+with a15s timeout, no overlapping requests and no rapid error retries. Manual,
+invalid coordinates and unloaded instances make no requests. Errors retain the
+last good estimate for the same location in memory, with visible age/error;
+it is not cached across reloads. Before any successful response, the explicitly
+labeled fallback assumes partly cloudy, dry and calm while solar time continues.
+Location changes discard old-location data. Estimates older than30min are labeled
+stale; newly received estimates over2h old are rejected.
+
+Cloud cover drives cloud amount; cloud/precipitation darken clouds. Liquid rain
+and showers determine drop density, normalized from their current accumulation
+interval to mm/hour. Snowfall is in cm and is never added to liquid rain. Snow
+conditions are reported as unsupported animation: snow-only estimates draw no
+rain. Thunder/hail/fog are reported and affect available cloud/rain fields;
+there is no lightning, hail or fog particle effect. Horizontal wind uses the
+eastward component of the meteorological bearing, capped visually at60km/h;
+a northerly/southerly wind can therefore have no horizontal drift.
+
+The [NOAA solar approximation](https://gml.noaa.gov/grad/solcalc/solareqns.PDF)
+uses real UTC plus latitude/longitude every minute. The sun moves through the
+painted sky and hides below the horizon; twilight warms the scene, and night
+keeps legible cool terrain. This needs no cached timezone offset, so Boston DST
+does not jump the sun. Polar day/night works without requiring sunrise events.
+The provider timezone is shown as a label; there is no civil-clock display.
+
+Seasonal warmth blends smoothly between winter/spring/summer/autumn calendar
+tones, opposite in the southern hemisphere, using the location's mean solar
+calendar rather than the computer's timezone. It is an approximate hemisphere
+palette, not local vegetation phenology. Original leaves/tree/cliff/river,
+painted highlights and composition remain baked; no bare branches, accumulated
+snow, new terrain, moon or stars are generated. Low sun can be occluded by the
+painted mountains. Pixel grading remains cached, never driven at frame rate.
+
+Actual1280×720 fixture captures: [clear noon](preview-auto-noon.png),
+[dusk](preview-auto-dusk.png), [rainy night](preview-auto-night.png),
+[autumn](preview-auto-autumn.png), [winter](preview-auto-winter.png).
+These use documented synthetic weather/date fixtures to inspect visual response,
+not claims of current Boston conditions. [API field/units documentation](https://open-meteo.com/en/docs);
+[geocoding/GeoNames source](https://open-meteo.com/en/docs/geocoding-api) for Boston's public coordinates.
 
 ## Controls
 
 In **Desktop and Wallpaper → Wallpaper type → Pixel Weather**, the form groups
-controls by lighting, sun, clouds, wind/rain, and animation:
+controls by mode/location/status, saved Manual lighting/sun/clouds/wind/rain,
+and animation. Manual weather knobs are disabled while Automatic is selected:
 
 | Control | Range | Default |
 | --- | --- | --- |
@@ -138,20 +203,30 @@ writes `/tmp/pixel-weather-rain-01.png` through `-12.png`, advancing half a
 simulation second between frames. Frames are bounded to 40. These options are
 preview tools; there is no seed field to manage in the native settings form.
 
+Use `--automatic-fixture=noon|dusk|night|autumn|winter --capture --seed=73` to
+capture the Automatic mapping without network traffic. Fixture dates/values are
+in weather-fixtures.js; normal standalone previews remain Manual by default.
+
 ## Native preview and restore
 
-The reviewed randomized-rain version is active as **Pixel Weather Preview 7**
-(`org.nixos.pixelweather.preview7`). Its native settings dialog was reopened with
-the Apply/scroll instructions visible: [current native form](preview-controls-native-guidance.png).
-Your previous independent-control values were preserved. The current scene
-demonstrates a custom sun shower: brightness112, warmth55, sun68/29 at strength80,
-cloud amount40/darkness25, wind−30 and rain65, cell size2/speed10/unpaused. Press
-Sunny for the approved baseline, or edit individual controls and Apply.
+The reviewed Automatic revision is active as **Pixel Weather Preview 8**
+(`org.nixos.pixelweather.preview8`), with Boston fixed coordinates and Automatic
+enabled. The native form displays the actual running source, weather estimate,
+phase/season and update ages: [current native form](preview-auto-native-settings.png).
+The settings dialog is open for experiments. Uncheck Automatic and Apply to
+restore the saved Manual controls, or choose a Manual preset and Apply.
+
+The latest user-edited Manual values were copied from preview7 before selection:
+brightness100/warmth100, sun73/34 at strength100, cloud100/darkness0, wind35,
+rain0, cell2/speed8/unpaused. Automatic never overwrites them. Native mode and
+Boston coordinates persisted on disk and through unload/reload; returning to
+Manual preserved those exact values. Automatic is enabled again.
 
 Native legacy migration saves all converted values/version to disk. Custom
 controls survived unload/reload, and the final form reopened with correct saved
-values and no plugin-specific initial-property errors. Interactive preset/reset/
-pause clicks, scrolling, and Apply/reopen were not automated; Qt tests cover the
+values and no plugin-specific initial-property errors. Native mode changes were
+performed through Plasma's configuration API. Interactive preset/reset/pause,
+Apply/Cancel clicks and scrolling were not automated; Qt tests cover the
 form/helper/save contracts. IMPLEMENTATION.md records the verification limits.
 
 Lead owns native activation **after review**, using a fresh preview plugin ID
