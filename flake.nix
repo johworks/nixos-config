@@ -16,6 +16,11 @@
       url = "github:nixos/nixpkgs/nixos-unstable";
     };
 
+    # Keep OpenCode current without upgrading the desktop's other packages.
+    nixpkgsOpencode = {
+      url = "github:nixos/nixpkgs/nixos-unstable";
+    };
+
     home-manager = {
       url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgsUnstable";
