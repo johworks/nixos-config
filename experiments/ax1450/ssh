@@ -1,0 +1,12 @@
+#!/bin/sh
+set -eu
+
+repo=$(CDPATH= cd -- "$(dirname -- "$0")/../.." && pwd)
+exec ssh -F /dev/null \
+  -i "$repo/.ax1450-private/id_rsa" \
+  -o IdentitiesOnly=yes \
+  -o UserKnownHostsFile="$repo/.ax1450-private/known_hosts" \
+  -o StrictHostKeyChecking=yes \
+  -o HostKeyAlgorithms=+ssh-rsa \
+  -o PubkeyAcceptedAlgorithms=+ssh-rsa \
+  -p 2222 root@192.168.10.161 "$@"
