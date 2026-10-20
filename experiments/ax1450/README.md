@@ -32,6 +32,65 @@ post-cleanup backup are retained privately.
 installed or tested. The existing web admin password is still the temporary
 password John set during reset; SSH uses its own dedicated key.
 
+## Persistent root access (2026-10-19)
+
+Root access now survives reboots. The AP's only writable persistence is its
+flash config partitions (squashfs root; `/etc`, `/overlay`, `/tmp` are RAM),
+so the injection lives in the settings the firmware already persists:
+
+- `router-config` partition: base64 of the full bootstrap script
+  (5KB). This partition has no boot-time consumer; it is only read when the
+  web UI downloads a config backup (and overwritten when one is restored).
+- `autoreboot` uci config (`user-config` partition): `enable=on`,
+  `cycle=week`, `time=03:11`, and a `day` value of
+  `* <loader> #`. `S99auto-reboot` regenerates root's crontab from this at
+  every boot; the `#` comments out the vendor's reboot command, so the
+  entry only runs our loader, daily at 03:11.
+- The loader (187 bytes, well under busybox uci's 2047-byte line limit and
+  free of `<>&%` for the XML round trip) reads the payload back with
+  `nvrammanager -r`, materializes `/etc/ax1450/bootstrap.sh`, and runs it.
+- The bootstrap re-adds a `*/30` self-heal crontab line pointing at the
+  materialized file, so a dead listener recovers within 30 minutes of
+  uptime; a reboot recovers at the next 03:11 (cron-only by design — no web
+  admin password is stored anywhere).
+
+The listener pins a dedicated Dropbear RSA host key (embedded in the
+payload), so clients keep stable `known_hosts` entries across reboots.
+Clients: desktop `ax1450-lab` key and NUC `ax1450-nuc` key; sources
+restricted to 192.168.10.122 and 192.168.10.1 on port 2222; password
+authentication disabled.
+
+`make-bootstrap.py` regenerates the bootstrap, payload, loader, and pinned
+`known_hosts` line from the private key material:
+
+```sh
+nix --store daemon shell --no-write-lock-file nixpkgs#python3 --command \
+  python3 experiments/ax1450/make-bootstrap.py \
+  --host-key .ax1450-private/ax1450_host_key \
+  --host-key-pub .ax1450-private/ax1450_host_key.pub \
+  --public-key .ax1450-private/id_rsa.pub \
+  --public-key .ax1450-private/id_rsa_nuc.pub \
+  --ap 192.168.10.161 --port 2222 \
+  --allow 192.168.10.122 --allow 192.168.10.1 \
+  --output-dir .ax1450-private/persistent
+```
+
+Installing a regenerated payload requires (over live root SSH): write
+`payload.b64` to the `router-config` partition with `nvrammanager -w`, then
+update the `day` value in `/etc/config/autoreboot`, run
+`/usr/bin/lua -e 'require("luci.sys.config").saveconfig()'`, and run
+`/etc/init.d/auto-reboot start`. Do not use `uci set` for the day option:
+TP-Link's uci CLI rejects it, and a failed `uci commit` leaves stale deltas
+in `/tmp/.uci/autoreboot` that silently shadow the file (delete that file if
+it appears).
+
+Verified by reboot test 2026-10-19: with the schedule temporarily set to a
+near-term time, the AP was rebooted; root SSH returned at exactly the
+scheduled minute (~8 minutes after the reboot command), key-only, from both
+the desktop and the NUC, with AP mode and Wi-Fi intact. The schedule was
+then set to its final 03:11 and confirmed in the decrypted `user-config`
+partition.
+
 ## Evidence and approach
 
 The [official V1.6 download](https://www.tp-link.com/us/support/download/archer-ax1450/v1.60/)
@@ -103,11 +162,10 @@ unavailable; it also erases the Wi-Fi and AP settings.
 ## Boundaries
 
 This experiment does not flash firmware, modify the bootloader, install a
-replacement web interface, or remove telemetry services. The SSH files and
-process are temporary until persistence is separately implemented and tested.
-The configuration injection itself is persistent until removed; do not leave
-the altered scheduler or NTP settings behind after testing.
-
-Root access does not add missing drivers, additional flash storage, or a
-supported upstream OpenWrt upgrade path. Further customization should account
-for the stock kernel and proprietary Wi-Fi stack.
+replacement web interface, or remove telemetry services. The persistence
+uses only the vendor's own config storage. Restoring any older config
+backup through the web UI overwrites both config partitions and removes the
+persistence; a firmware upgrade or factory reset does the same. Root access
+does not add missing drivers, additional flash storage, or a supported
+upstream OpenWrt upgrade path. Further customization should account for
+the stock kernel and proprietary Wi-Fi stack.
