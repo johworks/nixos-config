@@ -22,6 +22,7 @@
     ../../modules/nixos/vaultwarden/vaultwarden.nix
     ../../modules/nixos/blog-static.nix
     ../../modules/nixos/ddns/ddns.nix
+    ../../modules/nixos/ax1450
     ../../modules/nixos/esphome.nix
     ../../modules/nixos/home-assistant-analysis.nix
     ../../modules/nixos/home-assistant.nix
@@ -120,6 +121,12 @@
   };
 
   services.beadsDolt.enable = true;
+
+  # Archer AX1450 AP: keeps root persistence verified and Wi-Fi converged.
+  services.ax1450 = {
+    enable = true;
+    wifi.ssid = "TP-Link_2724";
+  };
 
   # Some programs need SUID wrappers, can be configured further or are
   # started in user sessions.
