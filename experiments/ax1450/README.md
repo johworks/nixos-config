@@ -4,7 +4,7 @@ Target: John's Archer AX1450 v1.0 (US), access-point mode, management address
 `192.168.10.161`, firmware `1.3.12 Build 20250828 Rel. 26873(5553)`.
 The NUC remains the gateway; this desktop uses Ethernet at `192.168.10.122`.
 
-## Verified result (2026-10-19)
+## Initial experiment (2026-10-19)
 
 The owned AP returned `uid=0(root) gid=0(root) groups=0(root)` over SSH.
 Its kernel reports `Linux Archer_AX10 4.1.52 ... armv7l`.
@@ -28,9 +28,9 @@ peers were restored through the vendor API. No injected cron entries remain;
 the AP still reports access-point mode. The original backup and a fresh
 post-cleanup backup are retained privately.
 
-**Access is temporary until the AP reboots.** Persistent access has not been
-installed or tested. The existing web admin password is still the temporary
-password John set during reset; SSH uses its own dedicated key.
+Access was temporary at the end of this initial experiment. The next phase
+installed and tested persistence as described below. SSH uses its own
+dedicated key, separate from the web admin password.
 
 ## Persistent root access (2026-10-19)
 
@@ -90,6 +90,45 @@ scheduled minute (~8 minutes after the reboot command), key-only, from both
 the desktop and the NUC, with AP mode and Wi-Fi intact. The schedule was
 then set to its final 03:11 and confirmed in the decrypted `user-config`
 partition.
+
+## Nix management and recovery checks
+
+The NUC enables `services.ax1450` from `modules/nixos/ax1450`. Its ten-minute
+timer manages the main SSID and PSK on both bands and verifies root-access
+persistence. The SSH key and Wi-Fi PSK come from sops. Credentials travel
+over SSH stdin, including the router's UCI batch input; they are never put
+in the reconcile command's arguments.
+
+Each run decodes the flash bootstrap into a private temporary file and
+checks its pinned SHA256 before installing or executing it. The module owns
+the AP's single-section `autoreboot` config: enabled, weekly cycle, 03:11,
+and the loader day value. It repairs missing, duplicate, or unsafe vendor
+cron entries by checking the full expected line. The schedule is on the
+AP's clock; SSH can remain unavailable for nearly 24 hours after reboot.
+
+Wi-Fi changes must pass UCI commit, vendor reload, both bands' UCI and
+Broadcom runtime SSID/PSK checks, BSS-up checks, and a vendor flash save.
+Failures return a nonzero status. Private RAM markers under `/etc/ax1450`
+retain pending apply/save work for the next run. A failed flash save retries
+without another Wi-Fi reload. A converged run does not reload Wi-Fi or
+write flash. These checks verify the vendor's reported state; they do not
+replace a client association test with the desired password.
+
+Offline regression checks run under BusyBox ash with a disposable mock
+vendor filesystem, and are included in `nix flake check`:
+
+```sh
+nix --store daemon build --no-write-lock-file --no-link \
+  .#checks.x86_64-linux.ax1450-reconcile
+nix --store daemon flake check --no-write-lock-file
+nix --store daemon build --no-write-lock-file --no-link \
+  .#nixosConfigurations.nuc.config.system.build.toplevel
+```
+
+After switching the NUC configuration, inspect convergence with
+`systemctl status ax1450-reconcile.timer` and
+`journalctl -u ax1450-reconcile.service -n 30`. An immediate run is
+`sudo systemctl start ax1450-reconcile.service`.
 
 ## Evidence and approach
 

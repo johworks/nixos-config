@@ -17,7 +17,16 @@ let
     "[${cfg.ap}]:${toString cfg.sshPort} ${hostKeyLine}"
   );
 
-  remoteScript = pkgs.writeText "ax1450-reconcile-remote" (builtins.readFile ./reconcile-remote.sh);
+  remoteScript = pkgs.writeText "ax1450-reconcile-remote" (
+    ''
+      SSID=${lib.escapeShellArg cfg.wifi.ssid}
+      DAY_VALUE=${lib.escapeShellArg dayValue}
+      EXPECTED_SHA=${lib.escapeShellArg cfg.expectedBootstrapSha256}
+      PORT=${lib.escapeShellArg (toString cfg.sshPort)}
+      MANAGER_IP=${lib.escapeShellArg cfg.managerIp}
+    ''
+    + builtins.readFile ./reconcile-remote.sh
+  );
 
   # The persisted autoreboot day value on the AP: a short loader that
   # materializes /etc/ax1450/bootstrap.sh from the router-config flash
@@ -34,16 +43,16 @@ let
       set -euo pipefail
 
       psk_b64=$(base64 -w0 "${pskPath}")
-      ssid=${lib.escapeShellArg cfg.wifi.ssid}
-      day_value=${lib.escapeShellArg dayValue}
-      expected_sha=${lib.escapeShellArg cfg.expectedBootstrapSha256}
 
-      remote_cmd=$(printf '/bin/sh -s -- %q %q %q %q %q %q' \
-        "$psk_b64" "$ssid" "$day_value" "$expected_sha" \
-        "${toString cfg.sshPort}" "${cfg.managerIp}")
-
-      if ! ssh -F /dev/null \
+      # Base64 contains no shell metacharacters. Send the assignment and
+      # script over stdin so neither SSH nor the remote shell exposes the
+      # password in process arguments.
+      if ! {
+        printf 'PSK_B64=%s\n' "$psk_b64"
+        cat "${remoteScript}"
+      } | ssh -F /dev/null \
         -i "${sshKeyPath}" \
+        -o BatchMode=yes \
         -o IdentitiesOnly=yes \
         -o UserKnownHostsFile="${knownHosts}" \
         -o StrictHostKeyChecking=yes \
@@ -51,7 +60,7 @@ let
         -o PubkeyAcceptedAlgorithms=+ssh-rsa \
         -o ConnectTimeout=15 \
         -p "${toString cfg.sshPort}" \
-        "root@${cfg.ap}" "$remote_cmd" < "${remoteScript}"; then
+        "root@${cfg.ap}" /bin/sh -s; then
         echo "AX1450 reconcile failed. If the AP rebooted recently, root SSH returns at the next 03:11 scheduler fire." >&2
         exit 1
       fi
@@ -115,12 +124,15 @@ in
       restartUnits = [ "ax1450-reconcile.service" ];
     };
 
+    system.build.ax1450-reconcile = reconcile;
+
     systemd.services.ax1450-reconcile = {
       description = "Verify AX1450 root persistence and converge Wi-Fi settings";
       after = [ "network-online.target" ];
       wants = [ "network-online.target" ];
       serviceConfig = {
         Type = "oneshot";
+        TimeoutStartSec = "3min";
         # Root to read the sops secrets (0400); the script only opens the
         # SSH connection and reads store paths.
         ProtectSystem = "strict";
