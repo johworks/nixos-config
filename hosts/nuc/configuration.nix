@@ -119,7 +119,12 @@
   services.homeAssistantAnalysis = {
     enable = true;
     baseUrl = "http://192.168.10.1:8123";
+    bindAddress = "192.168.10.1";
+    openFirewall = false;
   };
+
+  # Keep D-Bus stable during the router's 26.05 upgrade; adopt broker separately.
+  services.dbus.implementation = "dbus";
 
   services.beadsDolt.enable = true;
 

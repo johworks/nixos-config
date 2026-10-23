@@ -1,5 +1,7 @@
 { ... }:
 {
+  imports = [ ./security.nix ];
+
   # Keep the repo-wide system defaults in one obvious place.
   time.timeZone = "America/New_York";
 

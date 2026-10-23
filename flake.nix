@@ -8,7 +8,7 @@
     };
 
     nixpkgsStable = {
-      url = "github:nixos/nixpkgs/nixos-25.11";
+      url = "github:nixos/nixpkgs/nixos-26.05";
     };
 
     # Update Vaultwarden independently of the hosts' system packages.
@@ -27,7 +27,7 @@
     };
 
     home-managerStable = {
-      url = "github:nix-community/home-manager/release-25.11";
+      url = "github:nix-community/home-manager/release-26.05";
       inputs.nixpkgs.follows = "nixpkgsStable";
     };
 

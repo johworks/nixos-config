@@ -20,7 +20,10 @@
         disable_signout_menu = true;
       };
       "auth.basic".enabled = false;
-      security.disable_initial_admin_creation = true;
+      security = {
+        disable_initial_admin_creation = true;
+        secret_key = "$__file{/var/lib/grafana/secret-key}";
+      };
       users.allow_sign_up = false;
       analytics = {
         reporting_enabled = false;
@@ -68,6 +71,15 @@
   systemd.services.grafana = {
     wants = [ "network-online.target" ];
     after = [ "network-online.target" ];
+    # This provisioned dashboard has no data-source credentials to re-encrypt.
+    # Keep the generated key private and stable across future upgrades.
+    preStart = ''
+      if [ ! -s /var/lib/grafana/secret-key ]; then
+        umask 0077
+        ${pkgs.openssl}/bin/openssl rand -hex 32 > /var/lib/grafana/secret-key.new
+        mv /var/lib/grafana/secret-key.new /var/lib/grafana/secret-key
+      fi
+    '';
   };
 
   # The exporter module grants ambient NET_RAW, but its generic hardening

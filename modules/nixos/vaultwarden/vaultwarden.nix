@@ -34,6 +34,9 @@ in
       # Only listen on localhost; nginx will terminate TLS
       ROCKET_ADDRESS = "127.0.0.1";
       ROCKET_PORT = 8222;
+      # nginx overwrites this header with its direct client's address.
+      IP_HEADER = "X-Real-IP";
+      IP_HEADER_TRUSTED_PROXIES = "127.0.0.1";
 
       # Tell users the external URL is HTTPS
       DOMAIN = "https://${myDomain}";

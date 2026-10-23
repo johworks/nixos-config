@@ -42,7 +42,15 @@
   '';
 
   # Fix for the r8125 NIC issue
-  boot.extraModulePackages = [ config.boot.kernelPackages.r8125 ]; # official realtek one
+  boot.extraModulePackages = [
+    (config.boot.kernelPackages.r8125.overrideAttrs (old: {
+      # r8125 skips modules_install, so generate the certificate required by
+      # Nixpkgs' deterministic module-signing and kernel aggregation tooling.
+      postFixup = (old.postFixup or "") + ''
+        ${lib.getExe pkgs.kmodigest} "$out/lib/modules/${config.boot.kernelPackages.kernel.modDirVersion}/kernel/drivers/net/ethernet/realtek/r8125.ko"
+      '';
+    }))
+  ];
   boot.blacklistedKernelModules = [ "r8169" ]; # r8125 rev 0xc is too new
 
   networking.hostName = "desktop";
@@ -57,6 +65,9 @@
   # Enable the KDE Plasma Desktop Environment.
   services.displayManager.sddm.enable = true;
   services.desktopManager.plasma6.enable = true;
+
+  # Keep the session bus unchanged during the security upgrade; migrate separately.
+  services.dbus.implementation = "dbus";
 
   # Configure keymap in X11
   services.xserver.xkb = {

@@ -130,6 +130,8 @@ in
 
   services.postgresql = {
     enable = true;
+    # Preserve the deployed database major across NixOS upgrades.
+    package = pkgs.postgresql_16;
     settings.listen_addresses = lib.mkForce "";
     ensureDatabases = [ "matrix-synapse" ];
     ensureUsers = [
@@ -138,6 +140,11 @@ in
         ensureDBOwnership = true;
       }
     ];
+  };
+
+  services.postgresqlBackup = {
+    enable = true;
+    databases = [ "matrix-synapse" ];
   };
 
   services.nginx = {

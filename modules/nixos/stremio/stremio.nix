@@ -16,6 +16,7 @@ in
   virtualisation.oci-containers.containers.stremio = {
     image = "stremio/server:latest";
     autoStart = true;
+    pull = "newer";
     ports = [ "127.0.0.1:${toString stremioPort}:${toString stremioPort}" ];
     volumes = [
       "${configDir}:/root/.stremio-server"

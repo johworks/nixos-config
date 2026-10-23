@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ ... }:
 
 {
   systemd.network.enable = true;
@@ -36,7 +36,10 @@
     "10-enp1s0" = {
       matchConfig.Name = "enp1s0";
       networkConfig = {
-        VLAN = [ "vlan10" "vlan20" ];
+        VLAN = [
+          "vlan10"
+          "vlan20"
+        ];
         LinkLocalAddressing = "no"; # rely on VLAN interfaces
       };
     };
@@ -87,8 +90,17 @@
   # DoH + DoT
   services.stubby = {
     enable = true;
-    settings = pkgs.stubby.passthru.settingsExample // {
+    # Keep resolver policy explicit instead of building Stubby's example at eval time.
+    settings = {
       appdata_dir = "/var/cache/stubby";
+      resolution_type = "GETDNS_RESOLUTION_STUB";
+      dns_transport_list = [ "GETDNS_TRANSPORT_TLS" ];
+      tls_authentication = "GETDNS_AUTHENTICATION_REQUIRED";
+      tls_query_padding_blocksize = 128;
+      edns_client_subnet_private = 1;
+      round_robin_upstreams = 1;
+      idle_timeout = 10000;
+      log_level = "GETDNS_LOG_NOTICE";
       upstream_recursive_servers = [
         # Cloudflare
         {
@@ -113,7 +125,10 @@
     enable = true;
     settings = {
       # Include loopback so the host's resolver (127.0.0.1) works at boot.
-      interface = [ "vlan20" "lo" ];
+      interface = [
+        "vlan20"
+        "lo"
+      ];
       #bind-interfaces = true;
       # vlan 20 can appear slightly after dnsmasq during boot; synamic binding
       # avoids startup failures on reboot while still restricting interfaces.
@@ -140,8 +155,20 @@
     };
   };
 
-  networking.firewall.allowedTCPPorts = [ 53 ]; # DNS
-  networking.firewall.allowedUDPPorts = [ 53 67 ]; # DNS + DHCP
+  # Router DNS/DHCP and management UIs belong on the LAN, not the WAN VLAN.
+  networking.firewall.interfaces.vlan20 = {
+    allowedTCPPorts = [
+      53
+      6052
+      8091
+      8123
+    ];
+    allowedUDPPorts = [
+      53
+      67
+      5353
+    ];
+  };
 
   # Use stubby locally instead of ISP-provided resolvers
   networking.nameservers = [ "127.0.0.1" ];

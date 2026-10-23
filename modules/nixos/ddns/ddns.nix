@@ -4,7 +4,7 @@ let
   cfg = config.services.ddns.cloudflare;
 
   # Python runtime + deps your script needs
-  python = pkgs.python311.withPackages (ps: with ps; [
+  python = pkgs.python3.withPackages (ps: with ps; [
     requests
     #os         # always available
     cloudflare
