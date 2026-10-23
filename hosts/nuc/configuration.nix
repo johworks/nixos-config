@@ -126,6 +126,7 @@
   # Archer AX1450 AP: keeps root persistence verified and Wi-Fi converged.
   services.ax1450 = {
     enable = true;
+    metrics.enable = true;
     wifi = {
       ssid = "TP-Link_2724";
       # Adopt the AP's existing settings without changing radio behavior.

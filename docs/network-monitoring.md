@@ -24,6 +24,10 @@ Change the files and rebuild to update the deployment.
   so actual disk usage can exceed 2 GB.
 - Persistent service state uses the NixOS module defaults under
   `/var/lib/prometheus2` and `/var/lib/grafana`. Rebuilding preserves history.
+- `ax1450-metrics.timer` collects a read-only AP snapshot over the existing
+  pinned, key-only SSH connection every 30 seconds. Node Exporter's textfile
+  collector reads `/var/lib/ax1450-metrics/ax1450.prom`; no new AP listener is
+  opened. The collector reads only the SSH key, not the Wi-Fi password.
 
 Grafana listens only on `192.168.10.1:3000`; the firewall opens that port only on
 LAN interface `vlan20`. Prometheus (`9090`), Node Exporter (`9100`), and Blackbox
@@ -48,6 +52,51 @@ Allow about a minute after first deployment for rate graphs to populate. The
 rolling 24-hour traffic totals are estimates from available samples; a full
 day of coverage requires a full day of collection. Temperature is the highest
 available hardware sensor reading, rather than a specific CPU sensor.
+
+## AP measurements
+
+The dashboard includes AP uptime, one-minute load and memory use, plus
+per-band traffic, associated-client counts, radio retransmissions/failures,
+weakest-client RSSI, noise floor, primary channel and operating width. Binary
+reachability, service-state and collector-state panels have been removed;
+the underlying diagnostics and probes remain available in Prometheus.
+
+Traffic and client counts cover the main SSIDs (`wl1.1` for 2.4 GHz,
+`wl0.1` for 5 GHz), excluding guest interfaces. Transmit means AP to clients;
+receive means clients to AP. Radio retransmission/failure counters include
+other traffic on the same radio. Their rates are not application packet
+loss percentages. `rate()` handles counter resets after reboot or reload.
+The Broadcom channel-idle score is not graphed because its scaling has not
+been verified for this firmware.
+
+RSSI is measured at the AP, with only the weakest valid reading per band
+exported. It is absent when there are no readable associated clients.
+Device MAC addresses, names, SSIDs and credentials are not metric labels.
+A disabled BSS reports zero clients; unavailable readings remain absent.
+Load average is a count of runnable/waiting work, not CPU utilization.
+
+Failed collection atomically replaces the old sample with failure diagnostics,
+removing previous AP readings. Every AP query also requires successful
+collection and a snapshot timestamp less than 90 seconds old. This prevents
+a stopped timer or leftover textfile after reboot from looking current.
+AP charts leave gaps for unavailable data. Root SSH can remain unavailable
+until the AP's 03:11 recovery schedule fires after an AP reboot.
+
+Enable collection with `services.ax1450.metrics.enable = true`; the NUC
+configuration already does so. Implementation lives in
+`modules/nixos/ax1450/{metrics.nix,metrics.py,collect-remote.sh}`.
+The Python collector is bounded to 20 seconds, with a 25-second systemd limit.
+No Wi-Fi reload, settings commit, flash write or AP reboot occurs during
+collection. The [Node Exporter textfile collector](https://github.com/prometheus/node_exporter#textfile-collector)
+reads atomic `.prom` files; freshness is a separate metric, not a custom
+Prometheus sample timestamp.
+
+```sh
+systemctl status ax1450-metrics.timer
+journalctl -u ax1450-metrics.service -n 20 --no-pager
+cat /var/lib/ax1450-metrics/ax1450.prom
+curl -fsS 'http://127.0.0.1:9090/api/v1/query?query=ax1450_metrics_collection_success'
+```
 
 ## Validation and troubleshooting
 

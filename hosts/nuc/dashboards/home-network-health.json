@@ -1,13 +1,15 @@
 {
   "uid": "home-network-health",
   "title": "Home Network Health",
-  "description": "NUC router traffic, internet reachability, DNS and system health. Provisioned from the NixOS flake.",
+  "description": "NUC routing, internet performance, DNS and AX1450 Wi-Fi traffic, clients, signal and retries. Provisioned from the NixOS flake.",
   "tags": [
     "network",
-    "nuc"
+    "nuc",
+    "wifi",
+    "ax1450"
   ],
   "schemaVersion": 39,
-  "version": 1,
+  "version": 2,
   "editable": false,
   "timezone": "browser",
   "refresh": "15s",
@@ -31,246 +33,12 @@
   },
   "panels": [
     {
-      "id": 1,
-      "title": "Cloudflare reachability",
-      "type": "stat",
-      "description": "Latest probe result. Missing data is unknown, not healthy.",
-      "gridPos": {
-        "x": 0,
-        "y": 0,
-        "w": 4,
-        "h": 4
-      },
-      "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "unit": "short",
-          "min": 0,
-          "max": 1,
-          "mappings": [
-            {
-              "type": "value",
-              "options": {
-                "0": {
-                  "text": "DOWN",
-                  "color": "red"
-                },
-                "1": {
-                  "text": "UP",
-                  "color": "green"
-                }
-              }
-            }
-          ],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "red",
-                "value": null
-              },
-              {
-                "color": "green",
-                "value": 1
-              }
-            ]
-          }
-        },
-        "overrides": []
-      },
-      "targets": [
-        {
-          "refId": "A",
-          "expr": "probe_success{job=\"internet-icmp\",destination=\"Cloudflare\"}",
-          "legendFormat": "",
-          "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
-          },
-          "range": false,
-          "instant": true
-        }
-      ],
-      "options": {
-        "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
-          "fields": "",
-          "values": false
-        },
-        "colorMode": "value",
-        "graphMode": "none",
-        "textMode": "auto",
-        "orientation": "auto"
-      }
-    },
-    {
-      "id": 2,
-      "title": "Quad9 reachability",
-      "type": "stat",
-      "description": "Latest probe result. Missing data is unknown, not healthy.",
-      "gridPos": {
-        "x": 4,
-        "y": 0,
-        "w": 4,
-        "h": 4
-      },
-      "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "unit": "short",
-          "min": 0,
-          "max": 1,
-          "mappings": [
-            {
-              "type": "value",
-              "options": {
-                "0": {
-                  "text": "DOWN",
-                  "color": "red"
-                },
-                "1": {
-                  "text": "UP",
-                  "color": "green"
-                }
-              }
-            }
-          ],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "red",
-                "value": null
-              },
-              {
-                "color": "green",
-                "value": 1
-              }
-            ]
-          }
-        },
-        "overrides": []
-      },
-      "targets": [
-        {
-          "refId": "A",
-          "expr": "probe_success{job=\"internet-icmp\",destination=\"Quad9\"}",
-          "legendFormat": "",
-          "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
-          },
-          "range": false,
-          "instant": true
-        }
-      ],
-      "options": {
-        "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
-          "fields": "",
-          "values": false
-        },
-        "colorMode": "value",
-        "graphMode": "none",
-        "textMode": "auto",
-        "orientation": "auto"
-      }
-    },
-    {
-      "id": 3,
-      "title": "Local DNS",
-      "type": "stat",
-      "description": "Latest probe result. Missing data is unknown, not healthy.",
-      "gridPos": {
-        "x": 8,
-        "y": 0,
-        "w": 4,
-        "h": 4
-      },
-      "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "unit": "short",
-          "min": 0,
-          "max": 1,
-          "mappings": [
-            {
-              "type": "value",
-              "options": {
-                "0": {
-                  "text": "DOWN",
-                  "color": "red"
-                },
-                "1": {
-                  "text": "UP",
-                  "color": "green"
-                }
-              }
-            }
-          ],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "red",
-                "value": null
-              },
-              {
-                "color": "green",
-                "value": 1
-              }
-            ]
-          }
-        },
-        "overrides": []
-      },
-      "targets": [
-        {
-          "refId": "A",
-          "expr": "probe_success{job=\"router-dns\"}",
-          "legendFormat": "",
-          "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
-          },
-          "range": false,
-          "instant": true
-        }
-      ],
-      "options": {
-        "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
-          "fields": "",
-          "values": false
-        },
-        "colorMode": "value",
-        "graphMode": "none",
-        "textMode": "auto",
-        "orientation": "auto"
-      }
-    },
-    {
       "id": 4,
-      "title": "Router CPU",
+      "title": "NUC CPU",
       "type": "stat",
       "description": "",
       "gridPos": {
-        "x": 12,
+        "x": 0,
         "y": 0,
         "w": 4,
         "h": 4
@@ -316,11 +84,11 @@
     },
     {
       "id": 5,
-      "title": "Memory used",
+      "title": "NUC memory used",
       "type": "stat",
       "description": "",
       "gridPos": {
-        "x": 16,
+        "x": 4,
         "y": 0,
         "w": 4,
         "h": 4
@@ -366,9 +134,153 @@
     },
     {
       "id": 6,
-      "title": "Router uptime",
+      "title": "NUC uptime",
       "type": "stat",
       "description": "",
+      "gridPos": {
+        "x": 8,
+        "y": 0,
+        "w": 4,
+        "h": 4
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "s"
+        },
+        "overrides": []
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "time() - node_boot_time_seconds{job=\"node\"}",
+          "legendFormat": "",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "range": false,
+          "instant": true
+        }
+      ],
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "none",
+        "graphMode": "none",
+        "textMode": "auto",
+        "orientation": "auto"
+      }
+    },
+    {
+      "id": 20,
+      "title": "AP load · 1 minute",
+      "type": "stat",
+      "description": "One-minute Linux load average on the AP; this is not a CPU percentage.",
+      "gridPos": {
+        "x": 12,
+        "y": 0,
+        "w": 4,
+        "h": 4
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "(ax1450_load1) and on(job,instance) (ax1450_metrics_collection_success == 1) and on(job,instance) (time() - ax1450_metrics_sample_timestamp_seconds < 90)",
+          "legendFormat": "",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "range": false,
+          "instant": true
+        }
+      ],
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "none",
+        "graphMode": "none",
+        "textMode": "auto",
+        "orientation": "auto"
+      }
+    },
+    {
+      "id": 21,
+      "title": "AP memory used",
+      "type": "stat",
+      "description": "AP memory use calculated from MemAvailable, including reclaimable cache.",
+      "gridPos": {
+        "x": 16,
+        "y": 0,
+        "w": 4,
+        "h": 4
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent"
+        },
+        "overrides": []
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "(100 * (1 - ax1450_memory_available_bytes / ax1450_memory_total_bytes)) and on(job,instance) (ax1450_metrics_collection_success == 1) and on(job,instance) (time() - ax1450_metrics_sample_timestamp_seconds < 90)",
+          "legendFormat": "",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "range": false,
+          "instant": true
+        }
+      ],
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "none",
+        "graphMode": "none",
+        "textMode": "auto",
+        "orientation": "auto"
+      }
+    },
+    {
+      "id": 22,
+      "title": "AP uptime",
+      "type": "stat",
+      "description": "Time since the AX1450 booted.",
       "gridPos": {
         "x": 20,
         "y": 0,
@@ -388,7 +300,7 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "time() - node_boot_time_seconds{job=\"node\"}",
+          "expr": "(ax1450_uptime_seconds) and on(job,instance) (ax1450_metrics_collection_success == 1) and on(job,instance) (time() - ax1450_metrics_sample_timestamp_seconds < 90)",
           "legendFormat": "",
           "datasource": {
             "type": "prometheus",
@@ -535,7 +447,7 @@
     },
     {
       "id": 9,
-      "title": "Download \u00b7 last 24 hours",
+      "title": "Download · last 24 hours",
       "type": "stat",
       "description": "Rolling 24-hour estimate, independent of the time picker. During the first day only collected history is available.",
       "gridPos": {
@@ -583,7 +495,7 @@
     },
     {
       "id": 10,
-      "title": "Upload \u00b7 last 24 hours",
+      "title": "Upload · last 24 hours",
       "type": "stat",
       "description": "Rolling 24-hour estimate, independent of the time picker. During the first day only collected history is available.",
       "gridPos": {
@@ -681,7 +593,7 @@
     },
     {
       "id": 12,
-      "title": "Temperature",
+      "title": "NUC temperature",
       "type": "stat",
       "description": "Highest hardware sensor temperature reported by node exporter.",
       "gridPos": {
@@ -728,15 +640,15 @@
       }
     },
     {
-      "id": 13,
-      "title": "Connectivity history",
+      "id": 23,
+      "title": "Wi-Fi traffic by band",
       "type": "timeseries",
-      "description": "1 = successful probe; 0 = failed probe. Gaps mean monitoring data is unavailable.",
+      "description": "Main-SSID interface traffic from the AP perspective. Includes local traffic; excludes guest interfaces. Counter resets are handled by rate().",
       "gridPos": {
         "x": 0,
         "y": 16,
         "w": 12,
-        "h": 7
+        "h": 8
       },
       "datasource": {
         "type": "prometheus",
@@ -744,9 +656,8 @@
       },
       "fieldConfig": {
         "defaults": {
-          "unit": "short",
+          "unit": "bps",
           "min": 0,
-          "max": 1,
           "custom": {
             "drawStyle": "line",
             "lineInterpolation": "linear",
@@ -762,8 +673,8 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "probe_success{job=\"internet-icmp\"}",
-          "legendFormat": "{{destination}}",
+          "expr": "(8 * rate(ax1450_wifi_transmit_bytes_total[$__rate_interval])) and on(job,instance) (ax1450_metrics_collection_success == 1) and on(job,instance) (time() - ax1450_metrics_sample_timestamp_seconds < 90)",
+          "legendFormat": "{{band}} to clients",
           "datasource": {
             "type": "prometheus",
             "uid": "prometheus"
@@ -773,8 +684,195 @@
         },
         {
           "refId": "B",
-          "expr": "probe_success{job=\"router-dns\"}",
-          "legendFormat": "Local DNS",
+          "expr": "(8 * rate(ax1450_wifi_receive_bytes_total[$__rate_interval])) and on(job,instance) (ax1450_metrics_collection_success == 1) and on(job,instance) (time() - ax1450_metrics_sample_timestamp_seconds < 90)",
+          "legendFormat": "{{band}} from clients",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "range": true,
+          "instant": false
+        }
+      ],
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "none"
+        }
+      }
+    },
+    {
+      "id": 24,
+      "title": "Wi-Fi clients by band",
+      "type": "timeseries",
+      "description": "Associated clients on each main SSID. A disabled BSS reports zero; unavailable readings leave gaps.",
+      "gridPos": {
+        "x": 12,
+        "y": 16,
+        "w": 12,
+        "h": 8
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "min": 0,
+          "custom": {
+            "drawStyle": "line",
+            "lineInterpolation": "stepAfter",
+            "lineWidth": 2,
+            "fillOpacity": 10,
+            "showPoints": "never",
+            "spanNulls": false,
+            "axisPlacement": "auto"
+          },
+          "decimals": 0
+        },
+        "overrides": []
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "(ax1450_wifi_associated_clients) and on(job,instance) (ax1450_metrics_collection_success == 1) and on(job,instance) (time() - ax1450_metrics_sample_timestamp_seconds < 90)",
+          "legendFormat": "{{band}} clients",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "range": true,
+          "instant": false
+        }
+      ],
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "none"
+        }
+      }
+    },
+    {
+      "id": 25,
+      "title": "Wi-Fi retransmissions and failures",
+      "type": "timeseries",
+      "description": "Broadcom radio counters, including radio traffic beyond the main SSID. These are driver-reported retries/failures, not application packet loss.",
+      "gridPos": {
+        "x": 0,
+        "y": 24,
+        "w": 12,
+        "h": 8
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "pps",
+          "min": 0,
+          "custom": {
+            "drawStyle": "line",
+            "lineInterpolation": "linear",
+            "lineWidth": 2,
+            "fillOpacity": 10,
+            "showPoints": "never",
+            "spanNulls": false,
+            "axisPlacement": "auto"
+          }
+        },
+        "overrides": []
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "(rate(ax1450_wifi_transmit_retries_total[$__rate_interval])) and on(job,instance) (ax1450_metrics_collection_success == 1) and on(job,instance) (time() - ax1450_metrics_sample_timestamp_seconds < 90)",
+          "legendFormat": "{{band}} retries",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "range": true,
+          "instant": false
+        },
+        {
+          "refId": "B",
+          "expr": "(rate(ax1450_wifi_transmit_failures_total[$__rate_interval])) and on(job,instance) (ax1450_metrics_collection_success == 1) and on(job,instance) (time() - ax1450_metrics_sample_timestamp_seconds < 90)",
+          "legendFormat": "{{band}} failed transmissions",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "range": true,
+          "instant": false
+        }
+      ],
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "none"
+        }
+      }
+    },
+    {
+      "id": 26,
+      "title": "Wi-Fi signal and noise",
+      "type": "timeseries",
+      "description": "Minimum RSSI among associated clients and the radio noise floor, both measured by the AP. Client RSSI is absent when no valid reading exists; device identities are not exported.",
+      "gridPos": {
+        "x": 12,
+        "y": 24,
+        "w": 12,
+        "h": 8
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "dBm",
+          "custom": {
+            "drawStyle": "line",
+            "lineInterpolation": "linear",
+            "lineWidth": 2,
+            "fillOpacity": 10,
+            "showPoints": "never",
+            "spanNulls": false,
+            "axisPlacement": "auto"
+          }
+        },
+        "overrides": []
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "(ax1450_wifi_weakest_client_rssi_dbm) and on(job,instance) (ax1450_metrics_collection_success == 1) and on(job,instance) (time() - ax1450_metrics_sample_timestamp_seconds < 90)",
+          "legendFormat": "{{band}} weakest client",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "range": true,
+          "instant": false
+        },
+        {
+          "refId": "B",
+          "expr": "(ax1450_wifi_noise_dbm) and on(job,instance) (ax1450_metrics_collection_success == 1) and on(job,instance) (time() - ax1450_metrics_sample_timestamp_seconds < 90)",
+          "legendFormat": "{{band}} noise floor",
           "datasource": {
             "type": "prometheus",
             "uid": "prometheus"
@@ -800,8 +898,8 @@
       "type": "timeseries",
       "description": "Resolve example.com through dnsmasq and Stubby. Cached responses are included; this is not an uncached upstream latency test.",
       "gridPos": {
-        "x": 12,
-        "y": 16,
+        "x": 0,
+        "y": 32,
         "w": 12,
         "h": 7
       },
@@ -851,12 +949,12 @@
     },
     {
       "id": 15,
-      "title": "Failed probes \u00b7 rolling 5 minutes",
+      "title": "Failed probes · rolling 5 minutes",
       "type": "timeseries",
       "description": "Percentage of sampled probes that failed, not continuous packet-loss measurement. Probes run every 15 seconds.",
       "gridPos": {
-        "x": 0,
-        "y": 23,
+        "x": 12,
+        "y": 32,
         "w": 12,
         "h": 7
       },
@@ -911,8 +1009,8 @@
       "type": "timeseries",
       "description": "Kernel interface counters shown separately. CAKE shaping drops require separate tc metrics and are not represented here.",
       "gridPos": {
-        "x": 12,
-        "y": 23,
+        "x": 0,
+        "y": 39,
         "w": 12,
         "h": 7
       },
@@ -994,69 +1092,13 @@
       }
     },
     {
-      "id": 17,
-      "title": "Router services",
-      "type": "timeseries",
-      "description": "1 = systemd unit active; 0 = another state. Connectivity probes independently test actual network behavior.",
-      "gridPos": {
-        "x": 0,
-        "y": 30,
-        "w": 12,
-        "h": 7
-      },
-      "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "unit": "short",
-          "min": 0,
-          "max": 1,
-          "custom": {
-            "drawStyle": "line",
-            "lineInterpolation": "linear",
-            "lineWidth": 2,
-            "fillOpacity": 10,
-            "showPoints": "never",
-            "spanNulls": false,
-            "axisPlacement": "auto"
-          }
-        },
-        "overrides": []
-      },
-      "targets": [
-        {
-          "refId": "A",
-          "expr": "node_systemd_unit_state{job=\"node\",state=\"active\",name=~\"dnsmasq.service|stubby.service|qos-shaper.service|grafana.service|prometheus.service\"}",
-          "legendFormat": "{{name}}",
-          "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
-          },
-          "range": true,
-          "instant": false
-        }
-      ],
-      "options": {
-        "legend": {
-          "displayMode": "list",
-          "placement": "bottom"
-        },
-        "tooltip": {
-          "mode": "multi",
-          "sort": "none"
-        }
-      }
-    },
-    {
-      "id": 18,
-      "title": "Monitoring collectors",
-      "type": "timeseries",
-      "description": "Successful metric collection, separate from probe success. Missing history is not evidence of an outage.",
+      "id": 27,
+      "title": "Wi-Fi channels and widths",
+      "type": "stat",
+      "description": "Latest primary channel and operating width in MHz for each active radio. Samples older than 90 seconds are hidden.",
       "gridPos": {
         "x": 12,
-        "y": 30,
+        "y": 39,
         "w": 12,
         "h": 7
       },
@@ -1067,42 +1109,46 @@
       "fieldConfig": {
         "defaults": {
           "unit": "short",
-          "min": 0,
-          "max": 1,
-          "custom": {
-            "drawStyle": "line",
-            "lineInterpolation": "linear",
-            "lineWidth": 2,
-            "fillOpacity": 10,
-            "showPoints": "never",
-            "spanNulls": false,
-            "axisPlacement": "auto"
-          }
+          "decimals": 0
         },
         "overrides": []
       },
       "targets": [
         {
           "refId": "A",
-          "expr": "up",
-          "legendFormat": "{{job}} {{instance}}",
+          "expr": "(ax1450_wifi_channel) and on(job,instance) (ax1450_metrics_collection_success == 1) and on(job,instance) (time() - ax1450_metrics_sample_timestamp_seconds < 90)",
+          "legendFormat": "{{band}} channel",
           "datasource": {
             "type": "prometheus",
             "uid": "prometheus"
           },
-          "range": true,
-          "instant": false
+          "range": false,
+          "instant": true
+        },
+        {
+          "refId": "B",
+          "expr": "(ax1450_wifi_channel_width_mhz) and on(job,instance) (ax1450_metrics_collection_success == 1) and on(job,instance) (time() - ax1450_metrics_sample_timestamp_seconds < 90)",
+          "legendFormat": "{{band}} width · MHz",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "range": false,
+          "instant": true
         }
       ],
       "options": {
-        "legend": {
-          "displayMode": "list",
-          "placement": "bottom"
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
         },
-        "tooltip": {
-          "mode": "multi",
-          "sort": "none"
-        }
+        "colorMode": "none",
+        "graphMode": "none",
+        "textMode": "auto",
+        "orientation": "auto"
       }
     },
     {
@@ -1111,13 +1157,13 @@
       "type": "text",
       "gridPos": {
         "x": 0,
-        "y": 37,
+        "y": 46,
         "w": 24,
         "h": 4
       },
       "options": {
         "mode": "markdown",
-        "content": "WAN: **vlan10** \u00b7 LAN: **vlan20** \u00b7 Trunk: **enp1s0**. Metrics every **15 seconds**; history up to **30 days / 2 GB**, whichever limit is reached first.\n\nTraffic includes the NUC and routed clients. Same-LAN traffic may remain on the switch. Interface totals do not identify individual devices. Monitoring gaps cannot distinguish a NUC outage from a monitoring outage. Panels are provisioned from Git."
+        "content": "WAN: **vlan10** · LAN: **vlan20** · Trunk: **enp1s0**. NUC/probes every **15 seconds**, AP snapshots every **30 seconds**; history up to **30 days / 2 GB**.\n\nWi-Fi traffic and clients cover the main SSIDs; retry/failure counters cover each radio. RSSI/noise are measured at the AP. Failed or stale AP samples leave gaps; they are not zero traffic or signal. AP SSH can remain unavailable until its recovery schedule fires after a reboot. Panels are provisioned from Git."
       }
     }
   ]

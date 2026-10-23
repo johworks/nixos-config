@@ -131,6 +131,8 @@ let
   };
 in
 {
+  imports = [ ./metrics.nix ];
+
   options.services.ax1450 = {
     enable = lib.mkEnableOption "Archer AX1450 AP management from this host";
 

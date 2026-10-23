@@ -116,21 +116,32 @@
         };
     in
     {
-      checks.${system}.ax1450-reconcile =
-        pkgsStable.runCommand "ax1450-reconcile-tests"
-          {
-            nativeBuildInputs = [
-              pkgsStable.python3
-              pkgsStable.bash
-            ];
-          }
-          ''
-            export AX1450_TEST_SHELL=${pkgsStable.busybox}/bin/ash
-            export AX1450_TEST_WRAPPER=${self.nixosConfigurations.nuc.config.system.build.ax1450-reconcile}/bin/ax1450-reconcile
-            cp ${./modules/nixos/ax1450/reconcile-remote.sh} reconcile-remote.sh
-            python3 ${./modules/nixos/ax1450/test_reconcile.py}
-            touch "$out"
-          '';
+      checks.${system} = {
+        ax1450-reconcile =
+          pkgsStable.runCommand "ax1450-reconcile-tests"
+            {
+              nativeBuildInputs = [
+                pkgsStable.python3
+                pkgsStable.bash
+              ];
+            }
+            ''
+              export AX1450_TEST_SHELL=${pkgsStable.busybox}/bin/ash
+              export AX1450_TEST_WRAPPER=${self.nixosConfigurations.nuc.config.system.build.ax1450-reconcile}/bin/ax1450-reconcile
+              cp ${./modules/nixos/ax1450/reconcile-remote.sh} reconcile-remote.sh
+              python3 ${./modules/nixos/ax1450/test_reconcile.py}
+              touch "$out"
+            '';
+
+        ax1450-metrics =
+          pkgsStable.runCommand "ax1450-metrics-tests" { nativeBuildInputs = [ pkgsStable.python3 ]; }
+            ''
+              cp ${./modules/nixos/ax1450/metrics.py} metrics.py
+              cp ${./modules/nixos/ax1450/test_metrics.py} test_metrics.py
+              python3 test_metrics.py
+              touch "$out"
+            '';
+      };
 
       # For NixOS rebuild
       nixosConfigurations = {
