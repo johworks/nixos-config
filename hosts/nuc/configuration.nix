@@ -128,6 +128,14 @@
 
   services.beadsDolt.enable = true;
 
+  # Unmatched names must not fall back to the first public site.
+  services.nginx.virtualHosts."default" = {
+    default = true;
+    serverName = "_";
+    rejectSSL = true;
+    extraConfig = "return 444;";
+  };
+
   # Archer AX1450 AP: keeps root persistence verified and Wi-Fi converged.
   services.ax1450 = {
     enable = true;
