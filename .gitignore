@@ -5,4 +5,5 @@ efi-backups
 experiments/qos-tune/
 .codex
 /result
+/result-*
 /.ha-ac-analysis/
