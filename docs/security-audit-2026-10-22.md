@@ -4,6 +4,13 @@ Audit task: `nixos-6bn`. Repository baseline:
 `5002a5f29d4c20f64076223118bb62d2cc7e56d5`.
 Times are America/New_York; the audit ran after midnight UTC on 23 October.
 
+Concurrent commit `e94b53c` added NUC network monitoring during the audit.
+Its source was also reviewed: Grafana binds `192.168.10.1:3000`, its firewall
+allowance is LAN-only, and Prometheus/exporters bind loopback. These services
+were absent from the inspected running-service/listener inventory. Their full
+dependency advisories were not separately enumerated; include them in the NUC
+baseline refresh before deployment.
+
 ## Result and scope
 
 Patching is needed. Both the desktop and NUC accepted a certificate chained
