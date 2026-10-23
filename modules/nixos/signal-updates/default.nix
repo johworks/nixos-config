@@ -22,7 +22,7 @@ let
     name = "signal-updates";
     runtimeInputs = [ pkgs.qrencode ];
     text = ''
-      exec ${pkgs.python3}/bin/python3 ${./client.py} "$@"
+      exec ${pkgs.python3}/bin/python3 -I ${./client.py} "$@"
     '';
   };
 in
@@ -32,6 +32,21 @@ in
   config = lib.mkIf cfg.enable {
     environment.systemPackages = [ helper ];
     system.build.signalUpdatesTrustStore = trustStore;
+
+    # The desktop coordinator can send bounded self-reports over John's SSH
+    # connection. It receives neither the Signal socket nor activation rights.
+    security.sudo.extraRules = [
+      {
+        users = [ "john" ];
+        runAs = "signal-updates";
+        commands = [
+          {
+            command = "/run/current-system/sw/bin/signal-updates report";
+            options = [ "NOPASSWD" ];
+          }
+        ];
+      }
+    ];
 
     users.groups.signal-updates = { };
     users.users.signal-updates = {

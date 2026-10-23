@@ -2,6 +2,7 @@
 
 import argparse
 import json
+import re
 import socket
 import subprocess
 import sys
@@ -70,12 +71,12 @@ class Client:
             raise TransportError("Linked account has no valid account ID.")
         return account["aci"]
 
-    def test(self):
+    def send(self, message):
         result = self.call("send", {
             "account": self.account(),
             "noteToSelf": True,
             "notifySelf": True,
-            "message": TEST_MESSAGE,
+            "message": message,
         })
         if not isinstance(result, dict) or type(result.get("timestamp")) is not int:
             raise TransportError("Delivery was not confirmed; check Note to Self before retrying.")
@@ -85,6 +86,56 @@ class Client:
             for delivery in deliveries
         ):
             raise TransportError("Signal reported a delivery failure; check Note to Self before retrying.")
+
+    def test(self):
+        self.send(TEST_MESSAGE)
+
+
+def format_report(report):
+    """Only bounded build metadata is allowed into the self-chat, never logs."""
+    if not isinstance(report, dict) or set(report) != {
+        "id", "status", "base_commit", "candidate_commit", "hosts", "repair_attempts",
+        "inputs_refreshed", "independent_pin_count", "failed_stage",
+    }:
+        raise TransportError("Invalid report fields.")
+    if report["status"] not in ("built; operator review required", "failed", "interrupted"):
+        raise TransportError("Invalid report status.")
+    if not isinstance(report["id"], str) or not re.fullmatch(r"\d{8}T\d{6}Z-[a-f0-9]{8}", report["id"]):
+        raise TransportError("Invalid report ID.")
+    for field in ("base_commit", "candidate_commit"):
+        value = report[field]
+        if value is not None and (not isinstance(value, str) or not re.fullmatch(r"[a-f0-9]{40}", value)):
+            raise TransportError("Invalid report revision.")
+    for field, maximum in (("repair_attempts", 2), ("independent_pin_count", 10)):
+        if type(report[field]) is not int or not 0 <= report[field] <= maximum:
+            raise TransportError("Invalid report count.")
+    if type(report["inputs_refreshed"]) is not bool:
+        raise TransportError("Invalid refresh status.")
+    hosts = report["hosts"]
+    if not isinstance(hosts, dict) or set(hosts) - {"desktop", "nuc"}:
+        raise TransportError("Invalid report hosts.")
+    lines = ["NixOS update preparation — build report", report["id"], report["status"]]
+    for name, host in sorted(hosts.items()):
+        if not isinstance(host, dict) or set(host) != {"system", "status"} or host["status"] != "built":
+            raise TransportError("Invalid host build result.")
+        if not isinstance(host["system"], str) or not re.fullmatch(r"/nix/store/[a-z0-9]{32}-nixos-system-[A-Za-z0-9.+_-]+", host["system"]):
+            raise TransportError("Invalid system output.")
+        lines.append(name + ": " + host["system"])
+    stage = report["failed_stage"]
+    if stage is not None:
+        if not isinstance(stage, str) or stage not in {"base", "clone", "checkout", "refresh", "stage", "staged", "commit", "revision",
+                         "diff", "changed-nix", "format", "flake-check", "build-nuc", "build-desktop", "clean", "repair"}:
+            raise TransportError("Invalid failure stage.")
+        lines.append("Failed stage: " + stage)
+    lines.extend([
+        "Base: " + (report["base_commit"] or "not recorded"),
+        "Candidate: " + (report["candidate_commit"] or "not produced"),
+        "Inputs refreshed: " + str(report["inputs_refreshed"]),
+        "Repair attempts: " + str(report["repair_attempts"]),
+        "Independent application pins needing review: " + str(report["independent_pin_count"]),
+        "Logs and diff are saved on the desktop. Activation approval is not enabled.",
+    ])
+    return "\n".join(lines)
 
 
 def link(client):
@@ -110,7 +161,7 @@ def link(client):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("command", choices=["status", "link", "test"])
+    parser.add_argument("command", choices=["status", "link", "test", "report"])
     args = parser.parse_args()
     client = Client()
     try:
@@ -119,6 +170,12 @@ def main():
         elif args.command == "test":
             client.test()
             print("Test submitted to Note to Self. Check delivery and the iPhone notification.")
+        elif args.command == "report":
+            raw = sys.stdin.buffer.read(65537)
+            if len(raw) > 65536:
+                raise TransportError("Report exceeds 64 KiB.")
+            client.send(format_report(json.loads(raw)))
+            print("Build report submitted to Note to Self.")
         else:
             count = len(client.accounts())
             print(f"Signal transport reachable; linked accounts: {count}.")

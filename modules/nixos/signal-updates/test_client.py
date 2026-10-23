@@ -62,6 +62,35 @@ def response(request, result):
 
 
 class ClientTests(unittest.TestCase):
+    def report(self, **updates):
+        value = {"id": "20261023T120000Z-1234abcd", "status": "built; operator review required",
+                 "base_commit": "a" * 40, "candidate_commit": "b" * 40,
+                 "hosts": {"nuc": {"system": "/nix/store/" + "a" * 32 + "-nixos-system-nuc-test", "status": "built"}},
+                 "repair_attempts": 0, "inputs_refreshed": True,
+                 "independent_pin_count": 3, "failed_stage": None}
+        value.update(updates)
+        return value
+
+    def test_report_includes_build_identity_but_no_activation_request(self):
+        result = client.format_report(self.report())
+        self.assertIn("b" * 40, result)
+        self.assertIn("nixos-system-nuc-test", result)
+        self.assertIn("Activation approval is not enabled", result)
+
+    def test_report_rejects_unstructured_text_recipients_and_bad_metadata(self):
+        for values in ({"recipient": "+000000"}, {"failure": "PRIVATE LOG"},
+                       {"id": "spoof\napprove"}, {"status": "approve now"},
+                       {"hosts": {"unknown": {}}}, {"repair_attempts": True},
+                       {"failed_stage": "PRIVATE LOG"}, {"failed_stage": []}):
+            with self.subTest(values=values):
+                with self.assertRaises(client.TransportError):
+                    client.format_report(self.report(**values))
+
+    def test_failed_preparation_without_candidate_can_be_reported(self):
+        result = client.format_report(self.report(status="failed", hosts={}, candidate_commit=None, failed_stage="clone"))
+        self.assertIn("Failed stage: clone", result)
+        self.assertIn("not produced", result)
+
     def test_events_and_wrong_ids_are_not_printed_or_returned(self):
         def handler(request):
             return [

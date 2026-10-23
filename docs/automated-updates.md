@@ -1,8 +1,10 @@
 # Agent-assisted NixOS updates
 
 Design recorded on 23 October 2026; implementation task `nixos-6d6`.
-No update timer, Signal account, or privileged executor has been enabled by this
-design. The recent migration remains tracked separately in `nixos-uez`.
+The NUC's private Signal transport is active; John verified Note to Self delivery
+and an iPhone notification on 23 October. Preparation and reporting are described
+below. No activation executor is implemented. The recent migration remains
+tracked separately in `nixos-uez`.
 
 ## Confirmed policy
 
@@ -34,6 +36,8 @@ At design time local main is 25 commits ahead of origin/main. Before enabling
 an updater that consumes GitHub, reconcile the published source with the
 reviewed local configuration. Candidate reports must identify their exact base
 commit. The preparation job must not change John's normal working checkout.
+The initial implementation uses reviewed local `main`, so it does not consume
+the older `origin/main`; publishing the reviewed history remains separate work.
 
 ## Proposed workflow
 
@@ -55,8 +59,9 @@ handoff. No further repair or activation is implied by an expired job.
 Start with systemd scheduling, Nix's own update/build commands, a Codex worker,
 and small reporting and approval components. Existing OpenRig experiments may
 provide execution oversight, but a new orchestration framework is not required.
-The worker's execution host and schedule remain deployment choices. Full flake
-checks belong on the desktop/build host: evaluating the other hosts on the NUC
+Preparation runs on the desktop, weekly on Sunday at 03:00 local time with up
+to 20 minutes of randomized delay. A persistent user timer catches missed runs
+when the user manager next runs. Full flake checks belong on the desktop/build host: evaluating the other hosts on the NUC
 previously caused it to realize unrelated workstation dependencies.
 
 ### Preparation and debugging
@@ -73,9 +78,14 @@ previously caused it to realize unrelated workstation dependencies.
 
 Codex supports non-interactive execution, workspace permissions, JSONL events
 and schema-constrained final reports. The installed CLI exposes these features.
-Use an explicit automation profile and keep its authentication out of candidate
-build/test environments. No model, authentication method or spending limit has
-been selected for the new worker.
+John selected his existing desktop Codex sign-in. The repair command ignores
+personal config/rules, uses the CLI's default model, and has a separate explicit
+permission profile. Its commands can edit the candidate and read runtime tools;
+they cannot read the original repository, account keys, or report directory,
+and have no command network access. Candidate builds/checks use a separate HOME
+and do not inherit API/SSH credential environment variables. Each job allows at
+most two repairs of ten minutes each within a one-hour preparation deadline.
+The local subscription's rate limits still apply; no API key has been configured.
 
 The worker must not weaken TLS, remove tests to obtain a pass, change trust or
 privilege policy, or bypass switch inhibitors. Today's D-Bus failure should
@@ -171,10 +181,18 @@ confirm both arrival and notification on the phone. It does not send a message
 merely by linking or starting the service. A timeout is not proof that linking
 or sending failed: check status/Note to Self before retrying.
 
-This component does not consume approval replies or prepare/activate updates.
+The transport does not consume approval replies or activate updates.
 Its tests cover real-daemon startup without an account, socket response/event
 handling, account ambiguity, self-only routing, failed delivery, and the linking
-flow. Live linking and iPhone delivery remain manual verification steps.
+flow. Live linking, text delivery and an iPhone notification have been confirmed.
+
+The `report` command accepts a bounded metadata summary on stdin and always
+sends to Note to Self. Its schema excludes message bodies, recipients, raw
+logs and agent replies. A sudo rule lets John run exactly
+`sudo -n -u signal-updates /run/current-system/sw/bin/signal-updates report`;
+this grants send-only reporting as the isolated account, not access to the
+socket or an activation command. The coordinator uses John's existing NUC SSH
+key; the repair worker cannot read that key.
 
 To disconnect, remove `NUC Update Reports` from Signal's Linked Devices and
 stop/disable the service through NixOS. Revoking the device does not erase its
@@ -184,7 +202,61 @@ Only the configured approver's authenticated Signal identity may approve jobs;
 a profile display name or membership in a reporting group is insufficient.
 Use a setup challenge and identity verification. Reject stale, duplicate,
 wrong-host, altered-candidate and unknown-sender approvals. No sudo passwords
-are transmitted through chat. No real Signal messages have been sent.
+are transmitted through chat. The live delivery test was an inert message.
+
+## Running candidate preparation
+
+`scripts/updates/prepare.py`, packaged as `update-prepare`, clones reviewed local
+`main` into a separate private directory. It does not pull or modify the normal
+checkout. It refreshes the lock, commits the candidate before checking it, checks
+changed Nix formatting, runs the flake checks, and builds desktop and NUC with
+one local build job and two build cores. Each successful output has a persistent
+GC root beside its report. Failure triggers bounded repair and the same checks
+again. A changed candidate gets a new commit and lock hash; agent assertions do
+not determine whether a check passed.
+
+Reports and numbered command logs live under
+`~/.local/state/nixos-updates/<run-id>/`. Each run records base/candidate commit,
+lock hash, input revisions/hashes, independent application pins, actual exit
+codes, repair count, and built system paths. Keep these directories private.
+There is no automatic retention cleanup yet: after review, remove an unwanted
+run's GC-root symlinks and candidate when its artifacts are no longer needed.
+
+After activating the NUC reporting permission and desktop configuration:
+
+```sh
+systemctl --user status nixos-update-prepare.timer
+systemctl --user start --no-block nixos-update-prepare.service
+journalctl --user -u nixos-update-prepare.service -f
+```
+
+For a manual run without refreshing inputs or using the agent:
+
+```sh
+nix --store daemon run --no-write-lock-file .#update-prepare -- \
+  --repo "$PWD" --no-refresh --repair-attempts 0 --notify-signal
+```
+
+Without `--notify-signal`, the same command only saves the local report. A
+notification has a separate 40-second allowance after the preparation deadline;
+a failed send preserves the local report and returns a failed job exit status.
+Stopping the service cancels its process group and leaves the partial report.
+Use `systemctl --user stop nixos-update-prepare.timer` to stop scheduling; stop
+the service separately to cancel an active job.
+
+The initial pipeline refreshes flake inputs. Home Assistant/ESPHome image digests
+and Stremio source pins are inventoried but not automatically refreshed, and the
+runtime TLS/container/service workflow checks are not yet automated. Reports
+explicitly require operator review. There is no Signal approval parser or host
+executor, so replying to a build report cannot activate a candidate.
+
+Verification includes bounded retry, timeout/child termination, source checkout
+isolation, private state/locking, credential environment separation, and safe
+notification summaries. A real signed-in Codex run repaired a disposable failing
+flake in one attempt; the original checkout and the assertion were preserved,
+and the coordinator then independently passed the flake check and built its
+system output. Live reporting of an actual host candidate remains a separate
+post-activation check.
 
 ## Reducing the need for future patches
 
@@ -213,15 +285,16 @@ cannot guarantee that every incident will be fixed by updating the inputs.
 4. Enable scheduled preparation and approved deployment for the desktop, then
    the NUC after router and shared-database coordination checks pass.
 
-The notification transport is being prepared first to resolve account linking
-and phone notification behavior. This does not complete candidate preparation
-or the inert approval protocol milestones.
+The transport and phone notification are verified. The preparation/reporting
+implementation does not complete independent application pin updates, runtime
+regression coverage, or the inert approval protocol milestones.
 
 ## Sources checked
 
 - Installed NixOS auto-upgrade module and nixos-rebuild-ng source: supported
   operations and the flake `--upgrade` warning.
 - [Official OpenAI non-interactive Codex documentation](https://learn.chatgpt.com/docs/non-interactive-mode).
+- [Official OpenAI permission profiles](https://learn.chatgpt.com/docs/permissions).
 - [signal-cli README](https://github.com/AsamK/signal-cli) and
   [notification behavior](https://github.com/AsamK/signal-cli/discussions/1458).
 - [Signal registration requirements](https://support.signal.org/hc/en-us/articles/360007318691-Register-a-phone-number).

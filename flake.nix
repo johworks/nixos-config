@@ -116,7 +116,34 @@
         };
     in
     {
+      packages.${system}.update-prepare = pkgsUnstable.writeShellApplication {
+        name = "update-prepare";
+        runtimeInputs = [
+          pkgsUnstable.git
+          pkgsUnstable.nix
+          pkgsUnstable.nixfmt
+          pkgsUnstable.openssh
+          pkgsUnstable.nodejs
+        ];
+        text = ''
+          exec ${pkgsUnstable.python3}/bin/python3 ${./scripts/updates/prepare.py} "$@"
+        '';
+      };
+
       checks.${system} = {
+        update-preparation =
+          pkgsStable.runCommand "update-preparation-tests"
+            {
+              nativeBuildInputs = [ pkgsStable.git ];
+              TEST_SYSTEM = pkgsStable.runCommand "nixos-system-update-test" { } ''mkdir "$out"'';
+            }
+            ''
+              cp ${./scripts/updates/prepare.py} prepare.py
+              cp ${./scripts/updates/test_prepare.py} test_prepare.py
+              ${pkgsStable.python3}/bin/python3 test_prepare.py
+              touch "$out"
+            '';
+
         signal-updates = pkgsStable.runCommand "signal-updates-tests" { } ''
           export SIGNAL_CLI=${pkgsUnstable.signal-cli}/bin/signal-cli
           cp ${./modules/nixos/signal-updates/client.py} client.py

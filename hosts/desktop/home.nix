@@ -25,12 +25,15 @@ in
     ../../modules/home/profiles/base.nix
     ../../modules/home/profiles/desktop.nix
     ../../modules/home/codex/playwright.nix
+    ../../modules/home/update-preparation.nix
     ../../modules/home/firefox.nix
     ../../modules/home/git.nix
     ../../modules/home/ssh.nix
     ./cellular-wallpaper.nix
     (inputs.shared-nvim + "/home-manager/nvim.nix")
   ];
+
+  services.nixosUpdatePreparation.enable = true;
 
   # Reuse the shared CLI base so desktop gets the same Codex/npm tooling as nuc.
   home.packages = config.profiles.basePackages ++ [
