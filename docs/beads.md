@@ -8,9 +8,13 @@ Code branches do not create separate task databases.
 `services.beadsDolt.enable = true` in the NUC configuration declares the
 service, account, state directories, database initialization, and backup timer.
 On first startup the service creates the database using this repo's project
-identity. Later starts verify the existing database without reinitializing it.
-Its service-owned client configuration lives in `/var/lib/beads-dolt-client`.
-Initialization failures stop startup; they never trigger a database reset.
+identity. Later starts explicitly apply pending schema migrations with
+`bd migrate schema` before checking the existing database. The NUC is the sole
+migrator for this shared server. Migration failures stop startup; they never
+trigger a database reset. Back up before upgrading Beads and update workstation
+clients promptly afterward: older clients refuse a newer database schema.
+Its service-owned client configuration lives in `/var/lib/beads-dolt-client/.beads`;
+the sibling workspace gate lock stays inside the same writable state directory.
 
 The shared Home Manager profile installs a `bd` wrapper around the Beads
 package from the locked unstable input, including on the stable NUC.

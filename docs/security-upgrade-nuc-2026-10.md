@@ -54,6 +54,9 @@ shared database before the first new client connects, and upgrade the NUC
 before the desktop client. Do not run a candidate Beads client against the
 live database during build verification. Schema changes can require restoring
 that backup when rolling back; a NixOS generation rollback alone is insufficient.
+The server explicitly runs `bd migrate schema` before its readiness query;
+ordinary read commands do not migrate a shared server. Older workstation clients
+will refuse the migrated schema until their Beads package is upgraded too.
 
 ## Container verification
 

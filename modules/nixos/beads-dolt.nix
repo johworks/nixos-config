@@ -25,7 +25,8 @@ in
       wantedBy = [ "multi-user.target" ];
       environment = {
         HOME = "/var/lib/beads-dolt";
-        BEADS_DIR = "/var/lib/beads-dolt-client";
+        # The client creates a sibling gate lock; keep both inside writable state.
+        BEADS_DIR = "/var/lib/beads-dolt-client/.beads";
         BEADS_DOLT_SERVER_MODE = "1";
         BEADS_DOLT_SERVER_HOST = "127.0.0.1";
         BEADS_DOLT_SERVER_PORT = "3307";
@@ -37,6 +38,7 @@ in
         ${dolt}/bin/dolt config --global --add user.email "beads@localhost"
       '';
       postStart = ''
+        install -d -m 700 "$BEADS_DIR"
         install -m 600 ${../../.beads/metadata.json} "$BEADS_DIR/metadata.json"
         install -m 600 ${../../.beads/config.yaml} "$BEADS_DIR/config.yaml"
 
@@ -51,6 +53,8 @@ in
             --prefix nixos --server-port 3307 --stealth --skip-hooks \
             --skip-agents --non-interactive
         fi
+        # Shared servers require explicit consent; only the NUC migrates this DB.
+        ${beads}/bin/bd migrate schema
         ${beads}/bin/bd list --json >/dev/null
       '';
       serviceConfig = {
@@ -66,7 +70,7 @@ in
         ExecStart = "${dolt}/bin/dolt sql-server --host 127.0.0.1 --port 3307 --data-dir /var/lib/beads-dolt";
         Restart = "on-failure";
         RestartSec = 5;
-        TimeoutStartSec = 60;
+        TimeoutStartSec = 300;
         UMask = "0077";
         NoNewPrivileges = true;
         ProtectSystem = "strict";

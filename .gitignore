@@ -7,3 +7,4 @@ experiments/qos-tune/
 /result
 /result-*
 /.ha-ac-analysis/
+/.beads.gate.lock
