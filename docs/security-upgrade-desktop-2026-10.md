@@ -27,9 +27,11 @@ See the [Electron release notes](https://releases.electronjs.org/release/v42.11.
 
 The Realtek r8125 driver needs a deterministic module certificate with the new
 kernel tooling. Its desktop package generates that certificate after fixup,
-preserving the driver and r8169 blacklist needed by this NIC. The desktop also
-keeps classic D-Bus during the upgrade so switching does not replace the running
-session bus. Secure Boot signing still uses the existing local Lanzaboote keys.
+preserving the driver and r8169 blacklist needed by this NIC. The candidate
+selects classic D-Bus, while the running desktop uses dbus-broker. Stage this
+upgrade for boot and reboot: the switch inhibitor correctly refuses changing
+the running system bus implementation. Secure Boot signing still uses the
+existing local Lanzaboote keys.
 
 ## Verification
 
@@ -52,7 +54,7 @@ applications outside this configuration require their own updates. Restart
 applications after activation so running processes use the new libraries and
 trust stores. The previous generation remains available for rollback.
 
-## Activate
+## Stage and reboot
 
 Upgrade the NUC first to checkpoint and migrate the shared Beads database
 before the desktop starts using its new Beads client. From the reviewed
@@ -63,14 +65,19 @@ cd ~/nixos-config
 nix --store daemon flake check --no-write-lock-file
 nix --store daemon build --no-write-lock-file \
   .#nixosConfigurations.desktop.config.system.build.toplevel -o result-desktop-security
-sudo nixos-rebuild switch --no-write-lock-file --flake .#desktop
+sudo nixos-rebuild boot --no-write-lock-file --flake .#desktop
 ```
 
-Check normal browsing and Ethernet, then run the
+After the boot command succeeds, save your work and reboot with `sudo reboot`.
+If an earlier `switch` attempt failed its D-Bus inhibitor, the running system
+remains on the old generation even though the system profile may point at the
+candidate. The boot command installs the candidate for the next startup.
+
+After logging in, check normal browsing and Ethernet, then run the
 [credential-free certificate checks](security-audit-2026-10-22.md#remediation-and-verification-sequence).
 All compromised-chain URLs must fail certificate verification while ordinary
-HTTPS succeeds. A timeout is inconclusive. Reboot to activate the new kernel,
-then check `uname -r`, Ethernet, Secure Boot and `systemctl --failed`.
+HTTPS succeeds. A timeout is inconclusive. Check `uname -r`, Ethernet, Secure
+Boot and `systemctl --failed`; the prepared kernel is 6.18.57.
 
 The [NUC upgrade](security-upgrade-nuc-2026-10.md) has separate database backups,
 container changes and router verification steps.
