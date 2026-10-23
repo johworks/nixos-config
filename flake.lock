@@ -123,7 +123,9 @@
           "nixpkgsUnstable"
         ],
         "pre-commit": "pre-commit",
-        "rust-overlay": "rust-overlay"
+        "rust-overlay": [
+          "rust-overlay"
+        ]
       },
       "locked": {
         "lastModified": 1782141370,
@@ -237,6 +239,7 @@
         "nixpkgsStable": "nixpkgsStable",
         "nixpkgsUnstable": "nixpkgsUnstable",
         "nixpkgsVaultwarden": "nixpkgsVaultwarden",
+        "rust-overlay": "rust-overlay",
         "shared-nvim": "shared-nvim",
         "sops-nix": "sops-nix"
       }
@@ -244,16 +247,15 @@
     "rust-overlay": {
       "inputs": {
         "nixpkgs": [
-          "lanzaboote",
-          "nixpkgs"
+          "nixpkgsUnstable"
         ]
       },
       "locked": {
-        "lastModified": 1782012058,
-        "narHash": "sha256-9mWUnReOUXfKjZuJAL/bAFH3LUyECTRtXgSNVjRw3UY=",
+        "lastModified": 1792739799,
+        "narHash": "sha256-M2rr/yPbTHvgAzCyZ+zHJHflFM0XU7t42Sw2skA3TQM=",
         "owner": "oxalica",
         "repo": "rust-overlay",
-        "rev": "8534567325bd8a8d2928e6afd81e0a87d19efd3c",
+        "rev": "b0829a2cc9f7b596583331d78a942c1e5170d8a0",
         "type": "github"
       },
       "original": {

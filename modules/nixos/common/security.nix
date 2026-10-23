@@ -89,6 +89,17 @@ let
     );
 in
 {
+  # These fleet-wide rules intentionally include packages absent on some hosts.
+  # Keep upstream's closure filtering without its per-rule warning noise. The
+  # wrapper preserves .override for NixOS's configured Nix implementation.
+  nixpkgs.overlays = [
+    (_final: previous: {
+      replaceDependencies = lib.makeOverridable (
+        overrides: args: (previous.replaceDependencies.override overrides) ({ verbose = false; } // args)
+      ) { };
+    })
+  ];
+
   # Temporary security hotfixes while upstream packages lag. Rewriting references
   # avoids recompiling the desktop's build toolchains for a CA-list change.
   system.replaceDependencies.replacements = lib.concatMap replacementsFor packageSets;

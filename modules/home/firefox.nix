@@ -1,7 +1,14 @@
-{ config, pkgs, inputs, ... }:
+{
+  config,
+  pkgs,
+  inputs,
+  ...
+}:
 {
   programs.firefox = {
     enable = true;
+    # Keep the existing profile and native messaging setup in place.
+    configPath = ".mozilla/firefox";
 
     profiles.default = {
       # --- Privacy & UX hardening (balanced; avoids common site breakage) ---
@@ -56,35 +63,52 @@
       # --- Search engines ---
       search = {
         default = "Brave Search";
-        force = true;      # enforce our defaults (prevents Firefox from changing them)
+        force = true; # enforce our defaults (prevents Firefox from changing them)
 
         engines = {
           "Brave Search" = {
-            urls = [{
-              template = "https://search.brave.com/search";
-              params = [
-                { name = "q"; value = "{searchTerms}"; }
-              ];
-            }];
+            urls = [
+              {
+                template = "https://search.brave.com/search";
+                params = [
+                  {
+                    name = "q";
+                    value = "{searchTerms}";
+                  }
+                ];
+              }
+            ];
           };
 
           "ddg".metaData.hidden = false; # ensure visible even if Firefox tries to hide it
 
           "Nix Packages" = {
-            urls = [{
-              template = "https://search.nixos.org/packages";
-              params = [
-                { name = "type"; value = "packages"; }
-                { name = "query"; value = "{searchTerms}"; }
-              ];
-            }];
+            urls = [
+              {
+                template = "https://search.nixos.org/packages";
+                params = [
+                  {
+                    name = "type";
+                    value = "packages";
+                  }
+                  {
+                    name = "query";
+                    value = "{searchTerms}";
+                  }
+                ];
+              }
+            ];
             icon = "${pkgs.nixos-icons}/share/icons/hicolor/scalable/apps/nix-snowflake.svg";
             definedAliases = [ "@np" ];
           };
         };
 
         # Optional: set explicit order in the search menu
-        order = [ "Brave Search" "ddg" "Nix Packages" ];
+        order = [
+          "Brave Search"
+          "ddg"
+          "Nix Packages"
+        ];
       };
 
       # --- Extensions ---

@@ -44,6 +44,13 @@
     lanzaboote = {
       url = "github:nix-community/lanzaboote/v1.1.0";
       inputs.nixpkgs.follows = "nixpkgsUnstable";
+      inputs.rust-overlay.follows = "rust-overlay";
+    };
+
+    # Refresh overlay APIs while Lanzaboote keeps its pinned Rust toolchain.
+    rust-overlay = {
+      url = "github:oxalica/rust-overlay";
+      inputs.nixpkgs.follows = "nixpkgsUnstable";
     };
 
     # Your Neovim repo as a non-flake input (works fine even if it has no flake)
