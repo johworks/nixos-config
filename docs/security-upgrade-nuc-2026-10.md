@@ -1,10 +1,11 @@
 # NUC security upgrade, October 2026
 
 Tracks `nixos-3ec` and `nixos-7s8`; the baseline and certificate work is
-`nixos-uez`. The freshly rebuilt NUC still runs NixOS 25.11 from May, Synapse
-1.152.0 and Vaultwarden 1.37.3. Rebuilding an unchanged lock file does not fetch
-security updates. On October 22 it had no failed units, monitoring was active,
-and its curl still accepted the compromised emSign chain.
+`nixos-uez`. The NUC was activated and reboot-verified on 23 October 2026.
+The preparation below replaced NixOS 25.11 from May, Synapse 1.152.0 and
+Vaultwarden 1.37.3. Rebuilding an unchanged lock file does not fetch security
+updates. On October 22 it had no failed units, monitoring was active, and its
+curl still accepted the compromised emSign chain.
 
 ## Prepared configuration
 
@@ -176,3 +177,30 @@ trying a rollback; a NixOS generation rollback alone does not undo database
 migrations. Vaultwarden's [1.37.4 upgrade notes](https://github.com/dani-garcia/vaultwarden/releases/tag/1.37.4)
 also describe obsolete clients and organization API-key rotation if untrusted
 organization administrators had access.
+
+## Activation and reboot verification, 23 October
+
+The active system is `n15pilan4cygybb6link86a0qkay5pa3`, running NixOS 26.05
+and kernel 6.18.57. There are no failed units. Synapse 1.163.0, Vaultwarden
+1.37.4, nginx 1.30.6, native Stremio 4.22.4 on Node 22.23.4, monitoring,
+Home Assistant and ESPHome are active. Beads starts with an explicit shared
+schema migration and has zero restarts; desktop and NUC clients both query it.
+
+WAN `vlan10` acquired `192.168.1.247/24`; LAN `vlan20` has `192.168.10.1/24`.
+From the desktop, DNS over UDP and TCP each returned answers, and Internet
+HTTPS through the NUC's default gateway succeeded. Dnsmasq logged DHCPACKs
+after reboot. All five monitoring scrape targets are up. The Synapse SQL and
+Beads backup timers are active, and the first post-activation SQL backup passed.
+
+All listed application health/settings endpoints return 200. Host curl rejects
+all four compromised chains with certificate errors and accepts the normal
+HTTPS control. Before reboot, the actual pinned HA and ESPHome containers each
+passed 20 TLS checks covering default urllib, Requests, explicit certifi and pip
+certifi. Verified rollback dumps and cold archives were retained before switching.
+
+John reports Grafana, Home Assistant, the blog and Vaultwarden working.
+Matrix messaging/calling, ESPHome discovery and Stremio playback/transcoding
+still require user workflow checks. Separate upstream-client WAN rejection
+tests are in progress; querying the WAN address from a LAN client does not
+validate its inbound interface policy. Those remaining checks stay tracked in
+`nixos-3ec` and `nixos-7s8`.

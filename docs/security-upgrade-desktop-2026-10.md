@@ -100,4 +100,5 @@ This does not certify every dependency copy. Older ensurepip bundles remain
 in Steam's 32-bit Python library dependency and a GStreamer documentation tool;
 follow-up `nixos-nzf` records their scope and the direct-interpreter test.
 Steam's normal Python executable selects the patched native interpreter.
-The NUC kernel reboot and its remaining router checks are still pending.
+The NUC kernel reboot is also verified; its remaining application and WAN
+checks are listed in the [NUC upgrade](security-upgrade-nuc-2026-10.md).
