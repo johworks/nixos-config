@@ -8,6 +8,68 @@
 let
   cfg = config.services.ax1450;
 
+  onOff = value: if value then "on" else "off";
+  setting =
+    section: option: value:
+    lib.optionalString (value != null) "${section} ${option} ${toString value}\n";
+
+  # Only these known vendor settings are accepted; no arbitrary UCI commands.
+  radioSettings =
+    section: radio:
+    setting section "disabled_all" (if radio.enable == null then null else onOff (!radio.enable))
+    + setting section "channel" radio.channel
+    + setting section "htmode" radio.channelWidth
+    + setting section "txpower" radio.transmitPower
+    + setting section "isolate" (
+      if radio.clientIsolation == null then null else onOff radio.clientIsolation
+    );
+  networkSettings =
+    section:
+    setting section "hidden" (if cfg.wifi.hidden == null then null else onOff cfg.wifi.hidden)
+    + setting section "wps" (if cfg.wifi.wps == null then null else onOff cfg.wifi.wps);
+  wifiSettings =
+    radioSettings "wl1" cfg.wifi.radios."2g"
+    + radioSettings "wl0" cfg.wifi.radios."5g"
+    + networkSettings "wl13"
+    + networkSettings "wl03"
+    + setting "smart" "smart_enable" (
+      if cfg.wifi.smartConnect == null then null else onOff cfg.wifi.smartConnect
+    );
+
+  radioOptions = channels: widths: {
+    enable = lib.mkOption {
+      type = lib.types.nullOr lib.types.bool;
+      default = null;
+      description = "Software radio switch, including guest networks. Null leaves it unmanaged; the hardware switch is respected.";
+    };
+    channel = lib.mkOption {
+      type = lib.types.nullOr (lib.types.enum ([ "auto" ] ++ channels));
+      default = null;
+      description = "Primary channel for this US AX1450, or auto. Null leaves it unmanaged.";
+    };
+    channelWidth = lib.mkOption {
+      type = lib.types.nullOr (lib.types.enum ([ "auto" ] ++ widths));
+      default = null;
+      description = "Maximum channel width in MHz, or auto for vendor coexistence handling. Null leaves it unmanaged.";
+    };
+    transmitPower = lib.mkOption {
+      type = lib.types.nullOr (
+        lib.types.enum [
+          "low"
+          "middle"
+          "high"
+        ]
+      );
+      default = null;
+      description = "Vendor transmit-power preset within the existing regulatory limits. Null leaves it unmanaged.";
+    };
+    clientIsolation = lib.mkOption {
+      type = lib.types.nullOr lib.types.bool;
+      default = null;
+      description = "Isolate clients on this band's main BSS. This does not provide VLAN or whole-LAN isolation. Null leaves it unmanaged.";
+    };
+  };
+
   # Public half of the Dropbear host key pinned inside the AP's bootstrap
   # payload. Regenerating the payload (experiments/ax1450/make-bootstrap.py)
   # requires updating this file and expectedBootstrapSha256.
@@ -20,6 +82,7 @@ let
   remoteScript = pkgs.writeText "ax1450-reconcile-remote" (
     ''
       SSID=${lib.escapeShellArg cfg.wifi.ssid}
+      WIFI_SETTINGS=${lib.escapeShellArg wifiSettings}
       DAY_VALUE=${lib.escapeShellArg dayValue}
       EXPECTED_SHA=${lib.escapeShellArg cfg.expectedBootstrapSha256}
       PORT=${lib.escapeShellArg (toString cfg.sshPort)}
@@ -106,14 +169,63 @@ in
         type = lib.types.str;
         description = "Desired SSID of the main network (both bands, smart-connect).";
       };
+      hidden = lib.mkOption {
+        type = lib.types.nullOr lib.types.bool;
+        default = null;
+        description = "Hide the main SSID on both bands. Null leaves it unmanaged.";
+      };
+      wps = lib.mkOption {
+        type = lib.types.nullOr lib.types.bool;
+        default = null;
+        description = "WPS on both main networks. The firmware disables WPS for hidden SSIDs or incompatible security modes. Null leaves it unmanaged.";
+      };
+      smartConnect = lib.mkOption {
+        type = lib.types.nullOr lib.types.bool;
+        default = null;
+        description = "Vendor band steering; both bands still share the configured SSID and password. Null leaves it unmanaged.";
+      };
+      radios = {
+        "2g" = radioOptions (lib.range 1 11) [
+          "20"
+          "40"
+        ];
+        "5g" =
+          radioOptions
+            [
+              36
+              40
+              44
+              48
+              149
+              153
+              157
+              161
+              165
+            ]
+            [ "20" "40" "80" ];
+      };
     };
   };
 
   config = lib.mkIf cfg.enable {
     assertions = [
       {
-        assertion = cfg.wifi.ssid != "";
-        message = "services.ax1450.wifi.ssid must be set.";
+        assertion =
+          cfg.wifi.ssid != ""
+          && builtins.stringLength cfg.wifi.ssid <= 32
+          && !(lib.hasInfix "\n" cfg.wifi.ssid)
+          && !(lib.hasInfix "\r" cfg.wifi.ssid);
+        message = "services.ax1450.wifi.ssid must contain 1–32 bytes without line breaks.";
+      }
+      {
+        assertion =
+          cfg.wifi.radios."5g".channel != 165
+          || builtins.elem cfg.wifi.radios."5g".channelWidth [
+            null
+            "auto"
+            "20"
+          ];
+        message = "AX1450 channel 165 supports only 20 MHz; use channelWidth = \"20\" or \"auto\".";
       }
     ];
 

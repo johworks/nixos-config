@@ -80,17 +80,91 @@ wifi_config_matches() {
     [ "$(uci -q get wireless.$sec.ssid)" = "$SSID" ] || return 1
     [ "$(uci -q get wireless.$sec.psk_key)" = "$psk" ] || return 1
   done
+  while read -r section option value; do
+    [ -n "$section" ] || continue
+    [ "$(uci -q get "wireless.$section.$option")" = "$value" ] || return 1
+  done <<SETTINGS
+$WIFI_SETTINGS
+SETTINGS
 }
 
 wifi_runtime_matches() {
   for sec in wl03 wl13; do
     iface=$(uci -q get wireless.$sec.ifname) || return 1
+    dev=$(uci -q get "wireless.$sec.device") || return 1
+    expected_bss=up
+    if [ "$(uci -q get "wireless.$dev.disabled")" = "on" ] ||
+       [ "$(uci -q get "wireless.$dev.disabled_all")" = "on" ] ||
+       [ "$(uci -q get wireless.$sec.enable)" = "off" ]; then
+      expected_bss=down
+    fi
+    [ "$(wl -i "$iface" bss)" = "$expected_bss" ] || return 1
+    [ "$expected_bss" = up ] || continue
     # The vendor apply path writes Broadcom runtime NVRAM before bringing
     # up each BSS. UCI alone only tells us the desired settings were stored.
     [ "$(nvram get "${iface}_ssid")" = "$SSID" ] || return 1
     [ "$(nvram get "${iface}_wpa_psk")" = "$psk" ] || return 1
-    [ "$(wl -i "$iface" bss)" = "up" ] || return 1
   done
+
+  while read -r section option value; do
+    [ -n "$section" ] || continue
+    case "$section" in
+      wl0|wl03) dev=wl0; iface=wl0.1; band=5g ;;
+      wl1|wl13) dev=wl1; iface=wl1.1; band=2g ;;
+      # Smart Connect is consumed by the proprietary nrd daemon. Its UCI
+      # setting and successful reload are checked; no independent getter.
+      smart) continue ;;
+    esac
+    # A disabled radio has no live channel, power or active BSS settings.
+    bss=$(wl -i "$iface" bss) || return 1
+    [ "$bss" = up ] || continue
+    case "$option" in
+      hidden|isolate)
+        case "$option" in hidden) command=closed ;; isolate) command=ap_isolate ;; esac
+        case "$value" in on) expected=1 ;; off) expected=0 ;; esac
+        [ "$(wl -i "$iface" "$command")" = "$expected" ] || return 1
+        ;;
+      channel)
+        if [ "$value" = auto ]; then
+          [ "$(nvram get "${dev}_chanspec")" = 0 ] || return 1
+        else
+          spec=$(wl -i "$dev" chanspec) || return 1
+          primary=${spec%% *}
+          primary=${primary%%/*}
+          primary=${primary%[lu]}
+          [ "$primary" = "$value" ] || return 1
+        fi
+        ;;
+      htmode)
+        if [ "$value" = auto ]; then
+          [ "$(nvram get "${dev}_obss_coex")" = 1 ] || return 1
+        else
+          case "$value" in 20) expected=0x1 ;; 40) expected=0x3 ;; 80) expected=0x7 ;; esac
+          [ "$(wl -i "$dev" bw_cap "$band")" = "$expected" ] || return 1
+          [ "$(nvram get "${dev}_obss_coex")" = 0 ] || return 1
+        fi
+        ;;
+      txpower)
+        case "$value" in high) expected=0 ;; middle) expected=12 ;; low) expected=24 ;; esac
+        [ "$(wl -i "$dev" txpwr_degrade)" = "$expected" ] || return 1
+        ;;
+      wps)
+        expected=disabled
+        if [ "$value" = on ] && [ "$(uci -q get "wireless.$section.hidden")" != on ]; then
+          encryption=$(uci -q get "wireless.$section.encryption") || return 1
+          version=$(uci -q get "wireless.$section.psk_version") || return 1
+          cipher=$(uci -q get "wireless.$section.psk_cipher") || return 1
+          case "$encryption:$version:$cipher" in
+            wpa:*|wep:*|psk:wpa:*|psk:*:tkip) ;;
+            *) expected=enabled ;;
+          esac
+        fi
+        [ "$(nvram get "${iface}_wps_mode")" = "$expected" ] || return 1
+        ;;
+    esac
+  done <<SETTINGS
+$WIFI_SETTINGS
+SETTINGS
 }
 
 uci_quote() {
@@ -106,13 +180,20 @@ if ! wifi_config_matches || ! wifi_runtime_matches || [ -e /etc/ax1450/wifi-pend
   touch /etc/ax1450/wifi-pending /etc/ax1450/save-pending
   ssid_quoted=$(uci_quote "$SSID")
   psk_quoted=$(uci_quote "$psk")
-  uci -q batch <<BATCH || fail "cannot set Wi-Fi settings"
+  cat > "$work/wireless.batch" <<BATCH
 set wireless.wl03.ssid=$ssid_quoted
 set wireless.wl13.ssid=$ssid_quoted
 set wireless.wl03.psk_key=$psk_quoted
 set wireless.wl13.psk_key=$psk_quoted
 BATCH
-  uci -q commit wireless || fail "cannot commit Wi-Fi settings"
+  while read -r section option value; do
+    [ -n "$section" ] || continue
+    printf "set wireless.%s.%s='%s'\n" "$section" "$option" "$value" >> "$work/wireless.batch"
+  done <<SETTINGS
+$WIFI_SETTINGS
+SETTINGS
+  uci -q batch < "$work/wireless.batch" > "$work/uci-batch.log" 2>&1 || fail "cannot set Wi-Fi settings"
+  uci -q commit wireless > "$work/uci-commit.log" 2>&1 || fail "cannot commit Wi-Fi settings"
   wifi_config_matches || fail "Wi-Fi settings did not commit"
   # Vendor output can contain credentials; keep it private and report only
   # the failed operation. The runtime checks also catch silent apply errors.

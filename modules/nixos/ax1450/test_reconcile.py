@@ -33,6 +33,15 @@ COMMANDS = {
 }
 
 
+def bss_up(settings, sec):
+    dev = settings[f"wireless.{sec}.device"]
+    return (
+        settings[f"wireless.{dev}.disabled"] == "off"
+        and settings[f"wireless.{dev}.disabled_all"] == "off"
+        and settings[f"wireless.{sec}.enable"] == "on"
+    )
+
+
 def scheduler(root):
     result = {}
     for line in (root / "etc/config/autoreboot").read_text().splitlines():
@@ -107,16 +116,67 @@ def mock_command(name, args):
             cron.write_text("\n".join(lines) + "\n")
     elif name == "nvram":
         key = args[1]
+        runtime = state["runtime"]
+        for dev in ["wl0", "wl1"]:
+            if key == f"{dev}_chanspec":
+                channel = runtime[f"wireless.{dev}.channel"]
+                print("0" if channel == "auto" else channel)
+            elif key == f"{dev}_obss_coex":
+                print(int(runtime[f"wireless.{dev}.htmode"] == "auto"))
         for sec, iface in [("wl03", "wl0.1"), ("wl13", "wl1.1")]:
             for suffix, option in [("ssid", "ssid"), ("wpa_psk", "psk_key")]:
                 if key == f"{iface}_{suffix}":
-                    print(state["runtime"][f"wireless.{sec}.{option}"])
+                    print(runtime[f"wireless.{sec}.{option}"])
+            if key == f"{iface}_wps_mode":
+                prefix = f"wireless.{sec}"
+                enabled = (
+                    runtime[f"{prefix}.wps"] == "on"
+                    and runtime[f"{prefix}.hidden"] == "off"
+                    and runtime[f"{prefix}.psk_version"] != "wpa"
+                    and runtime[f"{prefix}.psk_cipher"] != "tkip"
+                )
+                print("enabled" if enabled else "disabled")
     elif name == "wl":
-        print("down" if state.get("fail") == "bss-down" else "up")
+        assert args[0] == "-i"
+        iface, command = args[1:3]
+        dev = iface.split(".")[0]
+        sec = "wl03" if dev == "wl0" else "wl13"
+        runtime = state["runtime"]
+        if state.get("fail") == "query" and command == "closed":
+            rc = 1
+        elif command == "bss":
+            up = bss_up(runtime, sec) and state.get("fail") != "bss-down"
+            print("up" if up else "down")
+        elif command == "closed":
+            print(int(runtime[f"wireless.{sec}.hidden"] == "on"))
+        elif command == "ap_isolate":
+            print(int(runtime[f"wireless.{dev}.isolate"] == "on"))
+        elif command == "txpwr_degrade":
+            print(
+                {"high": 0, "middle": 12, "low": 24}[runtime[f"wireless.{dev}.txpower"]]
+            )
+        elif command == "bw_cap":
+            print(
+                {"auto": "0x3", "20": "0x1", "40": "0x3", "80": "0x7"}[
+                    runtime[f"wireless.{dev}.htmode"]
+                ]
+            )
+        elif command == "chanspec":
+            channel = runtime[f"wireless.{dev}.channel"]
+            width = runtime[f"wireless.{dev}.htmode"]
+            print(f"{channel}/{width} (0x1234)")
+        else:
+            raise AssertionError(args)
     elif name == "wifi":
         rc = int(state.get("fail") == "reload")
         if not rc and state.get("fail") != "silent-reload":
-            state["runtime"] = state["wifi"].copy()
+            # A vendor reload may succeed while failing to apply one field.
+            state["runtime"] = {
+                key: state["runtime"].get(key)
+                if state.get("runtime_ignore") == key
+                else value
+                for key, value in state["wifi"].items()
+            }
         # Make sure vendor output never leaks into the service journal.
         print(PSK)
     elif name == "lua":
@@ -161,13 +221,28 @@ class ReconcileTests(unittest.TestCase):
         (self.root / "tmp/ax1450-root.pid").write_text("123\n")
         wifi = {}
         for sec, iface in [("wl03", "wl0.1"), ("wl13", "wl1.1")]:
+            dev = iface.split(".")[0]
             wifi.update(
                 {
                     f"wireless.{sec}.ssid": SSID,
                     f"wireless.{sec}.psk_key": PSK,
                     f"wireless.{sec}.ifname": iface,
+                    f"wireless.{sec}.device": dev,
+                    f"wireless.{sec}.enable": "on",
+                    f"wireless.{sec}.hidden": "off",
+                    f"wireless.{sec}.wps": "on",
+                    f"wireless.{sec}.encryption": "psk",
+                    f"wireless.{sec}.psk_version": "rsn",
+                    f"wireless.{sec}.psk_cipher": "aes",
+                    f"wireless.{dev}.disabled": "off",
+                    f"wireless.{dev}.disabled_all": "off",
+                    f"wireless.{dev}.channel": "157" if dev == "wl0" else "auto",
+                    f"wireless.{dev}.htmode": "auto",
+                    f"wireless.{dev}.txpower": "high",
+                    f"wireless.{dev}.isolate": "off",
                 }
             )
+        wifi["wireless.smart.smart_enable"] = "on"
         self.write_state({"wifi": wifi, "runtime": wifi.copy(), "calls": []})
         self.set_scheduler()
         self.cron = self.root / "etc/crontabs/root"
@@ -199,7 +274,7 @@ class ReconcileTests(unittest.TestCase):
         )
         (self.root / "etc/config/autoreboot").write_text(text)
 
-    def run_reconcile(self, *, ssid=SSID, psk=PSK):
+    def run_reconcile(self, *, ssid=SSID, psk=PSK, settings=""):
         script_path = Path(__file__).with_name("reconcile-remote.sh")
         if not script_path.exists():
             script_path = Path("reconcile-remote.sh")
@@ -217,6 +292,7 @@ class ReconcileTests(unittest.TestCase):
         values = {
             "PSK_B64": base64.b64encode(psk.encode()).decode(),
             "SSID": ssid,
+            "WIFI_SETTINGS": settings,
             "DAY_VALUE": DAY,
             "EXPECTED_SHA": self.sha,
             "PORT": "2222",
@@ -257,6 +333,129 @@ class ReconcileTests(unittest.TestCase):
         self.assertFalse(
             {"wifi", "lua", "auto-reboot"} & {call[0] for call in self.state()["calls"]}
         )
+
+    def test_optional_settings_converge_and_second_run_is_noop(self):
+        settings = """wl1 disabled_all off
+wl1 channel 6
+wl1 htmode 20
+wl1 txpower middle
+wl1 isolate on
+wl0 disabled_all off
+wl0 channel 149
+wl0 htmode 80
+wl0 txpower low
+wl0 isolate on
+wl03 hidden on
+wl13 hidden on
+wl03 wps off
+wl13 wps off
+smart smart_enable off
+"""
+        self.assert_success(self.run_reconcile(settings=settings))
+        state = self.state()
+        for row in settings.splitlines():
+            section, option, expected = row.split()
+            key = f"wireless.{section}.{option}"
+            for values in [state["wifi"], state["runtime"], state["persisted"]["wifi"]]:
+                self.assertEqual(values[key], expected)
+        self.assertEqual([call[0] for call in state["calls"]].count("wifi"), 1)
+        self.update_state(calls=[])
+        self.assert_success(self.run_reconcile(settings=settings))
+        self.assertFalse({"wifi", "lua"} & {call[0] for call in self.state()["calls"]})
+
+    def test_unmanaged_settings_are_preserved(self):
+        state = self.state()
+        state["wifi"]["wireless.wl1.channel"] = "11"
+        state["wifi"]["wireless.wl1.txpower"] = "low"
+        state["wifi"]["wireless.wl13.hidden"] = "on"
+        state["wifi"]["wireless.smart.smart_enable"] = "off"
+        state["runtime"] = state["wifi"].copy()
+        before = state["wifi"].copy()
+        self.write_state(state)
+        self.drift_wifi()
+        before["wireless.wl03.psk_key"] = PSK
+        self.assert_success(self.run_reconcile())
+        self.assertEqual(self.state()["persisted"]["wifi"], before)
+
+    def test_disable_and_reenable_radio(self):
+        settings = "wl1 disabled_all on\nwl1 channel 11\nwl1 txpower low\n"
+        self.assert_success(self.run_reconcile(settings=settings))
+        self.assertFalse(bss_up(self.state()["runtime"], "wl13"))
+        self.assertTrue(bss_up(self.state()["runtime"], "wl03"))
+        self.update_state(calls=[])
+        self.assert_success(self.run_reconcile(settings=settings))
+        self.assertNotIn("wifi", [call[0] for call in self.state()["calls"]])
+        self.assert_success(
+            self.run_reconcile(
+                settings=settings.replace("disabled_all on", "disabled_all off")
+            )
+        )
+        self.assertTrue(bss_up(self.state()["runtime"], "wl13"))
+
+    def test_hardware_switch_is_respected(self):
+        state = self.state()
+        for values in [state["wifi"], state["runtime"]]:
+            values["wireless.wl1.disabled"] = "on"
+        self.write_state(state)
+        self.assert_success(self.run_reconcile(settings="wl1 disabled_all off\n"))
+        self.assertNotIn("wifi", [call[0] for call in self.state()["calls"]])
+
+    def test_optional_runtime_failures_are_reported_and_retried(self):
+        for section, option, value in [
+            ("wl1", "channel", "11"),
+            ("wl1", "htmode", "20"),
+            ("wl0", "htmode", "80"),
+            ("wl1", "txpower", "low"),
+            ("wl0", "isolate", "on"),
+            ("wl03", "hidden", "on"),
+            ("wl13", "wps", "off"),
+            ("wl1", "disabled_all", "on"),
+        ]:
+            with self.subTest(option=option, section=section):
+                settings = f"{section} {option} {value}\n"
+                self.update_state(
+                    runtime_ignore=f"wireless.{section}.{option}", calls=[]
+                )
+                self.assert_failure(self.run_reconcile(settings=settings))
+                self.assertNotIn("lua", [call[0] for call in self.state()["calls"]])
+                self.update_state(runtime_ignore="")
+                self.assert_success(self.run_reconcile(settings=settings))
+                self.assertEqual(
+                    self.state()["persisted"]["wifi"][f"wireless.{section}.{option}"],
+                    value,
+                )
+                # Re-enable before the next case so all runtime checks run.
+                self.assert_success(
+                    self.run_reconcile(settings="wl1 disabled_all off\n")
+                )
+
+    def test_returning_to_auto_channel_and_width(self):
+        self.assert_success(
+            self.run_reconcile(settings="wl1 channel 6\nwl1 htmode 40\n")
+        )
+        self.assert_success(
+            self.run_reconcile(settings="wl1 channel auto\nwl1 htmode auto\n")
+        )
+        self.assertEqual(self.state()["runtime"]["wireless.wl1.channel"], "auto")
+
+    def test_rejects_optional_setting_that_did_not_commit(self):
+        self.update_state(ignore="wireless.wl0.channel")
+        self.assert_failure(self.run_reconcile(settings="wl0 channel 36\n"))
+        self.assertNotIn("wifi", [call[0] for call in self.state()["calls"]])
+
+    def test_hidden_ssid_disables_wps_in_vendor_runtime(self):
+        settings = "wl03 hidden on\nwl03 wps on\n"
+        self.assert_success(self.run_reconcile(settings=settings))
+        self.update_state(calls=[])
+        self.assert_success(self.run_reconcile(settings=settings))
+        self.assertNotIn("wifi", [call[0] for call in self.state()["calls"]])
+
+    def test_runtime_query_failure_is_not_reported_as_converged(self):
+        self.update_state(fail="query")
+        self.assert_failure(self.run_reconcile(settings="wl03 hidden off\n"))
+        self.assertNotIn("lua", [call[0] for call in self.state()["calls"]])
+        self.update_state(fail="")
+        self.assert_success(self.run_reconcile(settings="wl03 hidden off\n"))
 
     def test_repairs_scheduler_with_vendor_whitespace(self):
         for indent in ["    ", "", "\t"]:
@@ -408,6 +607,9 @@ class ReconcileTests(unittest.TestCase):
         self.assertNotIn(encoded, json.dumps(state["calls"]))
         self.assertTrue(state["ssh_stdin"].startswith(f"PSK_B64={encoded}\n"))
         self.assertIn("wifi_config_matches", state["ssh_stdin"])
+        self.assertIn("wl1 channel auto", state["ssh_stdin"])
+        self.assertIn("wl0 channel 157", state["ssh_stdin"])
+        self.assertIn("smart smart_enable on", state["ssh_stdin"])
         self.assertEqual(state["calls"][-1][-2:], ["/bin/sh", "-s"])
 
 

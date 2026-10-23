@@ -114,6 +114,79 @@ without another Wi-Fi reload. A converged run does not reload Wi-Fi or
 write flash. These checks verify the vendor's reported state; they do not
 replace a client association test with the desired password.
 
+### Declarative Wi-Fi settings
+
+`services.ax1450.wifi.ssid` and the sops secret `ax1450_wifi_psk` continue to
+manage the same main network on both bands. Additional options default to
+`null`, which leaves the corresponding vendor setting unmanaged. Removing
+an option therefore releases ownership; it does not restore a factory value.
+
+| Option under `services.ax1450.wifi` | Values | Vendor setting |
+| --- | --- | --- |
+| `hidden` | Boolean | Both main BSSes' `hidden` |
+| `wps` | Boolean | Both main BSSes' `wps` |
+| `smartConnect` | Boolean | `wireless.smart.smart_enable` |
+| `radios."2g".enable`, `radios."5g".enable` | Boolean | Inverse of the radio's `disabled_all` |
+| `radios.<band>.channel` | `"auto"` or a channel number | Radio `channel` |
+| `radios.<band>.channelWidth` | `"auto"`, `"20"`, `"40"`; also `"80"` on 5 GHz | Radio `htmode` |
+| `radios.<band>.transmitPower` | `"low"`, `"middle"`, `"high"` | Radio `txpower` |
+| `radios.<band>.clientIsolation` | Boolean | Radio `isolate` |
+
+Band names are `"2g"` and `"5g"`. On this device the 2.4 GHz radio is
+`wl1` (main section `wl13`, interface `wl1.1`); 5 GHz is `wl0` (`wl03`,
+`wl0.1`). The NUC configuration explicitly adopts the settings observed
+on the AP: both radios enabled, automatic widths, high transmit power,
+2.4 GHz automatic channel, 5 GHz channel 157, visible SSIDs, WPS and Smart
+Connect enabled, and client isolation disabled. This preserves existing
+behavior rather than choosing new Wi-Fi tuning or security policy.
+
+For example, to select a 20 MHz channel on 2.4 GHz and disable WPS:
+
+```nix
+services.ax1450.wifi = {
+  ssid = "TP-Link_2724";
+  wps = false;
+  radios."2g" = {
+    channel = 6;
+    channelWidth = "20";
+  };
+};
+```
+
+The channel enums match `wl channels` on the owned US AP: 1–11 on 2.4 GHz;
+36, 40, 44, 48, 149, 153, 157, 161, 165 on 5 GHz. Channel 165 cannot be
+combined with an explicit 40 or 80 MHz width. No country-code changes,
+DFS channels or 160 MHz setting are exposed. Widths are maximum capabilities;
+coexistence conditions can yield a narrower operating channel. Power presets
+use the vendor's 0/12/24 quarter-dB degradation settings, preserving the
+existing regulatory limits.
+
+Changes share one UCI commit, one vendor Wi-Fi reload and one flash save.
+A reload can briefly disconnect clients on both bands. Subsequent converged
+runs do neither. Runtime checks verify BSS up/down state, enabled networks'
+SSID/password, fixed primary channels, explicit bandwidth capabilities,
+automatic/coexistence NVRAM state, transmit-power degradation, hidden SSID,
+client isolation and WPS state. Disabled radios skip checks that require an
+active radio, and re-enabling them checks those settings again. The vendor
+hardware switch and existing main-BSS enable setting remain authoritative.
+The software radio switch affects guest networks too.
+
+Smart Connect is verified in UCI and applied by the vendor reload, which
+restarts `nrd`; band-steering behavior has no independent getter in this
+module. Disabling Smart Connect still leaves both bands with the same SSID
+and password. The firmware disables WPS when an SSID is hidden or its
+security mode is incompatible. Client isolation applies within each main
+BSS; it does not establish cross-band, VLAN or whole-LAN isolation.
+
+Vendor mappings were inspected in `/lib/wifi/tplink_brcm.sh` and
+`/lib/wifi/brcmwifi.sh`; current runtime getters were checked over root SSH.
+Regression tests exercise changes, retries, disabled radios and no-op runs
+against a mock vendor system. Testing alternate settings on real clients
+is separate from checking the current configuration without a reload.
+On 2026-10-22, the built wrapper was run twice against the AP after a
+read-only desired-state precheck (only local secret paths were redirected).
+Both runs reported convergence without reloads, repairs or flash saves.
+
 Offline regression checks run under BusyBox ash with a disposable mock
 vendor filesystem, and are included in `nix flake check`:
 

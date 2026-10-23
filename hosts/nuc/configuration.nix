@@ -125,7 +125,29 @@
   # Archer AX1450 AP: keeps root persistence verified and Wi-Fi converged.
   services.ax1450 = {
     enable = true;
-    wifi.ssid = "TP-Link_2724";
+    wifi = {
+      ssid = "TP-Link_2724";
+      # Adopt the AP's existing settings without changing radio behavior.
+      hidden = false;
+      wps = true;
+      smartConnect = true;
+      radios = {
+        "2g" = {
+          enable = true;
+          channel = "auto";
+          channelWidth = "auto";
+          transmitPower = "high";
+          clientIsolation = false;
+        };
+        "5g" = {
+          enable = true;
+          channel = 157;
+          channelWidth = "auto";
+          transmitPower = "high";
+          clientIsolation = false;
+        };
+      };
+    };
   };
 
   # Some programs need SUID wrappers, can be configured further or are
