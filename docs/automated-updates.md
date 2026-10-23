@@ -9,14 +9,14 @@ design. The recent migration remains tracked separately in `nixos-uez`.
 - Automatically prepare updates, build, debug failures, and produce reports.
 - Require John's approval before activation on both desktop and NUC.
 - Deliver reports and approval requests through Signal.
+- Link John's existing Signal account and use Note to Self; no spare number is
+  available for a separate bot account.
 - Preserve switch inhibitors and request a separate planned reboot when needed.
 
-The Signal identity is still undecided. A dedicated bot account is recommended;
-John asked for practical account guidance before choosing it. A dedicated
-account is a separate Signal identity, not another linked device on John's
-personal account. One central bot can cover multiple hosts and future services.
-Linking a personal account and using Note to Self is a viable alternative, with
-the different credential scope that linking that account entails.
+One central linked device can cover both hosts and future services. Its keys
+provide access to the personal account, so keep them separate from update
+workspaces and agent credentials. Never run `register` for the existing number;
+use the linked-device QR flow.
 
 ## Why the built-in update timer is insufficient here
 
@@ -137,11 +137,45 @@ a second number under John's control that can receive SMS or voice verification.
 Do not register over John's current personal Signal identity. The bot can be
 registered through signal-cli or linked to an existing dedicated account.
 
-Note to Self can also carry reports for multiple hosts. signal-cli supports
+The selected Note to Self approach carries reports for multiple hosts. signal-cli supports
 `--notify-self` for notification behavior, so it should not be dismissed as
-incapable of alerts. A dedicated identity is recommended for separation from
-personal messaging and future additional recipients/approvers. This is a design
-recommendation, not a claim of universal community consensus.
+incapable of alerts. A separate account can be reconsidered if a number becomes
+available or additional recipients/approvers are needed.
+
+### Transport setup on the NUC
+
+`services.signalUpdates` provides signal-cli from the locked unstable input,
+an isolated `signal-updates` system user, private state in
+`/var/lib/signal-updates`, and a Unix socket in `/run/signal-updates` (both
+directories mode 0700). It opens no TCP listener. The daemon can run before
+linking. Received message bodies are not printed; attachments, stories, avatars
+and stickers are not downloaded. Personal account traffic can still reach this
+linked device; keep its state and socket inaccessible to the repair worker.
+
+After building and activating the NUC configuration, run on the NUC:
+
+```sh
+sudo signal-updates status
+sudo signal-updates link
+sudo signal-updates test
+```
+
+In Signal on iPhone, open Settings → Linked Devices → Link New Device and scan
+the terminal QR code. Choose Don't Transfer History if offered. The device is
+named `NUC Update Reports`. Linking refuses an existing local account. The test
+sends a fixed inert message only to Note to Self and requests a notification;
+confirm both arrival and notification on the phone. It does not send a message
+merely by linking or starting the service. A timeout is not proof that linking
+or sending failed: check status/Note to Self before retrying.
+
+This component does not consume approval replies or prepare/activate updates.
+Its tests cover real-daemon startup without an account, socket response/event
+handling, account ambiguity, self-only routing, failed delivery, and the linking
+flow. Live linking and iPhone delivery remain manual verification steps.
+
+To disconnect, remove `NUC Update Reports` from Signal's Linked Devices and
+stop/disable the service through NixOS. Revoking the device does not erase its
+local state or backups; handle `/var/lib/signal-updates` as account credentials.
 
 Only the configured approver's authenticated Signal identity may approve jobs;
 a profile display name or membership in a reporting group is insufficient.
@@ -168,13 +202,17 @@ cannot guarantee that every incident will be fixed by updating the inputs.
 1. Report-only candidate preparation with bounded repair and persistent results.
    Demonstrate a successful candidate and a recoverable build failure without
    changing a live host or the user's checkout.
-2. Configure the chosen Signal account; demonstrate report delivery, identity
+2. Configure the selected personal linked device; demonstrate report delivery, identity
    verification, approval/rejection, expiry and replay handling with inert jobs.
 3. Add host executors and verified backup/recovery gates. Demonstrate that an
    approved artifact is the one activated and that later edits cannot inherit
    its approval. Exercise failure recovery on a disposable system first.
 4. Enable scheduled preparation and approved deployment for the desktop, then
    the NUC after router and shared-database coordination checks pass.
+
+The notification transport is being prepared first to resolve account linking
+and phone notification behavior. This does not complete candidate preparation
+or the inert approval protocol milestones.
 
 ## Sources checked
 

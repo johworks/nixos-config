@@ -117,6 +117,14 @@
     in
     {
       checks.${system} = {
+        signal-updates = pkgsStable.runCommand "signal-updates-tests" { } ''
+          export SIGNAL_CLI=${pkgsUnstable.signal-cli}/bin/signal-cli
+          cp ${./modules/nixos/signal-updates/client.py} client.py
+          cp ${./modules/nixos/signal-updates/test_client.py} test_client.py
+          ${pkgsStable.python3}/bin/python3 test_client.py
+          touch "$out"
+        '';
+
         ax1450-reconcile =
           pkgsStable.runCommand "ax1450-reconcile-tests"
             {

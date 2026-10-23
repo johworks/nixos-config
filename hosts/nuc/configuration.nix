@@ -16,6 +16,7 @@
     ../../modules/nixos/common/base.nix
     ../../modules/nixos/common/maintenance.nix
     ../../modules/nixos/beads-dolt.nix
+    ../../modules/nixos/signal-updates
     ./router-hardware.nix
     ./router-networking.nix
     ./router-monitoring.nix
@@ -127,6 +128,8 @@
   services.dbus.implementation = "dbus";
 
   services.beadsDolt.enable = true;
+
+  services.signalUpdates.enable = true;
 
   # Unmatched names must not fall back to the first public site.
   services.nginx.virtualHosts."default" = {
