@@ -19,6 +19,12 @@ The package version strings for backported bundle fixes remain unchanged.
 Remove these temporary backports once the locked packages contain equivalent
 fixes; the bootstrap patch does not downgrade newer bundled pip wheels.
 
+Electron 42 is replaced with the official 42.11.16 Linux binary, which includes
+upstream's compromised-intermediate mitigation. OpenCode's embedded Bun is
+wrapped to select the filtered system CA store instead of its bundled roots.
+The Electron replacement preserves its existing ABI and executable layout.
+See the [Electron release notes](https://releases.electronjs.org/release/v42.11.16).
+
 The Realtek r8125 driver needs a deterministic module certificate with the new
 kernel tooling. Its desktop package generates that certificate after fixup,
 preserving the driver and r8169 blacklist needed by this NIC. The desktop also
@@ -34,6 +40,11 @@ accepted `https://example.com/`. A fresh virtual environment bootstrapped pip
 credentials or TLS-verification bypasses. Node's HTTPS client was also checked
 against the candidate OS CA store; rejection includes OpenSSL's `INVALID_PURPOSE`
 error for explicitly distrusted roots.
+
+Electron's HTTPS client rejected all four compromised chains in Node mode and
+rejected the no-CT chain in normal headless application mode, with a successful
+ordinary HTTPS control. OpenCode's embedded Bun rejected all four chains and
+accepted the control through its installed wrapper.
 
 Existing virtual environments keep their own packages. The accessible home
 scan during the audit found none, but independently managed environments or

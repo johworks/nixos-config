@@ -66,6 +66,20 @@ let
         newDependency = cacert;
       }
     ]
+    ++
+      lib.optional (packages ? electron_42 && lib.versionOlder packages.electron_42.version "42.11.16")
+        {
+          oldDependency = packages.electron_42.unwrapped;
+          newDependency = packages.electron_42-bin.overrideAttrs (_: {
+            # Reference rewriting requires the replacement name to keep its length.
+            pname = packages.electron_42.unwrapped.pname;
+            version = "42.11.16";
+            src = packages.fetchurl {
+              url = "https://github.com/electron/electron/releases/download/v42.11.16/electron-v42.11.16-linux-x64.zip";
+              sha256 = "e27e9ec78d12edc83c817a1454b706530c000eedd217f65aed2a5d9657ec1be0";
+            };
+          });
+        }
     ++ lib.concatMap pythonReplacements (
       lib.unique [
         packages.python3
@@ -75,7 +89,7 @@ let
     );
 in
 {
-  # Temporary data-only hotfix while upstream bundles lag. Rewriting references
+  # Temporary security hotfixes while upstream packages lag. Rewriting references
   # avoids recompiling the desktop's build toolchains for a CA-list change.
   system.replaceDependencies.replacements = lib.concatMap replacementsFor packageSets;
 }
