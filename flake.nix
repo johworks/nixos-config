@@ -116,18 +116,32 @@
         };
     in
     {
-      packages.${system}.update-prepare = pkgsUnstable.writeShellApplication {
-        name = "update-prepare";
-        runtimeInputs = [
-          pkgsUnstable.git
-          pkgsUnstable.nix
-          pkgsUnstable.nixfmt
-          pkgsUnstable.openssh
-          pkgsUnstable.nodejs
-        ];
-        text = ''
-          exec ${pkgsUnstable.python3}/bin/python3 ${./scripts/updates/prepare.py} "$@"
-        '';
+      packages.${system} = {
+        update-prepare = pkgsUnstable.writeShellApplication {
+          name = "update-prepare";
+          runtimeInputs = [
+            pkgsUnstable.git
+            pkgsUnstable.nix
+            pkgsUnstable.nixfmt
+            pkgsUnstable.openssh
+            pkgsUnstable.nodejs
+          ];
+          text = ''
+            exec ${pkgsUnstable.python3}/bin/python3 ${./scripts/updates/prepare.py} "$@"
+          '';
+        };
+
+        hyprland-lab = pkgsUnstable.writeShellApplication {
+          name = "hyprlab";
+          runtimeInputs = with pkgsUnstable; [
+            nix
+            openssh
+            git
+          ];
+          text = ''
+            exec ${pkgsUnstable.python3}/bin/python3 ${./scripts/hyprland-lab/lab.py} "$@"
+          '';
+        };
       };
 
       checks.${system} = {
@@ -143,6 +157,13 @@
               ${pkgsStable.python3}/bin/python3 test_prepare.py
               touch "$out"
             '';
+
+        hyprland-lab = pkgsUnstable.runCommand "hyprland-lab-tests" { } ''
+          cp ${./scripts/hyprland-lab/lab.py} lab.py
+          cp ${./scripts/hyprland-lab/test_lab.py} test_lab.py
+          ${pkgsUnstable.python3}/bin/python3 -m unittest -v
+          touch "$out"
+        '';
 
         signal-updates = pkgsStable.runCommand "signal-updates-tests" { } ''
           export SIGNAL_CLI=${pkgsUnstable.signal-cli}/bin/signal-cli
@@ -210,6 +231,15 @@
           hostName = "vm";
           nixpkgsInput = nixpkgsUnstable;
           extraModules = [ home-manager.nixosModules.home-manager ];
+        };
+
+        hyprland-lab = mkHost {
+          hostName = "vm";
+          nixpkgsInput = nixpkgsUnstable;
+          extraModules = [
+            home-manager.nixosModules.home-manager
+            ./hosts/vm/lab.nix
+          ];
         };
 
         # Desktop host with KDE Plasma

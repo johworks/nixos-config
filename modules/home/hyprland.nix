@@ -1,4 +1,9 @@
-{ lib, config, pkgs, ... }:
+{
+  lib,
+  config,
+  pkgs,
+  ...
+}:
 let
   cfg = config.desktop.hyprland;
   colors = config.theme.colors;
@@ -6,9 +11,11 @@ let
   inherit (builtins) toString;
   inherit (lib)
     mkOption
-    types;
+    types
+    ;
 
-  hyprHex = color:
+  hyprHex =
+    color:
     if lib.hasPrefix "#" color then
       let
         body = lib.substring 1 ((lib.stringLength color) - 1) color;
@@ -70,13 +77,16 @@ in
     }
 
     (lib.mkIf cfg.enable {
-      home.packages = with pkgs; [
-        nautilus
-        libnotify
-        networkmanagerapplet
-        brightnessctl
-        awww
-      ] ++ cfg.extraPackages;
+      home.packages =
+        with pkgs;
+        [
+          nautilus
+          libnotify
+          networkmanagerapplet
+          brightnessctl
+          awww
+        ]
+        ++ cfg.extraPackages;
 
       services.dunst = {
         enable = true;
@@ -189,7 +199,8 @@ in
             "XCURSOR_SIZE,24"
             "HYPRCURSOR_THEME,Bibata-Modern-Ice"
             "HYPRCURSOR_SIZE,24"
-          ] ++ cfg.extraEnv;
+          ]
+          ++ cfg.extraEnv;
 
           general = {
             gaps_in = 2;
@@ -253,7 +264,6 @@ in
           };
 
           dwindle = {
-            pseudotile = true;
             preserve_split = true;
           };
 
@@ -296,7 +306,7 @@ in
             "SUPER, V, togglefloating"
             "SUPER, R, exec, $menu"
             "SUPER, P, pseudo, # dwindle"
-            "SUPER, J, togglesplit, # dwindle"
+            "SUPER, J, layoutmsg, togglesplit"
             "SUPER, left, movefocus, l"
             "SUPER, right, movefocus, r"
             "SUPER, up, movefocus, u"
@@ -353,11 +363,13 @@ in
             "match:class ^$, match:title ^$, match:xwayland true, match:float true, match:fullscreen false, match:pin false, no_initial_focus true"
           ];
 
-          exec-once =
-            [ "${pkgs.networkmanagerapplet}/bin/nm-applet --indicator" ]
-            ++ lib.optional (cfg.wallpaper != null)
+          exec-once = [
+            "${pkgs.networkmanagerapplet}/bin/nm-applet --indicator"
+          ]
+          ++
+            lib.optional (cfg.wallpaper != null)
               ''${pkgs.bash}/bin/bash -lc "${pkgs.awww}/bin/awww-daemon & sleep 1; ${pkgs.awww}/bin/awww img ${lib.escapeShellArg cfg.wallpaper}"''
-            ++ cfg.extraExecOnce;
+          ++ cfg.extraExecOnce;
         };
       };
     })

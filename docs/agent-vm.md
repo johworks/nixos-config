@@ -1,5 +1,8 @@
 # Disposable NixOS VMs for local agents
 
+Implemented workflow: [Hyprland development lab](hyprland-lab.md).
+The rest of this page preserves the original investigation and its then-untested proposal.
+
 Investigation: 2026-10-23. Beads: `nixos-vyh`. Baseline: `bbad9f8`;
 Nixpkgs: `02c087f3fe673c9e317f206a627cb6b910336dbe`.
 

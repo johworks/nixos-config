@@ -36,6 +36,11 @@ K.I.S.S (Keep It Simple Stupid)
 ## Testing & Validation
 - Run `nix flake check` before switching; fix evaluation errors first.
 - For new services/modules, ensure `systemd` targets make sense and the module is intentionally enabled.
+- For Hyprland changes, use the guest workflow in `docs/hyprland-lab.md`:
+  deploy to the lab, run `hyprlab verify`, and inspect the generated screenshots.
+  Exercise the UI states affected by the change; passing shell checks or merely
+  creating images does not establish visual correctness. Keep physical host
+  session changes separate from guest experiments.
 
 ## Task Tracking
 - Use Beads (`bd`) for project tasks; state lives in the NUC's shared Dolt database.
