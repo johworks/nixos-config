@@ -38,6 +38,23 @@ and its curl still accepted the compromised emSign chain.
   are also replaced with this read-only file. Keep the certificate directory
   filtered too, so OpenSSL cannot fall back to old hashed roots inside an image.
 
+Stremio moves from its unmaintained Node 14 container to a native systemd
+service using pinned server 4.22.4, Node.js 22.23.4 and FFmpeg 8.1.2. nginx
+continues to proxy port 11470, now bound to loopback. `/var/lib/stremio` remains
+the application state directory; systemd assigns it to the new service user.
+The FFmpeg package enables certificate and hostname verification by default
+and selects the filtered CA bundle, covering redirects and nested HLS resources.
+The unmodified FFmpeg package disables verification by default.
+Internal HTTPS and casting remain disabled; public HTTPS terminates at nginx.
+A conditional startup migration changes the old container cache path
+`/root/.stremio-server` to `/var/lib/stremio`, preserving other settings.
+
+Beads clients update from 1.0.3 to 1.3.1 alongside Dolt 1.86.6. Back up the
+shared database before the first new client connects, and upgrade the NUC
+before the desktop client. Do not run a candidate Beads client against the
+live database during build verification. Schema changes can require restoring
+that backup when rolling back; a NixOS generation rollback alone is insufficient.
+
 ## Container verification
 
 Candidate images were pulled into isolated rootless Podman storage on the
@@ -86,6 +103,13 @@ sudo -u postgres /run/current-system/sw/bin/pg_restore \
   --list /var/backup/security-upgrade-2026-10/matrix-synapse.dump >/dev/null
 ```
 
+Stop the old Stremio container before archiving its state and switching:
+
+```sh
+sudo systemctl stop podman-stremio.service
+sudo tar -C /var/lib -czf /var/backup/security-upgrade-2026-10/stremio.tar.gz stremio
+```
+
 Create and download a Home Assistant backup from its Settings > System > Backups
 page before changing the image. Preserve `/var/lib/esphome` and
 `/var/lib/stremio`; archive them while their containers are stopped if a
@@ -99,13 +123,17 @@ backups and the build are verified:
 
 ```sh
 sudo nixos-rebuild switch --no-write-lock-file --flake .#nuc
-sudo systemctl restart podman-home-assistant.service podman-esphome.service podman-stremio.service
+sudo systemctl restart podman-home-assistant.service podman-esphome.service stremio.service
 systemctl --failed
+systemctl is-active beads-dolt stremio
+bd ready --json
 curl --fail http://127.0.0.1:8008/_synapse/admin/v1/server_version
 curl --fail https://vault.goobhub.org/alive
 curl --fail http://192.168.10.1:8123/ >/dev/null
 curl --fail http://192.168.10.1:6052/ >/dev/null
 curl --fail http://192.168.10.1:8091/ >/dev/null
+curl --fail http://127.0.0.1:11470/settings >/dev/null
+curl --fail https://stream.goobhub.org/settings >/dev/null
 dig @192.168.10.1 example.com
 sudo systemctl start postgresqlBackup-matrix-synapse.service
 systemctl status postgresqlBackup-matrix-synapse.service --no-pager
@@ -116,12 +144,15 @@ Use the [audit's compromised-chain checks](security-audit-2026-10-22.md#remediat
 with each actual runtime. All four compromised test URLs must fail certificate
 verification; `https://example.com/` must succeed. A timeout or unrelated network
 failure is inconclusive. Check Matrix messaging/calling, Vaultwarden login/sync,
-Home Assistant integrations, and ESPHome device discovery from a LAN client.
+Home Assistant integrations, ESPHome device discovery, and Stremio playback
+(including a transcoded stream) from a LAN client.
 
 From a separate client on WAN `vlan10`, verify TCP 53, 3000, 6052, 8091 and
 8123 cannot connect and DNS UDP 53 does not answer. A test on the NUC itself
 does not exercise inbound firewall interface rules. Keep public HTTPS and
-Matrix media connectivity working. Reboot in a planned router outage, then
+Matrix media connectivity working. After upgrading the desktop, verify
+`systemctl --user is-active beads-tunnel` and `bd ready --json` there too.
+Reboot in a planned router outage, then
 check `uname -r`, DNS/DHCP/NAT, and `systemctl --failed` again.
 
 Synapse's upstream [upgrade notes](https://element-hq.github.io/synapse/latest/upgrade.html)
