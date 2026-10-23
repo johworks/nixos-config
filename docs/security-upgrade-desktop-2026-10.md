@@ -1,7 +1,7 @@
 # Desktop security upgrade, October 2026
 
 Tracks `nixos-uez`, following the [audit](security-audit-2026-10-22.md).
-The running desktop is unchanged until activation.
+The desktop was activated and reboot-verified on 23 October 2026.
 
 ## Prepared changes
 
@@ -27,11 +27,11 @@ See the [Electron release notes](https://releases.electronjs.org/release/v42.11.
 
 The Realtek r8125 driver needs a deterministic module certificate with the new
 kernel tooling. Its desktop package generates that certificate after fixup,
-preserving the driver and r8169 blacklist needed by this NIC. The candidate
-selects classic D-Bus, while the running desktop uses dbus-broker. Stage this
-upgrade for boot and reboot: the switch inhibitor correctly refuses changing
-the running system bus implementation. Secure Boot signing still uses the
-existing local Lanzaboote keys.
+preserving the driver and r8169 blacklist needed by this NIC. This upgrade
+selects classic D-Bus, while the previous desktop generation used dbus-broker.
+Activation required staging for boot and rebooting because the switch inhibitor
+refuses changing the running system bus implementation. Secure Boot signing
+uses the existing local Lanzaboote keys.
 
 ## Verification
 
@@ -81,3 +81,23 @@ Boot and `systemctl --failed`; the prepared kernel is 6.18.57.
 
 The [NUC upgrade](security-upgrade-nuc-2026-10.md) has separate database backups,
 container changes and router verification steps.
+
+## Post-reboot verification, 23 October
+
+The active system is `zbw2cc9ycj2hjhbix4ncad2a7vki9znw`, running kernel
+6.18.57. Secure Boot is enabled, Ethernet uses r8125 9.016.01-NAPI, D-Bus and
+Home Manager are healthy, and there are no failed system units. John confirmed
+normal browsing. The installed Beads 1.3.1 client reads the migrated shared
+database, and the user tunnel is active.
+
+All 35 targeted TLS checks passed: curl, Node 24.21.0, Electron 42.11.16 in
+Node mode, OpenCode's embedded Bun 1.4.2 through its installed wrapper, and
+native Python 3.14.8 with default SSL, deployed certifi, and a fresh venv's
+pip 26.2.2 bundle. Each rejected all four compromised chains with certificate
+errors while `https://example.com/` returned 200.
+
+This does not certify every dependency copy. Older ensurepip bundles remain
+in Steam's 32-bit Python library dependency and a GStreamer documentation tool;
+follow-up `nixos-nzf` records their scope and the direct-interpreter test.
+Steam's normal Python executable selects the patched native interpreter.
+The NUC kernel reboot and its remaining router checks are still pending.
