@@ -54,7 +54,9 @@ trust stores. The previous generation remains available for rollback.
 
 ## Activate
 
-From the reviewed checkout, without updating the lock again:
+Upgrade the NUC first to checkpoint and migrate the shared Beads database
+before the desktop starts using its new Beads client. From the reviewed
+checkout, without updating the lock again:
 
 ```sh
 cd ~/nixos-config

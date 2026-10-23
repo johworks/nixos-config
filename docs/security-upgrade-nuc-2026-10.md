@@ -49,7 +49,7 @@ Internal HTTPS and casting remain disabled; public HTTPS terminates at nginx.
 A conditional startup migration changes the old container cache path
 `/root/.stremio-server` to `/var/lib/stremio`, preserving other settings.
 
-Beads clients update from 1.0.3 to 1.3.1 alongside Dolt 1.86.6. Back up the
+Beads clients update from 1.0.3 to 1.3.1 alongside Dolt 2.5.0. Back up the
 shared database before the first new client connects, and upgrade the NUC
 before the desktop client. Do not run a candidate Beads client against the
 live database during build verification. Schema changes can require restoring
@@ -74,6 +74,16 @@ mounts and environment settings, urllib and Requests in both images rejected
 all four compromised chains with certificate-verification errors, while
 `https://example.com/` succeeded. No credentials or exploit payloads were used.
 This verifies TLS trust behavior, not every integration or device workflow.
+
+The compiled native Stremio candidate passed 55 runtime checks. With no TLS
+flags or certificate environment overrides, FFmpeg and ffprobe rejected all
+four compromised chains directly, through HTTP redirects, and as HTTPS
+segments in HTTP HLS playlists. Ordinary HTTPS handshakes succeeded. Local
+files, HTTP sources, settings/probe endpoints and complete HLS audio/video
+playlists plus initialization/media segments passed. Software outputs decoded
+as H.264/AAC; hardware acceleration and actual user integrations remain for
+post-activation verification. The cache-path migration also passed repeated-run,
+custom-path and missing-settings checks.
 
 ## Before activation, on the NUC
 
