@@ -122,6 +122,11 @@
           cp ${./modules/nixos/signal-updates/client.py} client.py
           cp ${./modules/nixos/signal-updates/test_client.py} test_client.py
           ${pkgsStable.python3}/bin/python3 test_client.py
+          export JAVAX_NET_SSL_TRUSTSTORE=${self.nixosConfigurations.nuc.config.system.build.signalUpdatesTrustStore}/cacerts
+          # Test signal-cli's actual JVM, which can differ from the default JRE.
+          signalJavaHome=$(${pkgsStable.gnused}/bin/sed -n "s/^export JAVA_HOME='\([^']*\)'$/\1/p" "$SIGNAL_CLI")
+          test -x "$signalJavaHome/bin/java"
+          "$signalJavaHome/bin/java" ${./modules/nixos/signal-updates/TestTrust.java} "$JAVAX_NET_SSL_TRUSTSTORE"
           touch "$out"
         '';
 

@@ -151,6 +151,9 @@ directories mode 0700). It opens no TCP listener. The daemon can run before
 linking. Received message bodies are not printed; attachments, stories, avatars
 and stickers are not downloaded. Personal account traffic can still reach this
 linked device; keep its state and socket inaccessible to the repair worker.
+Java's default trust store is generated from `security.pki.caBundle` so it follows
+the host's CA policy rather than retaining Java's separately bundled roots.
+Signal's explicit service trust store remains managed by signal-cli.
 
 After building and activating the NUC configuration, run on the NUC:
 
