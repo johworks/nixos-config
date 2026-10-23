@@ -120,6 +120,7 @@
     git
     sbctl
     pkgsUnstable.element-desktop
+    (pkgs.callPackage ./grok-bot.nix { })
   ];
 
   # Enable the OpenSSH daemon.

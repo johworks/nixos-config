@@ -40,6 +40,11 @@ in
     secureOpencode
   ];
 
+  xdg.mimeApps.defaultApplications = {
+    "x-scheme-handler/grokbot" = [ "grok-bot.desktop" ];
+    "x-scheme-handler/sand" = [ "grok-bot.desktop" ];
+  };
+
   # Preserve host keys learned by SSH instead of replacing them with the shared list.
   home.file.".ssh/known_hosts".enable = false;
 
