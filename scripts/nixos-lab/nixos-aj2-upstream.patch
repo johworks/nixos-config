@@ -1,0 +1,54 @@
+From baca25172d8c195b9abbe6f8a3ab5915dba09a91 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+Date: Thu, 20 Aug 2026 17:20:14 +0400
+Subject: [PATCH] ui/egl: fix render node cleanup order
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+ASAN detected some memory leaks when terminating. Release thread-bound
+EGL state first, destroy the context and terminate the display while the
+GBM device is still alive, then destroy GBM and close the render-node
+fd.
+
+Reviewed-by: Akihiko Odaki <odaki@rsg.ci.i.u-tokyo.ac.jp>
+Fixes: a3cf9b55bbdc ("ui/egl: implement display and EGL cleanup")
+Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
+Message-ID: <20260820132014.2729748-1-marcandre.lureau@redhat.com>
+---
+ ui/egl-helpers.c | 15 +++++++++------
+ 1 file changed, 9 insertions(+), 6 deletions(-)
+
+diff --git a/ui/egl-helpers.c b/ui/egl-helpers.c
+index d689f187c4e56..e89cc7c49af68 100644
+--- a/ui/egl-helpers.c
++++ b/ui/egl-helpers.c
+@@ -736,19 +736,22 @@ bool egl_init(const char *rendernode, DisplayGLMode mode, Error **errp)
+ 
+ void egl_cleanup(void)
+ {
++    if (qemu_egl_display) {
++        eglReleaseThread();
++    }
++
+     if (qemu_egl_rn_ctx) {
+         eglDestroyContext(qemu_egl_display, qemu_egl_rn_ctx);
+         qemu_egl_rn_ctx = NULL;
+     }
+ 
+-#ifdef CONFIG_GBM
+-    g_clear_pointer(&qemu_egl_rn_gbm_dev, gbm_device_destroy);
+-    g_clear_fd(&qemu_egl_rn_fd, NULL);
+-#endif
+-
+     if (qemu_egl_display) {
+-        eglReleaseThread();
+         eglTerminate(qemu_egl_display);
+         qemu_egl_display = NULL;
+     }
++
++#ifdef CONFIG_GBM
++    g_clear_pointer(&qemu_egl_rn_gbm_dev, gbm_device_destroy);
++    g_clear_fd(&qemu_egl_rn_fd, NULL);
++#endif
+ }

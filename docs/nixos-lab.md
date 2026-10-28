@@ -30,6 +30,12 @@ The default guest user is `john`; pass `--user` for an existing user in another
 flake. The guest autologs in as that user. Configurations that do not provide a
 graphical session can still be accessed through SSH.
 
+The lab backports QEMU's EGL cleanup fix for version 11.1.2 to prevent a host
+QEMU crash when accelerated guests exit. Existing runs retain their original
+QEMU launcher: run `build` followed by `reset` with the same selection to use
+the fixed launcher in a fresh run. `reset` retains the previous disk and
+artifacts; the new run starts with a fresh disk.
+
 Repeat the same selection arguments with `exec --root -- id`, `deploy`, `reboot`,
 `shot /tmp/desktop.png`, `status`, `stop`, or `reset`. `deploy` builds from the
 selected flake, copies its closure into the guest and activates it there. `build`

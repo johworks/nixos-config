@@ -5,7 +5,10 @@
   ...
 }:
 {
-  imports = [ (modulesPath + "/virtualisation/qemu-vm.nix") ];
+  imports = [
+    (modulesPath + "/virtualisation/qemu-vm.nix")
+    ./qemu.nix
+  ];
 
   virtualisation = {
     cores = 4;

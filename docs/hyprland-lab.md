@@ -149,6 +149,8 @@ To test a clean boot of updated source, rebuild the base before resetting:
 `reset` shuts down the current guest and removes only the `current` pointer.
 The next start makes a new writable overlay and fresh keys. Old disks, logs
 and screenshots remain available; they are not automatically garbage-collected.
+Each run retains its original QEMU launcher. To pick up the QEMU 11.1.2 EGL
+shutdown fix, build the base and reset before starting a new run.
 `stop` preserves the current disk for later restart. `force-stop` sends QMP
 `quit` when a guest will not shut down normally and may lose guest writes.
 
