@@ -93,11 +93,21 @@ class Client:
 
 def format_report(report):
     """Only bounded build metadata is allowed into the self-chat, never logs."""
-    if not isinstance(report, dict) or set(report) != {
+    fields = {
         "id", "status", "base_commit", "candidate_commit", "hosts", "repair_attempts",
         "inputs_refreshed", "independent_pin_count", "failed_stage",
-    }:
+    }
+    if not isinstance(report, dict) or set(report) not in (fields, fields | {"failure_kind", "changed_inputs"}):
         raise TransportError("Invalid report fields.")
+    kinds = {"unknown", "missing_blocklisted_certificates"}
+    inputs = {"firefox-addons", "home-manager", "home-managerStable", "nixpkgsOpencode",
+              "nixpkgsStable", "nixpkgsUnstable", "nixpkgsVaultwarden", "rust-overlay", "sops-nix"}
+    kind = report.get("failure_kind", "unknown")
+    changed = report.get("changed_inputs", [])
+    if not isinstance(kind, str) or kind not in kinds or not isinstance(changed, list) or any(
+        not isinstance(item, str) or item not in inputs for item in changed
+    ) or len(changed) > len(inputs) or len(set(changed)) != len(changed):
+        raise TransportError("Invalid diagnostic metadata.")
     if report["status"] not in ("built; operator review required", "failed", "interrupted"):
         raise TransportError("Invalid report status.")
     if not isinstance(report["id"], str) or not re.fullmatch(r"\d{8}T\d{6}Z-[a-f0-9]{8}", report["id"]):
@@ -114,7 +124,12 @@ def format_report(report):
     hosts = report["hosts"]
     if not isinstance(hosts, dict) or set(hosts) - {"desktop", "nuc"}:
         raise TransportError("Invalid report hosts.")
-    lines = ["NixOS update preparation — build report", report["id"], report["status"]]
+    titles = {"failed": "failed", "interrupted": "interrupted", "built; operator review required": "builds ready for review"}
+    lines = ["NixOS update preparation: " + titles[report["status"]]]
+    lines.append("Attempted to refresh flake dependencies in a separate candidate." if report["inputs_refreshed"]
+                 else "Checked a separate candidate without refreshing dependencies.")
+    if changed:
+        lines.append("Updated inputs: " + ", ".join(changed) + ".")
     for name, host in sorted(hosts.items()):
         if not isinstance(host, dict) or set(host) != {"system", "status"} or host["status"] != "built":
             raise TransportError("Invalid host build result.")
@@ -127,13 +142,17 @@ def format_report(report):
                          "diff", "changed-nix", "format", "flake-check", "build-nuc", "build-desktop", "clean", "repair"}:
             raise TransportError("Invalid failure stage.")
         lines.append("Failed stage: " + stage)
+        if kind == "missing_blocklisted_certificates":
+            lines.append("The updated certificate bundle is missing certificates that the blocklist expects to remove; the build stopped. Review the certificate policy against the new bundle.")
+        else:
+            lines.append("The cause could not be summarized safely; inspect the local failure log.")
     lines.extend([
         "Base: " + (report["base_commit"] or "not recorded"),
         "Candidate: " + (report["candidate_commit"] or "not produced"),
-        "Inputs refreshed: " + str(report["inputs_refreshed"]),
-        "Repair attempts: " + str(report["repair_attempts"]),
-        "Independent application pins needing review: " + str(report["independent_pin_count"]),
-        "Logs and diff are saved on the desktop. Activation approval is not enabled.",
+        "Repair attempts: " + str(report["repair_attempts"]) + "; review any candidate changes before use.",
+        "Separately pinned applications not automatically updated: " + str(report["independent_pin_count"]),
+        "Nothing was installed. Your working checkout was not changed. Activation approval is not enabled.",
+        "Report and logs: ~/.local/state/nixos-updates/" + report["id"] + "/",
     ])
     return "\n".join(lines)
 

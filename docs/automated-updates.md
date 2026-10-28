@@ -194,6 +194,12 @@ this grants send-only reporting as the isolated account, not access to the
 socket or an activation command. The coordinator uses John's existing NUC SSH
 key; the repair worker cannot read that key.
 
+Reports identify refreshed inputs and explain recognized failures using fixed,
+allowlisted descriptions; other failures point to the local logs. Install the
+updated NUC transport before updating the desktop coordinator: the new transport
+accepts the previous report format, but the previous transport rejects the new
+diagnostic fields. Neither installation sends a test message by itself.
+
 To disconnect, remove `NUC Update Reports` from Signal's Linked Devices and
 stop/disable the service through NixOS. Revoking the device does not erase its
 local state or backups; handle `/var/lib/signal-updates` as account credentials.

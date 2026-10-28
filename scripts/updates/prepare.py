@@ -209,12 +209,24 @@ class Preparation:
                   env=agent_env, stdin=prompt)
 
     def notify(self):
-        failed = [step["name"] for step in self.report["steps"] if step.get("exit_code", 0)]
+        failed = [step for step in self.report["steps"] if step.get("exit_code", 0)]
         summary = {key: self.report.get(key) for key in (
             "id", "status", "base_commit", "candidate_commit", "hosts", "repair_attempts", "inputs_refreshed",
         )}
         summary["independent_pin_count"] = len(self.report.get("independent_pins", []))
-        summary["failed_stage"] = failed[-1] if failed and self.report["status"] == "failed" else None
+        summary["failed_stage"] = failed[-1]["name"] if failed and self.report["status"] == "failed" else None
+        summary["failure_kind"] = "unknown"
+        if summary["failed_stage"]:
+            log = (self.run / failed[-1]["log"]).read_text(errors="replace")
+            if "Certs in blocklist but not in cert store:" in log:
+                summary["failure_kind"] = "missing_blocklisted_certificates"
+        summary["changed_inputs"] = []
+        refresh = next((step for step in self.report["steps"] if step["name"] == "refresh"), None)
+        if refresh:
+            log = (self.run / refresh["log"]).read_text(errors="replace")
+            known = {"firefox-addons", "home-manager", "home-managerStable", "nixpkgsOpencode",
+                     "nixpkgsStable", "nixpkgsUnstable", "nixpkgsVaultwarden", "rust-overlay", "sops-nix"}
+            summary["changed_inputs"] = sorted(set(re.findall(r"Updated input '([^']+)'", log)) & known)
         try:
             self.step("notify", ["ssh", "-F", "/dev/null", "-i", str(self.args.signal_key.expanduser()),
                       "-o", "BatchMode=yes", "-o", "ConnectTimeout=10", "john@192.168.10.1",

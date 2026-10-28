@@ -91,6 +91,22 @@ class ClientTests(unittest.TestCase):
         self.assertIn("Failed stage: clone", result)
         self.assertIn("not produced", result)
 
+    def test_known_failure_explains_candidate_and_cause(self):
+        result = client.format_report(self.report(status="failed", hosts={}, failed_stage="flake-check",
+            failure_kind="missing_blocklisted_certificates", changed_inputs=["nixpkgsStable", "home-manager"]))
+        self.assertIn("separate candidate", result)
+        self.assertIn("nixpkgsStable, home-manager", result)
+        self.assertIn("blocklist expects to remove", result)
+        self.assertIn("Nothing was installed", result)
+        self.assertIn("20261023T120000Z-1234abcd/", result)
+
+    def test_unrecognized_diagnostics_are_rejected(self):
+        for values in ({"failure_kind": "private log", "changed_inputs": []},
+                       {"failure_kind": "unknown", "changed_inputs": ["private log"]},
+                       {"failure_kind": "unknown", "changed_inputs": [[]]}):
+            with self.subTest(values=values), self.assertRaises(client.TransportError):
+                client.format_report(self.report(**values))
+
     def test_events_and_wrong_ids_are_not_printed_or_returned(self):
         def handler(request):
             return [

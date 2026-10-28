@@ -171,11 +171,24 @@ root=pathlib.Path(sys.argv[sys.argv.index('-C')+1]); (root/'value').write_text('
 import json, sys
 r=json.load(sys.stdin)
 assert set(r) == {'id','status','base_commit','candidate_commit','hosts','repair_attempts',
-                  'inputs_refreshed','independent_pin_count','failed_stage'}
+                  'inputs_refreshed','independent_pin_count','failed_stage','failure_kind','changed_inputs'}
 assert 'failure' not in r and 'steps' not in r
 ''')
         result, _, report = self.run_preparation(notify_signal=True)
         self.assertEqual(result, 0)
+        self.assertEqual(report["notification"], "submitted")
+
+    def test_failure_diagnostics_are_structured_and_do_not_send_logs(self):
+        self.write_program("nix", "import sys\nprint('Certs in blocklist but not in cert store: PRIVATE LOG')\nsys.exit(1 if 'check' in sys.argv else 0)")
+        self.write_program("ssh", '''
+import json, sys
+r=json.load(sys.stdin)
+assert r['failed_stage'] == 'flake-check'
+assert r['failure_kind'] == 'missing_blocklisted_certificates'
+assert 'PRIVATE LOG' not in json.dumps(r)
+''')
+        result, _, report = self.run_preparation(notify_signal=True)
+        self.assertEqual(result, 1)
         self.assertEqual(report["notification"], "submitted")
 
 
