@@ -1,0 +1,12 @@
+{
+  "KPackageStructure": "Plasma/Wallpaper",
+  "KPlugin": {
+    "Id": "org.nixos.pixelweather",
+    "Name": "Pixel Weather",
+    "Description": "Independent light, sun, clouds, wind and rain over a detailed pixel-art canyon",
+    "Icon": "preferences-desktop-wallpaper",
+    "License": "MIT",
+    "Version": "2.3"
+  },
+  "X-Plasma-API-Minimum-Version": "6.0"
+}

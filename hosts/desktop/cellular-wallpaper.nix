@@ -3,11 +3,11 @@ let
   selectWallpaper = pkgs.writeShellScript "select-cellular-wallpaper" ''
     exec ${pkgs.kdePackages.qttools}/bin/qdbus org.kde.plasmashell /PlasmaShell \
       org.kde.PlasmaShell.evaluateScript \
-      'desktops().forEach(function (desktop) { desktop.wallpaperPlugin = "org.nixos.cellular"; });'
+      'desktops().forEach(function (desktop) { desktop.wallpaperPlugin = "org.nixos.pixelweather"; });'
   '';
 in
 {
-  xdg.dataFile."plasma/wallpapers/org.nixos.cellular".source = ../../wallpapers/cellular;
+  xdg.dataFile."plasma/wallpapers/org.nixos.pixelweather".source = ../../wallpapers/pixel-weather;
 
   systemd.user.services.cellular-wallpaper = {
     Unit = {
