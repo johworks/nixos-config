@@ -265,6 +265,11 @@ The trust-policy denylist can remain explicit while redundant package rewriting
 is retired. New runtime variants and known residuals such as `nixos-nzf` need
 coverage; the existing list is not a universal vulnerability detector.
 
+The current inventory and recurring review procedure are in
+[temporary fixes](temporary-fixes.md). Each prepared candidate's local report
+points to it and marks the review as pending; preparing a build does not check
+whether a workaround is still needed. Signal remains a status-only summary.
+
 Automation can prepare and verify an emergency patch when upstream lags. It
 cannot guarantee that every incident will be fixed by updating the inputs.
 

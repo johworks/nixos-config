@@ -94,6 +94,20 @@ root=pathlib.Path(sys.argv[sys.argv.index('-C')+1]); (root/'value').write_text('
         self.assertEqual(self.git("rev-parse", "HEAD").strip(), self.base)
         self.assertEqual(self.git("status", "--porcelain"), "")
         self.assertNotIn("updated", (self.repo / "flake.lock").read_text())
+        self.assertEqual(report["temporary_fix_review"]["status"], "inventory missing; operator review required")
+
+    def test_temporary_fix_inventory_is_reported_as_unreviewed(self):
+        (self.repo / "docs").mkdir()
+        (self.repo / "docs/temporary-fixes.md").write_text("Review the tracked fixes.\n")
+        self.git("add", "docs/temporary-fixes.md")
+        self.git("-c", "user.name=Test", "-c", "user.email=test@localhost",
+                 "-c", "commit.gpgsign=false", "commit", "-m", "Inventory")
+        result, _, report = self.run_preparation()
+        self.assertEqual(result, 0)
+        self.assertEqual(report["temporary_fix_review"], {
+            "inventory": "docs/temporary-fixes.md",
+            "status": "not reviewed; operator review required",
+        })
 
     def test_repair_is_checked_again_and_preserves_failure_log(self):
         (self.repo / "value").write_text("broken")

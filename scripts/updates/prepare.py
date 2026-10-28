@@ -153,6 +153,12 @@ class Preparation:
         self.report["lock_sha256"] = digest(self.candidate / "flake.lock")
         self.step("diff", ["git", "diff", self.report["base_commit"], "HEAD"], self.candidate)
         self.report["independent_pins"] = pinned_sources(self.candidate)
+        inventory = "docs/temporary-fixes.md"
+        self.report["temporary_fix_review"] = {
+            "inventory": inventory,
+            "status": "not reviewed; operator review required" if (self.candidate / inventory).is_file()
+                      else "inventory missing; operator review required",
+        }
         lock = json.loads((self.candidate / "flake.lock").read_text())
         self.report["inputs"] = {
             name: {key: node.get("locked", {}).get(key) for key in ("rev", "narHash", "lastModified")}

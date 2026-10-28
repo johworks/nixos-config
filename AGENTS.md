@@ -26,6 +26,7 @@ K.I.S.S (Keep It Simple Stupid)
 - Keep diffs small; if touching multiple hosts, say why in the commit.
 - For new files referenced by the flake, use `git add -N <path>` so Nix can see them during eval/build without staging contents.
 - After edits: run formatting, then a quick eval/check.
+- Track temporary fixes and review them during input updates using `docs/temporary-fixes.md`; record findings and the next review date in Beads.
 
 ## Commands
 - Evaluate/check: use `nix --store daemon eval --no-write-lock-file ...`; `nix --store daemon flake check --no-write-lock-file`; quick view `nix --store daemon flake metadata --no-write-lock-file`.
