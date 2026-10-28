@@ -130,6 +130,18 @@
     in
     {
       packages.${system} = {
+        nixos-lab = pkgsUnstable.writeShellApplication {
+          name = "nixos-lab";
+          runtimeInputs = with pkgsUnstable; [
+            nix
+            openssh
+            git
+          ];
+          text = ''
+            exec ${pkgsUnstable.python3}/bin/python3 ${./scripts}/nixos-lab/lab.py "$@"
+          '';
+        };
+
         update-prepare = pkgsUnstable.writeShellApplication {
           name = "update-prepare";
           runtimeInputs = [
@@ -158,6 +170,13 @@
       };
 
       checks.${system} = {
+        nixos-lab = pkgsUnstable.runCommand "nixos-lab-tests" { } ''
+          cp -r ${./scripts} scripts
+          chmod -R u+w scripts
+          ${pkgsUnstable.python3}/bin/python3 -m unittest discover -s scripts/nixos-lab -v
+          touch "$out"
+        '';
+
         update-preparation =
           pkgsStable.runCommand "update-preparation-tests"
             {
