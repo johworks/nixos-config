@@ -1,6 +1,8 @@
 # Agent-assisted NixOS updates
 
 Design recorded on 23 October 2026; implementation task `nixos-6d6`.
+On 27 October John chose status-only Signal notifications: phone messages must
+not control update preparation, approvals, activation, or other workflows.
 The NUC's private Signal transport is active; John verified Note to Self delivery
 and an iPhone notification on 23 October. Preparation and reporting are described
 below. No activation executor is implemented. The recent migration remains
@@ -10,7 +12,7 @@ tracked separately in `nixos-uez`.
 
 - Automatically prepare updates, build, debug failures, and produce reports.
 - Require John's approval before activation on both desktop and NUC.
-- Deliver reports and approval requests through Signal.
+- Deliver status reports through Signal; do not accept commands or approvals.
 - Link John's existing Signal account and use Note to Self; no spare number is
   available for a separate bot account.
 - Preserve switch inhibitors and request a separate planned reboot when needed.
@@ -47,9 +49,8 @@ flowchart LR
     B -->|failure| C[Bounded agent repair]
     C --> B
     B -->|verified candidate| D[Report and immutable candidate]
-    D --> E[Signal approval request]
-    E -->|John approves| F[Host-owned activation executor]
-    F --> G[Health checks and result report]
+    D --> E[Signal status report]
+    D --> F[Operator reviews and activates separately]
 ```
 
 The repair loop has a finite attempt limit and a time/cost limit; values remain
@@ -57,7 +58,7 @@ to be configured. Exhausting a limit produces a failure report and a Beads
 handoff. No further repair or activation is implied by an expired job.
 
 Start with systemd scheduling, Nix's own update/build commands, a Codex worker,
-and small reporting and approval components. Existing OpenRig experiments may
+and a small reporting component. Existing OpenRig experiments may
 provide execution oversight, but a new orchestration framework is not required.
 Preparation runs on the desktop, weekly on Sunday at 03:00 local time with up
 to 20 minutes of randomized delay. A persistent user timer catches missed runs
@@ -69,7 +70,7 @@ previously caused it to realize unrelated workstation dependencies.
 1. Create a clean candidate branch/worktree from the recorded base commit.
 2. Refresh the selected inputs and report versions, revisions and image digests.
 3. Format, evaluate, check, and build the desktop and NUC candidates. Keep source
-   and lock file unchanged between the final successful checks and approval.
+   and lock file unchanged between the final successful checks and review.
 4. On failure, give the unprivileged agent the logs, candidate diff and relevant
    module context. Allow edits only in the candidate workspace, then rerun the
    same checks. The coordinator independently records exit codes and artifacts.
@@ -91,7 +92,7 @@ The worker must not weaken TLS, remove tests to obtain a pass, change trust or
 privilege policy, or bypass switch inhibitors. Today's D-Bus failure should
 produce a boot-and-reboot plan. Today's Beads failure should produce a tested
 schema-migration fix and a coordinated client/server activation plan. A changed
-candidate always requires a new approval.
+candidate always requires a new review.
 
 ### Report contents
 
@@ -100,7 +101,7 @@ candidate always requires a new approval.
 - Checks actually run, their exit statuses and failures or untested behavior.
 - Expected service restarts, schema changes, backup requirements and reboots.
 - Proposed privileged actions and the relevant recovery limitations.
-- An approval identifier with expiration, plus links or attached durable logs.
+- The local report and log location for operator review.
 
 Reports must distinguish certificate rejection from timeout or DNS failure.
 Unavailable external test endpoints yield an inconclusive result. Container
@@ -109,18 +110,10 @@ Reports sent outside the host must exclude credentials and private log content.
 
 ## Privileged activation
 
-A small executor owned by the target host performs the approved operation.
-Approval binds the host, candidate commit/lock, immutable store path, action,
-expiry and a single-use nonce. It must not authorize a mutable branch name or
-an arbitrary command supplied through chat. The exact approval protocol needs
-implementation and adversarial tests before root activation is enabled.
-
-The executor validates the approval and candidate again at application time,
-checks backup results, and invokes the approved prebuilt system. Avoid evaluating
-agent-controlled source as root. The agent does not receive a sudo password or
-general passwordless sudo. Signal credentials and approval state are outside
-the candidate workspace. Beads tracks project outcomes, not the authority to
-execute a privileged deployment.
+Signal is status-only. Review and activation happen separately under John's
+direct control; no Signal reply authorizes a command or update. The agent does
+not receive a sudo password or general passwordless sudo. Signal credentials
+remain outside the candidate workspace.
 
 After activation, perform local service checks and a separate client check of
 router connectivity. Connectivity rollback support from an existing tool such
@@ -150,7 +143,7 @@ registered through signal-cli or linked to an existing dedicated account.
 The selected Note to Self approach carries reports for multiple hosts. signal-cli supports
 `--notify-self` for notification behavior, so it should not be dismissed as
 incapable of alerts. A separate account can be reconsidered if a number becomes
-available or additional recipients/approvers are needed.
+available or additional recipients are needed.
 
 ### Transport setup on the NUC
 
@@ -204,11 +197,8 @@ To disconnect, remove `NUC Update Reports` from Signal's Linked Devices and
 stop/disable the service through NixOS. Revoking the device does not erase its
 local state or backups; handle `/var/lib/signal-updates` as account credentials.
 
-Only the configured approver's authenticated Signal identity may approve jobs;
-a profile display name or membership in a reporting group is insufficient.
-Use a setup challenge and identity verification. Reject stale, duplicate,
-wrong-host, altered-candidate and unknown-sender approvals. No sudo passwords
-are transmitted through chat. The live delivery test was an inert message.
+The live delivery test was an inert message. Signal replies are not processed
+as commands or approvals.
 
 ## Running candidate preparation
 
@@ -283,17 +273,14 @@ cannot guarantee that every incident will be fixed by updating the inputs.
 1. Report-only candidate preparation with bounded repair and persistent results.
    Demonstrate a successful candidate and a recoverable build failure without
    changing a live host or the user's checkout.
-2. Configure the selected personal linked device; demonstrate report delivery, identity
-   verification, approval/rejection, expiry and replay handling with inert jobs.
-3. Add host executors and verified backup/recovery gates. Demonstrate that an
-   approved artifact is the one activated and that later edits cannot inherit
-   its approval. Exercise failure recovery on a disposable system first.
-4. Enable scheduled preparation and approved deployment for the desktop, then
-   the NUC after router and shared-database coordination checks pass.
+2. Verify useful status delivery through the selected personal linked device.
+3. Improve independent application pin refresh and runtime regression checks.
+4. Keep activation under direct operator control, with backup, recovery, router
+   and shared-database coordination checks before switching.
 
 The transport and phone notification are verified. The preparation/reporting
-implementation does not complete independent application pin updates, runtime
-regression coverage, or the inert approval protocol milestones.
+implementation does not complete independent application pin updates or runtime
+regression coverage. Signal approval and remote execution are not planned.
 
 ## Sources checked
 
