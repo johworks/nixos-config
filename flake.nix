@@ -31,6 +31,12 @@
       inputs.nixpkgs.follows = "nixpkgsStable";
     };
 
+    plasma-manager = {
+      url = "github:nix-community/plasma-manager";
+      inputs.nixpkgs.follows = "nixpkgsUnstable";
+      inputs.home-manager.follows = "home-manager";
+    };
+
     firefox-addons = {
       url = "gitlab:rycee/nur-expressions?dir=pkgs/firefox-addons";
       inputs.nixpkgs.follows = "nixpkgsUnstable";
