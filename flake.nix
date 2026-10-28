@@ -149,6 +149,25 @@
       };
 
       checks.${system} = {
+        certificate-filter =
+          let
+            desktop = builtins.head self.nixosConfigurations.desktop.config.system.replaceDependencies.replacements;
+            nuc = builtins.head self.nixosConfigurations.nuc.config.system.replaceDependencies.replacements;
+            test = ./modules/nixos/common/test_cacert.py;
+          in
+          pkgsStable.runCommand "certificate-filter-tests"
+            {
+              nativeBuildInputs = [
+                pkgsStable.python3
+                pkgsStable.openssl
+              ];
+            }
+            ''
+              python3 ${test} ${builtins.head desktop.newDependency.nativeBuildInputs}/bin/buildcatrust ${desktop.newDependency.src} ${desktop.newDependency}/etc/ssl/certs/ca-bundle.crt
+              python3 ${test} ${builtins.head nuc.newDependency.nativeBuildInputs}/bin/buildcatrust ${nuc.newDependency.src} ${nuc.newDependency}/etc/ssl/certs/ca-bundle.crt
+              touch "$out"
+            '';
+
         nixos-lab = pkgsUnstable.runCommand "nixos-lab-tests" { } ''
           cp -r ${./scripts} scripts
           chmod -R u+w scripts

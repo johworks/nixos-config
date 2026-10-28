@@ -21,7 +21,16 @@ let
   replacementsFor =
     packages:
     let
-      cacert = packages.cacert.override { inherit blacklist; };
+      # These roots were removed from newer NSS releases. Keep distrusting them
+      # when present, while allowing precisely these three to already be absent.
+      buildcatrust = packages.buildcatrust.overrideAttrs (old: {
+        postPatch = (old.postPatch or "") + ''
+          substituteInPlace buildcatrust/cli.py --replace-fail \
+            'unseen_blocklist = blocklist - saw_blocklist' \
+            'unseen_blocklist = blocklist - saw_blocklist - {"emSign ECC Root CA - G3", "emSign Root CA - C1", "emSign ECC Root CA - C3"}'
+        '';
+      });
+      cacert = packages.cacert.override { inherit blacklist buildcatrust; };
       pythonReplacements =
         python:
         let

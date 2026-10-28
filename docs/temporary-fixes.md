@@ -30,6 +30,18 @@ Weekly update preparation records this inventory in its local `report.json` as
 **not reviewed**. It does not check upstream, run the retirement tests, or
 change Beads. A successful build or status-only Signal message is not a review.
 
+The CA bundle override allows only the three named emSign roots to be absent
+from NSS input. If present, they are still explicitly distrusted; an unexpected
+missing blocklist entry still fails the build. `certificate-filter` exercises
+both the actual stable and unstable bundle builders and checks that present
+incident roots are rejected. It is not a replacement for runtime TLS checks.
+On 28 October the failed update candidate's stable NSS 3.126 and unstable NSS
+3.131.1 system and standalone bundles rejected all four incident test chains
+and accepted ordinary HTTPS. Candidate Python certifi, pip and fresh venv pip
+bundles, and Node using the candidate system stores, passed the same checks.
+The Signal JVM trust-store check passed. This did not retest every application
+or change the deployed hosts.
+
 ## Current inventory
 
 | Beads task | Workaround and reason | Evidence needed before retirement |
