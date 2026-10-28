@@ -44,10 +44,13 @@
   # Fix for the r8125 NIC issue
   boot.extraModulePackages = [
     (config.boot.kernelPackages.r8125.overrideAttrs (old: {
-      # r8125 skips modules_install, so generate the certificate required by
-      # Nixpkgs' deterministic module-signing and kernel aggregation tooling.
+      # Older r8125 packages skip modules_install and need a certificate;
+      # newer packages already generate one before compressing the module.
       postFixup = (old.postFixup or "") + ''
-        ${lib.getExe pkgs.kmodigest} "$out/lib/modules/${config.boot.kernelPackages.kernel.modDirVersion}/kernel/drivers/net/ethernet/realtek/r8125.ko"
+        module="$out/lib/modules/${config.boot.kernelPackages.kernel.modDirVersion}/kernel/drivers/net/ethernet/realtek/r8125.ko"
+        if [ ! -f "$module.cer" ]; then
+          ${lib.getExe pkgs.kmodigest} "$module"
+        fi
       '';
     }))
   ];
