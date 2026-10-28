@@ -53,6 +53,7 @@ in
     # Codex appends remembered approvals to default.rules; keep that file mutable.
     home.file.".codex/rules/nixos.rules".source = ./nixos.rules;
     home.file.".codex/skills/blog-entry".source = ./skills/blog-entry;
+    home.file.".codex/skills/nixos-vm-lab".source = ./skills/nixos-vm-lab;
 
     # Merge into a regular file because Codex also saves settings in config.toml.
     home.activation.codexNixPermissions = lib.hm.dag.entryAfter [ "linkGeneration" ] ''
