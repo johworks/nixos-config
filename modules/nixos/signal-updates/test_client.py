@@ -107,6 +107,12 @@ class ClientTests(unittest.TestCase):
             with self.subTest(values=values), self.assertRaises(client.TransportError):
                 client.format_report(self.report(**values))
 
+    def test_vm_failure_is_reported_without_claiming_a_pass(self):
+        result = client.format_report(self.report(status="failed", hosts={}, failed_stage="vm-reboot",
+            failure_kind="unknown", changed_inputs=[], desktop_vm="failed"))
+        self.assertIn("Desktop VM boot, health, reboot and display manager: failed", result)
+        self.assertIn("Failed stage: vm-reboot", result)
+
     def test_events_and_wrong_ids_are_not_printed_or_returned(self):
         def handler(request):
             return [

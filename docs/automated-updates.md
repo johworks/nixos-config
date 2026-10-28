@@ -211,6 +211,14 @@ GC root beside its report. Failure triggers bounded repair and the same checks
 again. A changed candidate gets a new commit and lock hash; agent assertions do
 not determine whether a check passed.
 
+The scheduled job also builds and boots a disposable desktop VM from the same
+candidate, checks that systemd is healthy, reboots it, and checks systemd and
+the display manager again. A VM failure fails the job; it is not fed to the
+repair agent. The VM runs under the user's systemd service, outside the repair
+agent's sandbox, and is stopped after the test. It does not validate the real
+GPU, bootloader, peripherals, or application workflows. The NUC is built, but
+not tested in a VM. VM disks and logs remain in the private run directory.
+
 Reports and numbered command logs live under
 `~/.local/state/nixos-updates/<run-id>/`. Each run records base/candidate commit,
 lock hash, input revisions/hashes, independent application pins, actual exit
@@ -239,6 +247,14 @@ a failed send preserves the local report and returns a failed job exit status.
 Stopping the service cancels its process group and leaves the partial report.
 Use `systemctl --user stop nixos-update-prepare.timer` to stop scheduling; stop
 the service separately to cancel an active job.
+
+Manual runs can opt into the same test using `--vm-lab` followed by the path to
+`nixos-lab`. The NUC receiver must be updated before the desktop sender because
+the previous receiver rejects the new VM status field. Codex's normal sandbox
+currently hides KVM and the render node: individual read permissions did not
+expose them, while individual write permissions caused sandbox startup errors.
+Use the normal per-command permission mechanism for interactive lab runs; do
+not grant all of `/dev` to the repair agent.
 
 The initial pipeline refreshes flake inputs. Home Assistant/ESPHome image digests
 and Stremio source pins are inventoried but not automatically refreshed, and the

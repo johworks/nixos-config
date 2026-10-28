@@ -97,8 +97,12 @@ def format_report(report):
         "id", "status", "base_commit", "candidate_commit", "hosts", "repair_attempts",
         "inputs_refreshed", "independent_pin_count", "failed_stage",
     }
-    if not isinstance(report, dict) or set(report) not in (fields, fields | {"failure_kind", "changed_inputs"}):
+    if not isinstance(report, dict) or set(report) not in (fields, fields | {"failure_kind", "changed_inputs"},
+                                                           fields | {"failure_kind", "changed_inputs", "desktop_vm"}):
         raise TransportError("Invalid report fields.")
+    vm = report.get("desktop_vm", "not run")
+    if not isinstance(vm, str) or vm not in {"not run", "running", "passed", "failed", "cleanup failed"}:
+        raise TransportError("Invalid VM result.")
     kinds = {"unknown", "missing_blocklisted_certificates"}
     inputs = {"firefox-addons", "home-manager", "home-managerStable", "nixpkgsOpencode",
               "nixpkgsStable", "nixpkgsUnstable", "nixpkgsVaultwarden", "rust-overlay", "sops-nix"}
@@ -139,7 +143,8 @@ def format_report(report):
     stage = report["failed_stage"]
     if stage is not None:
         if not isinstance(stage, str) or stage not in {"base", "clone", "checkout", "refresh", "stage", "staged", "commit", "revision",
-                         "diff", "changed-nix", "format", "flake-check", "build-nuc", "build-desktop", "clean", "repair"}:
+                         "diff", "changed-nix", "format", "flake-check", "build-nuc", "build-desktop", "clean", "repair",
+                         "vm-start", "vm-system", "vm-reboot", "vm-system-after-reboot", "vm-display-manager"}:
             raise TransportError("Invalid failure stage.")
         lines.append("Failed stage: " + stage)
         if kind == "missing_blocklisted_certificates":
@@ -147,6 +152,7 @@ def format_report(report):
         else:
             lines.append("The cause could not be summarized safely; inspect the local failure log.")
     lines.extend([
+        "Desktop VM boot, health, reboot and display manager: " + vm + ".",
         "Base: " + (report["base_commit"] or "not recorded"),
         "Candidate: " + (report["candidate_commit"] or "not produced"),
         "Repair attempts: " + str(report["repair_attempts"]) + "; review any candidate changes before use.",

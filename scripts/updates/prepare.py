@@ -10,10 +10,12 @@ from pathlib import Path
 import re
 import signal
 import shutil
+import socket
 import subprocess
 import sys
 import time
 import uuid
+from urllib.parse import quote
 
 
 def digest(path):
@@ -185,6 +187,45 @@ class Preparation:
             raise StepFailed("Candidate changed during checks")
         if digest(self.candidate / "flake.lock") != self.report["lock_sha256"]:
             raise StepFailed("Lock file changed during checks")
+        if self.args.vm_lab and "desktop" in self.args.host:
+            self.test_desktop_vm()
+
+    def test_desktop_vm(self):
+        state = self.run / "desktop-vm"
+        command = [self.args.vm_lab, "--state", str(state), "--flake", "git+file://" + quote(str(self.candidate)) + "#desktop",
+                   "--hardware", "hosts/desktop/hardware-configuration.nix",
+                   "--compat", str(self.candidate / "scripts/nixos-lab/desktop-compat.nix")]
+        # Choose an available loopback port; the lab pins the guest SSH host key.
+        with socket.socket() as listener:
+            listener.bind(("127.0.0.1", 0))
+            port = listener.getsockname()[1]
+        self.report["desktop_vm"] = "running"
+        self.save()
+        try:
+            self.step("vm-start", [*command, "start", "--port", str(port)])
+            self.step("vm-system", [*command, "exec", "--root", "--", "systemctl", "is-system-running", "--wait"])
+            self.step("vm-reboot", [*command, "reboot"])
+            self.step("vm-system-after-reboot", [*command, "exec", "--root", "--", "systemctl", "is-system-running", "--wait"])
+            self.step("vm-display-manager", [*command, "exec", "--root", "--", "systemctl", "is-active", "display-manager.service"])
+            self.report["desktop_vm"] = "passed"
+        except BaseException:
+            self.report["desktop_vm"] = "failed"
+            raise
+        finally:
+            # QEMU runs in its own session, so always stop it even after a timeout.
+            try:
+                subprocess.run([*command, "stop"], cwd=self.run, env=self.env,
+                               stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, timeout=70, check=True)
+            except (OSError, subprocess.SubprocessError):
+                try:
+                    subprocess.run([*command, "force-stop"], cwd=self.run, env=self.env,
+                                   stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, timeout=15, check=True)
+                except (OSError, subprocess.SubprocessError):
+                    pass
+                self.report["desktop_vm"] = "cleanup failed"
+                self.save()
+                raise StepFailed("Desktop VM cleanup failed; inspect retained VM state")
+            self.save()
 
     def repair(self, reason):
         if (self.candidate / ".codex/config.toml").exists():
@@ -220,6 +261,7 @@ class Preparation:
             "id", "status", "base_commit", "candidate_commit", "hosts", "repair_attempts", "inputs_refreshed",
         )}
         summary["independent_pin_count"] = len(self.report.get("independent_pins", []))
+        summary["desktop_vm"] = self.report.get("desktop_vm", "not run")
         summary["failed_stage"] = failed[-1]["name"] if failed and self.report["status"] == "failed" else None
         summary["failure_kind"] = "unknown"
         if summary["failed_stage"]:
@@ -259,7 +301,7 @@ class Preparation:
                     self.checks()
                     break
                 except StepFailed as error:
-                    if attempt == self.args.repair_attempts:
+                    if attempt == self.args.repair_attempts or self.report.get("desktop_vm") in ("failed", "cleanup failed"):
                         raise
                     self.repair(error)
             self.report["status"] = "built; operator review required"
@@ -289,6 +331,7 @@ def main():
     parser.add_argument("--repair-attempts", type=int, choices=range(3), default=2)
     parser.add_argument("--codex", default="codex")
     parser.add_argument("--notify-signal", action="store_true")
+    parser.add_argument("--vm-lab", help="Path to nixos-lab for a disposable desktop boot test")
     parser.add_argument("--signal-key", type=Path, default=Path.home() / ".ssh/id_ed25519_nuc")
     parser.add_argument("--timeout", type=int, default=3600, help="Whole job limit in seconds")
     args = parser.parse_args()

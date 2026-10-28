@@ -25,7 +25,9 @@ in
       };
       Service = {
         Type = "oneshot";
-        ExecStart = "${package}/bin/update-prepare --repo ${home}/nixos-config --base main --codex ${home}/.npm-global/bin/codex --notify-signal";
+        ExecStart = "${package}/bin/update-prepare --repo ${home}/nixos-config --base main --codex ${home}/.npm-global/bin/codex --vm-lab ${
+          inputs.self.packages.${pkgs.stdenv.hostPlatform.system}.nixos-lab
+        }/bin/nixos-lab --notify-signal";
         Environment = [
           "HOME=${home}"
           "PATH=/run/current-system/sw/bin"

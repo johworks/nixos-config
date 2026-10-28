@@ -75,7 +75,7 @@ root=pathlib.Path(sys.argv[sys.argv.index('-C')+1]); (root/'value').write_text('
     def arguments(self, **updates):
         args = dict(repo=self.repo, state_dir=self.root / "state", base="main",
                     timeout=30, host=["nuc"], no_refresh=True, repair_attempts=0, codex="codex",
-                    notify_signal=False, signal_key=self.root / "unused-test-key")
+                    notify_signal=False, signal_key=self.root / "unused-test-key", vm_lab=None)
         args.update(updates)
         return argparse.Namespace(**args)
 
@@ -185,7 +185,7 @@ root=pathlib.Path(sys.argv[sys.argv.index('-C')+1]); (root/'value').write_text('
 import json, sys
 r=json.load(sys.stdin)
 assert set(r) == {'id','status','base_commit','candidate_commit','hosts','repair_attempts',
-                  'inputs_refreshed','independent_pin_count','failed_stage','failure_kind','changed_inputs'}
+                  'inputs_refreshed','independent_pin_count','failed_stage','failure_kind','changed_inputs','desktop_vm'}
 assert 'failure' not in r and 'steps' not in r
 ''')
         result, _, report = self.run_preparation(notify_signal=True)
@@ -204,6 +204,48 @@ assert 'PRIVATE LOG' not in json.dumps(r)
         result, _, report = self.run_preparation(notify_signal=True)
         self.assertEqual(result, 1)
         self.assertEqual(report["notification"], "submitted")
+
+    def test_desktop_vm_tests_boot_reboot_and_cleanup(self):
+        calls = self.root / "vm-calls"
+        self.write_program("nixos-lab", f'''
+import pathlib, sys
+with pathlib.Path({str(calls)!r}).open('a') as log: log.write(' '.join(sys.argv[1:]) + '\\n')
+''')
+        result, _, report = self.run_preparation(host=["desktop"], vm_lab=str(self.bin / "nixos-lab"))
+        self.assertEqual(result, 0)
+        self.assertEqual(report["desktop_vm"], "passed")
+        commands = calls.read_text().splitlines()
+        self.assertEqual(len(commands), 6)
+        self.assertIn(" start --port ", commands[0])
+        self.assertIn(" is-system-running --wait", commands[1])
+        self.assertTrue(commands[2].endswith(" reboot"))
+        self.assertTrue(commands[-1].endswith(" stop"))
+
+    def test_vm_failure_stops_guest_and_does_not_retry_repair(self):
+        calls = self.root / "vm-calls"
+        self.write_program("nixos-lab", f'''
+import pathlib, sys
+with pathlib.Path({str(calls)!r}).open('a') as log: log.write(' '.join(sys.argv[1:]) + '\\n')
+if 'reboot' in sys.argv: sys.exit(1)
+''')
+        result, _, report = self.run_preparation(host=["desktop"], repair_attempts=2,
+                                                  vm_lab=str(self.bin / "nixos-lab"))
+        self.assertEqual(result, 1)
+        self.assertEqual(report["desktop_vm"], "failed")
+        self.assertEqual(report["repair_attempts"], 0)
+        self.assertTrue(calls.read_text().splitlines()[-1].endswith(" stop"))
+
+    def test_vm_cleanup_failure_forces_stop_and_fails_report(self):
+        calls = self.root / "vm-calls"
+        self.write_program("nixos-lab", f'''
+import pathlib, sys
+with pathlib.Path({str(calls)!r}).open('a') as log: log.write(' '.join(sys.argv[1:]) + '\\n')
+if sys.argv[-1] == 'stop': sys.exit(1)
+''')
+        result, _, report = self.run_preparation(host=["desktop"], vm_lab=str(self.bin / "nixos-lab"))
+        self.assertEqual(result, 1)
+        self.assertEqual(report["desktop_vm"], "cleanup failed")
+        self.assertTrue(calls.read_text().splitlines()[-1].endswith(" force-stop"))
 
 
 if __name__ == "__main__":
