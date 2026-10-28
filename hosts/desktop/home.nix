@@ -64,16 +64,27 @@ in
         "Switch to Desktop 8" = "Meta+8";
         "Switch to Desktop 9" = "Meta+9";
         "Switch to Desktop 10" = "Meta+0";
-        "Window to Desktop 1" = "Meta+Shift+1";
-        "Window to Desktop 2" = "Meta+Shift+2";
-        "Window to Desktop 3" = "Meta+Shift+3";
-        "Window to Desktop 4" = "Meta+Shift+4";
-        "Window to Desktop 5" = "Meta+Shift+5";
-        "Window to Desktop 6" = "Meta+Shift+6";
-        "Window to Desktop 7" = "Meta+Shift+7";
-        "Window to Desktop 8" = "Meta+Shift+8";
-        "Window to Desktop 9" = "Meta+Shift+9";
-        "Window to Desktop 10" = "Meta+Shift+0";
+        # KWin uses the shifted symbol for these shortcuts on the US layout.
+        "Window to Desktop 1" = [ ];
+        "Window to Desktop 2" = [ ];
+        "Window to Desktop 3" = [ ];
+        "Window to Desktop 4" = [ ];
+        "Window to Desktop 5" = [ ];
+        "Window to Desktop 6" = [ ];
+        "Window to Desktop 7" = [ ];
+        "Window to Desktop 8" = [ ];
+        "Window to Desktop 9" = [ ];
+        "Window to Desktop 10" = [ ];
+        "Move and follow to desktop 1" = "Meta+!";
+        "Move and follow to desktop 2" = "Meta+@";
+        "Move and follow to desktop 3" = "Meta+#";
+        "Move and follow to desktop 4" = "Meta+$";
+        "Move and follow to desktop 5" = "Meta+%";
+        "Move and follow to desktop 6" = "Meta+^";
+        "Move and follow to desktop 7" = "Meta+&";
+        "Move and follow to desktop 8" = "Meta+*";
+        "Move and follow to desktop 9" = "Meta+(";
+        "Move and follow to desktop 10" = "Meta+)";
         view_actual_size = [ ];
       };
       plasmashell = {
@@ -89,6 +100,9 @@ in
       };
     };
   };
+
+  programs.plasma.configFile.kwinrc.Plugins.move-followEnabled = true;
+  xdg.dataFile."kwin/scripts/move-follow".source = ./kwin-move-follow;
 
   # Reuse the shared CLI base so desktop gets the same Codex/npm tooling as nuc.
   home.packages = config.profiles.basePackages ++ [
