@@ -65,16 +65,6 @@
       flake = false;
     };
 
-    # shiny-app = {
-    #   url = "git+ssh://git@github.com/Cgilrein/super_secret_project.git?ref=main";
-    #   #flake = false;
-    # };
-
-    #    finance-tracking = {
-    #      url = "github:johworks/finance_tracking?ref=main";
-    #      inputs.nixpkgs.follows = "nixpkgs";
-    #    };
-
   };
 
   outputs =
@@ -86,8 +76,6 @@
       home-managerStable,
       sops-nix,
       shared-nvim,
-      # shiny-app,
-      #    finance-tracking,
       ...
     }@inputs:
     let
@@ -102,17 +90,6 @@
 
       pkgsUnstable = mkPkgs nixpkgsUnstable;
       pkgsStable = mkPkgs nixpkgsStable;
-
-      # The finance/Teller prototype is retained in experiments but is not
-      # included in the flake derivations.
-      # financePrototype = pkgsUnstable.writeShellApplication {
-      #   name = "finance-prototype";
-      #   runtimeInputs = [ pkgsUnstable.nodejs_22 ];
-      #   text = ''
-      #     export FINANCE_PUBLIC_DIR="${./experiments/finance-prototype/public}"
-      #     exec node ${./experiments/finance-prototype/src/server.mjs} "$@"
-      #   '';
-      # };
 
       mkHost =
         {
@@ -129,6 +106,8 @@
         };
     in
     {
+      formatter.${system} = pkgsUnstable.nixfmt;
+
       packages.${system} = {
         nixos-lab = pkgsUnstable.writeShellApplication {
           name = "nixos-lab";
@@ -253,8 +232,6 @@
           extraModules = [
             home-managerStable.nixosModules.home-manager
             sops-nix.nixosModules.sops
-            # shiny-app.nixosModules.webapp
-            #          finance-tracking.nixosModules.finance-tracking
           ];
         };
 
@@ -286,17 +263,6 @@
 
       };
 
-      # packages.${system} = {
-      #   finance-prototype = financePrototype;
-      #   default = financePrototype;
-      # };
-      #
-      # devShells.${system}.finance-prototype = pkgsUnstable.mkShell {
-      #   packages = with pkgsUnstable; [
-      #     nodejs_22
-      #     jq
-      #   ];
-      # };
     };
 
 }

@@ -10,10 +10,7 @@
   ...
 }:
 let
-  sddm-background = builtins.fetchurl {
-    url = "https://gruvbox-wallpapers.pages.dev/wallpapers/photography/DKoRY7F.jpeg";
-    sha256 = "15vvx30kzjk4pfzaa50b42p24z5s7wki10v4jq0wdvgr862a7sdd";
-  };
+  sddm-background = import ../../wallpapers/sunset-field.nix { inherit pkgs; };
 in
 {
   imports = [
@@ -21,6 +18,7 @@ in
     ./hardware-configuration.nix
     ../../modules/nixos/common/base.nix
     ../../modules/nixos/common/maintenance.nix
+    ../../modules/nixos/common/hyprland.nix
   ];
 
   # Bootloader.
@@ -46,39 +44,6 @@ in
       package = pkgs.kdePackages.sddm;
     };
     defaultSession = "hyprland";
-  };
-
-  environment.sessionVariables = {
-    EDITOR = "nvim";
-    MOZ_ENABLE_WAYLAND = "1";
-    QT_QPA_PLATFORM = "wayland";
-  };
-
-  # Enable hyprland
-  programs.hyprland = {
-    enable = true;
-    xwayland.enable = true;
-  };
-
-  # Desktop portals
-  services.dbus.enable = true;
-  xdg.portal.enable = true;
-  xdg.portal.extraPortals = [
-    pkgs.xdg-desktop-portal-gtk
-    pkgs.xdg-desktop-portal-hyprland
-  ];
-
-  # Enable CUPS to print documents.
-  services.printing.enable = true;
-
-  # Enable sound with pipewire.
-  services.pulseaudio.enable = false;
-  security.rtkit.enable = true;
-  services.pipewire = {
-    enable = true;
-    alsa.enable = true;
-    alsa.support32Bit = true;
-    pulse.enable = true;
   };
 
   # Define a user account. Don't forget to set a password with ‘passwd’.
@@ -112,22 +77,6 @@ in
       loginBackground = true;
     })
   ];
-
-  fonts.fontconfig.enable = true;
-  fonts.packages = with pkgs; [
-    nerd-fonts.jetbrains-mono
-    nerd-fonts.symbols-only
-    noto-fonts
-    noto-fonts-cjk-sans
-    noto-fonts-color-emoji
-    font-awesome
-  ];
-  fonts.fontconfig.defaultFonts = {
-    sansSerif = [ "Noto Sans" ];
-    serif = [ "Noto Serif" ];
-    monospace = [ "JetBrainsMono Nerd Font" ];
-    emoji = [ "Noto Color Emoji" ];
-  };
 
   home-manager = {
     extraSpecialArgs = { inherit inputs; };

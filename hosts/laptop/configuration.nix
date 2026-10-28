@@ -10,10 +10,7 @@
   ...
 }:
 let
-  sddm-background = builtins.fetchurl {
-    url = "https://gruvbox-wallpapers.pages.dev/wallpapers/photography/DKoRY7F.jpeg";
-    sha256 = "15vvx30kzjk4pfzaa50b42p24z5s7wki10v4jq0wdvgr862a7sdd";
-  };
+  sddm-background = import ../../wallpapers/sunset-field.nix { inherit pkgs; };
   catppuccin-sddm-theme = pkgs.catppuccin-sddm.override {
     flavor = "mocha";
     font = "Noto Sans";
@@ -28,15 +25,13 @@ in
     ./hardware-configuration.nix
     ../../modules/nixos/common/base.nix
     ../../modules/nixos/common/maintenance.nix
-    #../../modules/nixos/bedrock/bedrock-connect.nix
+    ../../modules/nixos/common/hyprland.nix
   ];
 
   virtualisation.podman = {
     enable = true;
     dockerCompat = true; # Optional: adds `docker` CLI alias
     defaultNetwork.settings.dns_enabled = false;
-
-    #networks.bedrockconnectnet.subnet = "10.89.0.0/24";
   };
 
   # Bootloader.
@@ -48,17 +43,6 @@ in
 
   # Enable networking
   networking.networkmanager.enable = true;
-
-  # Enable the X11 windowing system.
-  # You can disable this if you're only using the Wayland session.
-  #services.xserver.enable = true;
-
-  # Enable the KDE Plasma Desktop Environment.
-  #services.desktopManager.plasma6.enable = true;
-
-  # Enable automatic login for the user.
-  #services.displayManager.autoLogin.enable = true;
-  #services.displayManager.autoLogin.user = "john";
 
   # Login graphically
   services.displayManager = {
@@ -72,50 +56,7 @@ in
     defaultSession = "hyprland";
   };
 
-  environment.sessionVariables = {
-    EDITOR = "nvim";
-    MOZ_ENABLE_WAYLAND = "1";
-    QT_QPA_PLATFORM = "wayland";
-  };
-
-  # Enable the gnome-keyring daemon for your user
-  #systemd.user.services.gnome-keyring-daemon = {
-  #  description = "GNOME Keyring Daemon";
-  #  serviceConfig.ExecStart = "${pkgs.gnome-keyring}/bin/gnome-keyring-daemon --start --foreground --components=secrets";
-  #  wantedBy = [ "default.target" ];
-  #};
-
-  # Enable hyprland
-  programs.hyprland = {
-    enable = true;
-    xwayland.enable = true;
-  };
-
-  # Desktop portals
-  services.dbus.enable = true;
-  xdg.portal.enable = true;
-  xdg.portal.extraPortals = [
-    pkgs.xdg-desktop-portal-gtk
-    pkgs.xdg-desktop-portal-hyprland
-  ];
-
-  # Enable CUPS to print documents.
-  services.printing.enable = true;
-
-  # Enable sound with pipewire.
-  services.pulseaudio.enable = false;
-  security.rtkit.enable = true;
-  services.pipewire = {
-    enable = true;
-    alsa.enable = true;
-    alsa.support32Bit = true;
-    pulse.enable = true;
-    jack.enable = true;
-
-    # use the example session manager (no others are packaged yet so this is enabled by default,
-    # no need to redefine it in your config for now)
-    #media-session.enable = true;
-  };
+  services.pipewire.jack.enable = true;
 
   # Define a user account. Don't forget to set a password with ‘passwd’.
   users.users.john = {
@@ -135,34 +76,8 @@ in
     pkgsUnstable.element-desktop
 
     home-manager
-
-    #nerd-fonts.jetbrains-mono
-
-    #sddm-astronaut
-
     catppuccin-sddm-theme
-
   ];
-
-  ## Make sure fonts installed here actually get picked up
-  #fonts.fontconfig.enable = true;
-  #fonts.packages = [ pkgs.nerd-fonts.jetbrains-mono ];
-
-  fonts.fontconfig.enable = true;
-  fonts.packages = with pkgs; [
-    nerd-fonts.jetbrains-mono
-    nerd-fonts.symbols-only
-    noto-fonts
-    noto-fonts-cjk-sans
-    noto-fonts-color-emoji
-    font-awesome
-  ];
-  fonts.fontconfig.defaultFonts = {
-    sansSerif = [ "Noto Sans" ];
-    serif = [ "Noto Serif" ];
-    monospace = [ "JetBrainsMono Nerd Font" ];
-    emoji = [ "Noto Color Emoji" ];
-  };
 
   home-manager = {
     extraSpecialArgs = { inherit inputs; };
@@ -179,22 +94,6 @@ in
     settings.PasswordAuthentication = true; # key only access (set to true rn though)
     settings.PermitRootLogin = "no";
   };
-
-  # Some programs need SUID wrappers, can be configured further or are
-  # started in user sessions.
-  # programs.mtr.enable = true;
-  # programs.gnupg.agent = {
-  #   enable = true;
-  #   enableSSHSupport = true;
-  # };
-
-  # List services that you want to enable:
-
-  # Open ports in the firewall.
-  # networking.firewall.allowedTCPPorts = [ ... ];
-  # networking.firewall.allowedUDPPorts = [ ... ];
-  # Or disable the firewall altogether.
-  # networking.firewall.enable = false;
 
   # This value determines the NixOS release from which the default
   # settings for stateful data, like file locations and database versions

@@ -1,7 +1,13 @@
-{ config, pkgs, inputs, lib, ... }:
+{
+  config,
+  pkgs,
+  inputs,
+  lib,
+  ...
+}:
 let
   gruvboxPlus = import ../../modules/home/gruvbox-plus.nix { inherit pkgs; };
-in 
+in
 {
 
   imports = [
@@ -57,7 +63,6 @@ in
     style.name = config.theme.qt.style;
   };
 
-
   # This value determines the Home Manager release that your configuration is
   # compatible with. This helps avoid breakage when a new Home Manager release
   # introduces backwards incompatible changes.
@@ -69,41 +74,26 @@ in
 
   # The home.packages option allows you to install Nix packages into your
   # environment.
-  home.packages = config.profiles.basePackages ++ (with pkgs; [
-    kdePackages.breeze-icons  # default used by gtk
+  home.packages = with pkgs; [
+    kdePackages.breeze-icons # default used by gtk
 
     # Make Qt applications integrate with GNOME stylings
-    adwaita-qt           # Qt style that matches Adwaita
+    adwaita-qt # Qt style that matches Adwaita
     qt6.qtwayland
     qt5.qtwayland
 
     # Compress videos before storage
     ffmpeg
-    
+
     # Interact with iCloud photos
     icloudpd
     ripgrep
 
     # Full suite of tools (calc == excel)
     libreoffice
-  ]);
+  ];
 
-
-  # Home Manager is pretty good at managing dotfiles. The primary way to manage
-  # plain files is through 'home.file'.
-  home.file =
-  let
-    sunset-field = builtins.fetchurl {
-      url = "https://gruvbox-wallpapers.pages.dev/wallpapers/photography/DKoRY7F.jpeg";
-      sha256 = "15vvx30kzjk4pfzaa50b42p24z5s7wki10v4jq0wdvgr862a7sdd";
-    };
-  in {
-    # Default wallpaper
-    "Pictures/Wallpapers/sunset-field.jpg".source = sunset-field;
-
+  home.file."Pictures/Wallpapers/sunset-field.jpg".source = import ../../wallpapers/sunset-field.nix {
+    inherit pkgs;
   };
-
-  # Let Home Manager install and manage itself.
-  # Moved to base.nix
-  # programs.home-manager.enable = true;
 }

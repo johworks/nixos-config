@@ -10,27 +10,16 @@
     ../beads
   ];
 
-  # Shared Home Manager defaults for every host. Override with lib.mkForce
-  # in downstream profiles or host modules when a machine needs a different
-  # value, e.g.
-  #   home.sessionVariables.EDITOR = lib.mkForce "helix";
-
-  options = {
-    # Default packages for all configs
-    profiles.basePackages = lib.mkOption {
-      type = with lib.types; listOf package;
-      default = with pkgs; [
-        gnumake
-        tree
-        sops
-        nodejs
-        bubblewrap
-        mcp-proxy
-      ];
-    };
-  };
-
   config = {
+
+    home.packages = with pkgs; [
+      gnumake
+      tree
+      sops
+      nodejs
+      bubblewrap
+      mcp-proxy
+    ];
 
     home.username = lib.mkDefault "john";
     home.homeDirectory = lib.mkDefault "/home/john";
