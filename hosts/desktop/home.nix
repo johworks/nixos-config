@@ -38,6 +38,7 @@ in
   # Reuse the shared CLI base so desktop gets the same Codex/npm tooling as nuc.
   home.packages = config.profiles.basePackages ++ [
     secureOpencode
+    pkgs.kdePackages.elisa
   ];
 
   xdg.mimeApps.defaultApplications = {
