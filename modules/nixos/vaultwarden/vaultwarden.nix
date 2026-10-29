@@ -87,11 +87,7 @@ in
     # globally used for any host with enableACME = true
     defaults = {
       email = "${myAcmeEmail}";
-      # Use the staging server for testing?
-      # caServer = "https://acme-staging-v02.api.letsencrypt.org/directory";
     };
-    # ensure the nginx challenge makes it through
-    #webroot = "/var/lib/acme/acme-challenges";
   };
 
   #####################################################################
@@ -145,7 +141,6 @@ in
       "network-online.target"
     ];
     wants = [ "network-online.target" ];
-    #unitConfig.ConditionPathExists=!"/run/systemd/system/backup-vaultwarden.service.d"; # harmless; we'll also check in the script
     serviceConfig = {
       Type = "oneshot";
       EnvironmentFile = config.sops.secrets."s3.env".path;

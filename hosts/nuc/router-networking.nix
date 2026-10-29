@@ -129,7 +129,6 @@
         "vlan20"
         "lo"
       ];
-      #bind-interfaces = true;
       # vlan 20 can appear slightly after dnsmasq during boot; synamic binding
       # avoids startup failures on reboot while still restricting interfaces.
       bind-dynamic = true;
@@ -172,12 +171,4 @@
 
   # Use stubby locally instead of ISP-provided resolvers
   networking.nameservers = [ "127.0.0.1" ];
-
-  # Failed wireguard routing
-  #wg-quick.interfaces = {
-  #  wg0 = {
-  #    configFile = "/etc/wireguard/wg0.conf";
-  #    autostart = true;
-  #  };
-  #};
 }

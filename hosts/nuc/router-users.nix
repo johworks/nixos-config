@@ -20,8 +20,6 @@
     openssh.authorizedKeys.keys = [
       "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIC6u080JUBY1CNv0JAsKbTe2pQ4d1cuyFykJrlJ5HIyh desktop->nuc"
     ];
-    #packages = with pkgs; [
-    #];
   };
 
   home-manager = {
