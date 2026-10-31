@@ -106,6 +106,7 @@ in
 
   home.packages = [
     secureOpencode
+    (pkgs.callPackage ./learnharness.nix { })
     pkgs.kdePackages.elisa
   ];
 
