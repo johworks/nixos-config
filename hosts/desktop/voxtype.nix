@@ -47,10 +47,12 @@ in
     };
     Service = {
       ExecStart = "${voxtype}/bin/voxtype --config ${settings} daemon";
+      # wl-copy invokes cat to read piped transcripts from Voxtype.
       Environment = "PATH=${
         pkgs.lib.makeBinPath [
           overlay
           pkgs.wl-clipboard
+          pkgs.coreutils
         ]
       }";
       Restart = "on-failure";
