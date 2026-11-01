@@ -79,6 +79,17 @@ all four compromised chains with certificate-verification errors, while
 `https://example.com/` succeeded. No credentials or exploit payloads were used.
 This verifies TLS trust behavior, not every integration or device workflow.
 
+To repeat these checks inside the running NUC containers:
+
+```sh
+sudo bash scripts/check-container-certificates.sh
+```
+
+The script uses each container's installed urllib, Requests, certifi and pip
+certifi, without restarting containers or installing packages. Expect 20 passing
+checks per container, 40 total. A timeout or DNS error is inconclusive and makes
+the script exit unsuccessfully. The script does not follow HTTP redirects.
+
 The compiled native Stremio candidate passed 55 runtime checks. With no TLS
 flags or certificate environment overrides, FFmpeg and ffprobe rejected all
 four compromised chains directly, through HTTP redirects, and as HTTPS
