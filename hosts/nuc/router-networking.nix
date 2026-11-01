@@ -83,8 +83,9 @@
   qos = {
     enable = true;
     wanInterface = "vlan10";
-    downloadMbit = 900;
-    uploadMbit = 780;
+    # Start at 95% of the 300/300 Mbps plan; tune with loaded latency tests.
+    downloadMbit = 285;
+    uploadMbit = 285;
   };
 
   # DoH + DoT

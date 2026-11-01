@@ -120,9 +120,8 @@
     metrics.enable = true;
     wifi = {
       ssid = "TP-Link_2724";
-      # Adopt the AP's existing settings without changing radio behavior.
       hidden = false;
-      wps = true;
+      wps = false;
       smartConnect = true;
       radios = {
         "2g" = {
