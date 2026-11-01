@@ -37,6 +37,9 @@
       inputs.home-manager.follows = "home-manager";
     };
 
+    # The pinned nixpkgs Voxtype package does not yet include its GTK overlay.
+    voxtype.url = "github:peteonrails/voxtype/v1.1.1";
+
     firefox-addons = {
       url = "gitlab:rycee/nur-expressions?dir=pkgs/firefox-addons";
       inputs.nixpkgs.follows = "nixpkgsUnstable";

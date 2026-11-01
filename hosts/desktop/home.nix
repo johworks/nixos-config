@@ -31,6 +31,7 @@ in
     ../../modules/home/git.nix
     ../../modules/home/ssh.nix
     ./cellular-wallpaper.nix
+    ./voxtype.nix
     (inputs.shared-nvim + "/home-manager/nvim.nix")
   ];
 
