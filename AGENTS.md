@@ -26,6 +26,8 @@ K.I.S.S (Keep It Simple Stupid)
 - Keep diffs small; if touching multiple hosts, say why in the commit.
 - For new files referenced by the flake, use `git add -N <path>` so Nix can see them during eval/build without staging contents.
 - After edits: run formatting, then a quick eval/check.
+- Prefer flake-managed services and host configuration. For temporary trials, identify and communicate any unmanaged services, shortcuts, files, and other host changes; remove them when the trial ends unless the user wants them retained.
+- Before activating a permanent replacement, stop and clean up the trial's conflicting services and shortcuts, then verify the managed service and its controls after activation.
 - Track temporary fixes and review them during input updates using `docs/temporary-fixes.md`; record findings and the next review date in Beads.
 
 ## Commands
