@@ -4,6 +4,9 @@ This flake manages NixOS hosts and Home Manager. Prefer simple, focused changes
 that are easy to read and review. Keep modules cohesive, put host-specific
 settings in the host, and comment non-obvious intent.
 
+This repository is public. Take care not to expose private information in
+configuration, documentation, logs, or commit history.
+
 ## Layout
 
 - `flake.nix` defines the host configurations; `hosts/` holds their settings.
