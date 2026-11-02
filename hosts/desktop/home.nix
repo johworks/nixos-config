@@ -111,10 +111,17 @@ in
     pkgs.kdePackages.elisa
   ];
 
-  xdg.mimeApps.defaultApplications = {
-    "x-scheme-handler/grokbot" = [ "grok-bot.desktop" ];
-    "x-scheme-handler/sand" = [ "grok-bot.desktop" ];
+  xdg.mimeApps = {
+    enable = true;
+    defaultApplications = {
+      "application/vnd.apple.mpegurl" = [ "vlc.desktop" ];
+      "audio/x-mpegurl" = [ "vlc.desktop" ];
+      "x-scheme-handler/grokbot" = [ "grok-bot.desktop" ];
+      "x-scheme-handler/sand" = [ "grok-bot.desktop" ];
+    };
   };
+  # Replace the existing desktop-generated file with the managed associations.
+  xdg.configFile."mimeapps.list".force = true;
 
   # Preserve host keys learned by SSH instead of replacing them with the shared list.
   home.file.".ssh/known_hosts".enable = false;
