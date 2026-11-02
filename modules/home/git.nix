@@ -1,6 +1,6 @@
 { lib, options, ... }:
 let
-  gitEmail = "githubcommits.credibly138@passinbox.com";
+  gitEmail = "162722452+johworks@users.noreply.github.com";
   gitSettings = {
     init.defaultBranch = "main";
     core.editor = "nvim";
