@@ -1,7 +1,7 @@
-{config, pkgs, ...}: 
+{ config, pkgs, ... }:
 let
   configDir = "/var/lib/pihole";
-in 
+in
 {
 
   systemd.tmpfiles.rules = [
@@ -17,22 +17,30 @@ in
     image = "pihole/pihole:latest";
     environment = {
       TZ = "America/New_York";
-      WEBPASSWORD = "admin";  # Change this!
       FTLCONF_dns_upstreams = "1.1.1.1;9.9.9.9";
       FTLCONF_webserver_port = "8000";
     };
+    # Provision a protected dotenv file with WEBPASSWORD before enabling.
+    environmentFiles = [ "/run/secrets/pihole.env" ];
     volumes = [
       "${configDir}/etc-pihole:/etc/pihole"
       "${configDir}/etc-dnsmasq.d:/etc/dnsmasq.d"
     ];
-    extraOptions = [ 
+    extraOptions = [
       "--cap-add=NET_ADMIN"
       "--cap-add=NET_RAW"
       "--network=host"
     ];
   };
 
-  networking.firewall.allowedUDPPorts = [ 53 67 ];
-  networking.firewall.allowedTCPPorts = [ 53 67 8000 ];
+  networking.firewall.allowedUDPPorts = [
+    53
+    67
+  ];
+  networking.firewall.allowedTCPPorts = [
+    53
+    67
+    8000
+  ];
 
 }

@@ -9,7 +9,6 @@ let
   domain = "goobhub.org";
   matrixRtcDomain = "matrix-rtc.${domain}";
   turnDomain = "turn.${domain}";
-  myAcmeEmail = "viridianveil@protonmail.com";
 in
 {
   sops.secrets."matrix-rtc-livekit-secret" = {
@@ -117,11 +116,6 @@ in
       recordName = turnDomain;
     }
   ];
-
-  security.acme = {
-    acceptTerms = true;
-    defaults.email = myAcmeEmail;
-  };
 
   networking.firewall = {
     enable = true;

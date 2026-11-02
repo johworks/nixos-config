@@ -116,7 +116,7 @@ replace a client association test with the desired password.
 
 ### Declarative Wi-Fi settings
 
-`services.ax1450.wifi.ssid` and the sops secret `ax1450_wifi_psk` continue to
+The SOPS secrets `ax1450_wifi_ssid` and `ax1450_wifi_psk` continue to
 manage the same main network on both bands. Additional options default to
 `null`, which leaves the corresponding vendor setting unmanaged. Removing
 an option therefore releases ownership; it does not restore a factory value.
@@ -144,7 +144,6 @@ For example, to select a 20 MHz channel on 2.4 GHz and disable WPS:
 
 ```nix
 services.ax1450.wifi = {
-  ssid = "TP-Link_2724";
   wps = false;
   radios."2g" = {
     channel = 6;
@@ -250,11 +249,11 @@ enable the stock server's session flag; no unauthenticated telnet was used.
 
 ## Local private files
 
-`.ax1450-private/` at the repository root is mode 700 and excluded via
-`.git/info/exclude`. It contains the original configuration backup, the
+`.ax1450-private/` at the repository root is mode 700 and excluded by
+`.gitignore`. It contains the original configuration backup, the
 dedicated SSH key, the modified backup, and its decoded bootstrap script.
 Backup files and keys must never be staged or committed. Browser artifacts
-are separately excluded through the same local Git exclusion file.
+are separately excluded by `.gitignore`.
 
 From the repository root, prepare a new output file with Python and OpenSSL:
 

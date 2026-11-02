@@ -8,3 +8,12 @@ experiments/qos-tune/
 /result-*
 /.ha-ac-analysis/
 /.beads.gate.lock
+# Local browser sessions, router backups/keys, and imported finance data.
+/.ax1450-private/
+/.playwright-mcp/
+.finance-data/
+# Common local credential files; tracked SOPS files are unaffected.
+.env
+.env.*
+*.pem
+*.key

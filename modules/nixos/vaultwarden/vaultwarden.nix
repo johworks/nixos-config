@@ -9,7 +9,6 @@
 let
   myDomain = "vault.goobhub.org";
   myZoneName = "goobhub.org";
-  myAcmeEmail = "viridianveil@protonmail.com";
   backupDir = "/data/vaultwarden/backups";
 in
 {
@@ -42,8 +41,14 @@ in
       DOMAIN = "https://${myDomain}";
 
       SIGNUPS_ALLOWED = false;
-      ADMIN_TOKEN = "$argon2id$v=19$m=65540,t=3,p=4$aRPjxTgv5LL3fD9Tv4cV+ksx1odV6IN7TA/leVyBQNQ$fHUzPUj6Vwgg6wToZSQLdm5GEp86G1eENPtr0wBFcSU";
     };
+    environmentFile = config.sops.secrets."vaultwarden-admin.env".path;
+  };
+
+  sops.secrets."vaultwarden-admin.env" = {
+    sopsFile = ./secrets/admin.env;
+    format = "dotenv";
+    restartUnits = [ "vaultwarden.service" ];
   };
 
   #####################################################################
@@ -76,17 +81,6 @@ in
           proxy_set_header X-Forwarded-Proto $scheme;
         '';
       };
-    };
-  };
-
-  #####################################################################
-  # 3. ACME global settings
-  #####################################################################
-  security.acme = {
-    acceptTerms = true;
-    # globally used for any host with enableACME = true
-    defaults = {
-      email = "${myAcmeEmail}";
     };
   };
 

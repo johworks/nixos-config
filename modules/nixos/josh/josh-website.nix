@@ -3,8 +3,7 @@
 let
   myDomain0 = "joshnaked.com";
   myDomain1 = "joshnaked.gay";
-  myAcmeEmail = "viridianveil@protonmail.com";
-in 
+in
 {
   #####################################################################
   # Ensure the directory exists on boot
@@ -21,8 +20,13 @@ in
 
     # Internal server serving the website on localhost:8223
     virtualHosts.static = {
-      listen = [ { addr = "127.0.0.1"; port = 8223; } ];
-      root   = "/var/www/josh_website";
+      listen = [
+        {
+          addr = "127.0.0.1";
+          port = 8223;
+        }
+      ];
+      root = "/var/www/josh_website";
       extraConfig = ''
         index index.html;
       '';
@@ -30,43 +34,40 @@ in
 
     # Two domains:
     virtualHosts."${myDomain0}" = {
-      forceSSL   = true;
+      forceSSL = true;
       enableACME = true;
 
       locations."/" = {
-        proxyPass       = "http://127.0.0.1:8223";
+        proxyPass = "http://127.0.0.1:8223";
         proxyWebsockets = true;
       };
     };
     virtualHosts."${myDomain1}" = {
-      forceSSL   = true;
+      forceSSL = true;
       enableACME = true;
 
       locations."/" = {
-        proxyPass       = "http://127.0.0.1:8223";
+        proxyPass = "http://127.0.0.1:8223";
         proxyWebsockets = true;
       };
     };
 
   };
 
-
   #####################################################################
   # ACME global settings
   #####################################################################
-  security.acme = {
-    acceptTerms = true;
-    # globally used for any host with enableACME = true
-    defaults = {
-      email  = "${myAcmeEmail}";
-    };
-  };
+  # The host supplies the ACME contact address.
+  security.acme.acceptTerms = true;
 
   #####################################################################
   # Firewall
   #####################################################################
   networking.firewall = {
-    allowedTCPPorts = [ 80 443 ];
+    allowedTCPPorts = [
+      80
+      443
+    ];
     enable = true;
   };
 

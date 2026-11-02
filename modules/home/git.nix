@@ -1,5 +1,6 @@
 { lib, options, ... }:
 let
+  gitEmail = "githubcommits.credibly138@passinbox.com";
   gitSettings = {
     init.defaultBranch = "main";
     core.editor = "nvim";
@@ -9,19 +10,18 @@ in
 {
   # Keep one module working across the newer laptop/desktop Home Manager and the
   # older stable Home Manager used on the NUC.
-  programs.git =
-    {
-      enable = true;
-    }
-    // lib.optionalAttrs (options.programs.git ? settings) {
-      settings = gitSettings // {
-        user.name = "John";
-        user.email = "jworks2507@gmail.com";
-      };
-    }
-    // lib.optionalAttrs (!(options.programs.git ? settings)) {
-      userName = "John";
-      userEmail = "jworks2507@gmail.com";
-      extraConfig = gitSettings;
+  programs.git = {
+    enable = true;
+  }
+  // lib.optionalAttrs (options.programs.git ? settings) {
+    settings = gitSettings // {
+      user.name = "John";
+      user.email = gitEmail;
     };
+  }
+  // lib.optionalAttrs (!(options.programs.git ? settings)) {
+    userName = "John";
+    userEmail = gitEmail;
+    extraConfig = gitSettings;
+  };
 }

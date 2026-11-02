@@ -1,9 +1,10 @@
 #!/bin/sh
-# Runs ON the Archer AX1450. The NUC sends PSK_B64 and public settings as
+# Runs ON the Archer AX1450. The NUC sends SSID_B64, PSK_B64 and settings as
 # shell assignments over stdin before this script, never in process argv.
 set -eu
 umask 077
 export PATH=/sbin:/usr/sbin:/bin:/usr/bin
+export LC_ALL=C
 
 fail() {
   echo "FAIL: $1" >&2
@@ -13,6 +14,17 @@ fail() {
 work=$(mktemp -d /tmp/ax1450-reconcile.XXXXXX)
 trap 'rm -rf "$work"' EXIT
 trap 'exit 1' HUP INT TERM
+
+# Preserve trailing newlines until validation; command substitution alone
+# would silently strip them and change the network name.
+ssid=$(printf '%s' "$SSID_B64" | /usr/bin/openssl base64 -d -A && printf '.') || fail "cannot decode Wi-Fi name"
+SSID=${ssid%.}
+[ "${#SSID}" -ge 1 ] && [ "${#SSID}" -le 32 ] || fail "invalid Wi-Fi name length"
+cr=$(printf '\r')
+case "$SSID" in
+  *'
+'*|*"$cr"*) fail "Wi-Fi name must be a single line" ;;
+esac
 
 psk=$(printf '%s' "$PSK_B64" | /usr/bin/openssl base64 -d -A) || fail "cannot decode Wi-Fi password"
 [ "${#psk}" -ge 8 ] && [ "${#psk}" -le 64 ] || fail "invalid Wi-Fi password length"

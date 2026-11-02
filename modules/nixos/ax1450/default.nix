@@ -81,7 +81,6 @@ let
 
   remoteScript = pkgs.writeText "ax1450-reconcile-remote" (
     ''
-      SSID=${lib.escapeShellArg cfg.wifi.ssid}
       WIFI_SETTINGS=${lib.escapeShellArg wifiSettings}
       DAY_VALUE=${lib.escapeShellArg dayValue}
       EXPECTED_SHA=${lib.escapeShellArg cfg.expectedBootstrapSha256}
@@ -98,6 +97,7 @@ let
 
   sshKeyPath = config.sops.secrets."ax1450_ssh_key".path;
   pskPath = config.sops.secrets."ax1450_wifi_psk".path;
+  ssidPath = config.sops.secrets."ax1450_wifi_ssid".path;
 
   reconcile = pkgs.writeShellApplication {
     name = "ax1450-reconcile";
@@ -106,12 +106,14 @@ let
       set -euo pipefail
 
       psk_b64=$(base64 -w0 "${pskPath}")
+      ssid_b64=$(base64 -w0 "${ssidPath}")
 
       # Base64 contains no shell metacharacters. Send the assignment and
       # script over stdin so neither SSH nor the remote shell exposes the
-      # password in process arguments.
+      # Wi-Fi name or password in process arguments.
       if ! {
         printf 'PSK_B64=%s\n' "$psk_b64"
+        printf 'SSID_B64=%s\n' "$ssid_b64"
         cat "${remoteScript}"
       } | ssh -F /dev/null \
         -i "${sshKeyPath}" \
@@ -167,10 +169,6 @@ in
     };
 
     wifi = {
-      ssid = lib.mkOption {
-        type = lib.types.str;
-        description = "Desired SSID of the main network (both bands, smart-connect).";
-      };
       hidden = lib.mkOption {
         type = lib.types.nullOr lib.types.bool;
         default = null;
@@ -213,14 +211,6 @@ in
     assertions = [
       {
         assertion =
-          cfg.wifi.ssid != ""
-          && builtins.stringLength cfg.wifi.ssid <= 32
-          && !(lib.hasInfix "\n" cfg.wifi.ssid)
-          && !(lib.hasInfix "\r" cfg.wifi.ssid);
-        message = "services.ax1450.wifi.ssid must contain 1–32 bytes without line breaks.";
-      }
-      {
-        assertion =
           cfg.wifi.radios."5g".channel != 165
           || builtins.elem cfg.wifi.radios."5g".channelWidth [
             null
@@ -235,6 +225,10 @@ in
       restartUnits = [ "ax1450-reconcile.service" ];
     };
     sops.secrets."ax1450_wifi_psk" = {
+      restartUnits = [ "ax1450-reconcile.service" ];
+    };
+    sops.secrets."ax1450_wifi_ssid" = {
+      sopsFile = ./secrets/secrets.yaml;
       restartUnits = [ "ax1450-reconcile.service" ];
     };
 

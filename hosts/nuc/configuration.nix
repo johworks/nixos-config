@@ -106,6 +106,12 @@
 
   services.signalUpdates.enable = true;
 
+  # Certificate contact and terms apply to all HTTPS services on this host.
+  security.acme = {
+    acceptTerms = true;
+    defaults.email = "httpscertificatenoti.online935@passinbox.com";
+  };
+
   # Unmatched names must not fall back to the first public site.
   services.nginx.virtualHosts."default" = {
     default = true;
@@ -119,7 +125,6 @@
     enable = true;
     metrics.enable = true;
     wifi = {
-      ssid = "TP-Link_2724";
       hidden = false;
       wps = false;
       smartConnect = true;

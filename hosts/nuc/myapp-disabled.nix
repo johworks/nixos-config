@@ -28,9 +28,10 @@
 
     reverseProxy = {
       enable = true;
-      hostName = "kensfatcock.com";
+      # Replace the example domain before enabling this template.
+      hostName = "app.example.org";
       # ACME will fail until this is added as a CNAME.
-      # serverAliases = [ "www.kensfatcock.com" ];
+      # serverAliases = [ "www.app.example.org" ];
       enableACME = true;
       forceSSL = true;
     };
@@ -41,7 +42,7 @@
 
     autoDeploy = {
       enable = true;
-      repoUrl = "git+ssh://git@github.com/Cgilrein/super_secret_project.git";
+      repoUrl = "git+ssh://git@github.com/example/example.git";
       branch = "main";
       keyFile = /run/secrets/webapp_deploy_key;
       secretFile = /run/secrets/github_webhook;

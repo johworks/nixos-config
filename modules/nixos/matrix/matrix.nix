@@ -11,7 +11,6 @@ let
   domain = "goobhub.org";
   matrixDomain = "matrix.${domain}";
   matrixRtcDomain = "matrix-rtc.${domain}";
-  myAcmeEmail = "viridianveil@protonmail.com";
   enableFederation = false;
   clientConfig = {
     "m.homeserver".base_url = "https://${matrixDomain}";
@@ -190,11 +189,6 @@ in
       recordName = matrixDomain;
     }
   ];
-
-  security.acme = {
-    acceptTerms = true;
-    defaults.email = myAcmeEmail;
-  };
 
   networking.firewall = {
     allowedTCPPorts = [

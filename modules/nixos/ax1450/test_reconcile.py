@@ -16,7 +16,7 @@ import sys
 import tempfile
 import unittest
 
-SSID = "TP-Link_2724"
+SSID = "Example Lab Network"
 PSK = "test-only-O'Brien$\\password"
 DAY = "* mkdir -p /etc/ax1450; /usr/bin/nvrammanager -r /etc/ax1450/payload.b64 -p router-config; /usr/bin/openssl base64 -d -A -in /etc/ax1450/payload.b64 | tee /etc/ax1450/bootstrap.sh | /bin/sh #"
 COMMANDS = {
@@ -291,7 +291,7 @@ class ReconcileTests(unittest.TestCase):
         )
         values = {
             "PSK_B64": base64.b64encode(psk.encode()).decode(),
-            "SSID": ssid,
+            "SSID_B64": base64.b64encode(ssid.encode()).decode(),
             "WIFI_SETTINGS": settings,
             "DAY_VALUE": DAY,
             "EXPECTED_SHA": self.sha,
@@ -585,6 +585,12 @@ smart smart_enable off
         self.assert_failure(self.run_reconcile(psk="short"))
         self.assertFalse((self.root / "bootstrap-ran").exists())
 
+    def test_invalid_ssid_does_not_change_device(self):
+        for ssid in ("", "x" * 33, "name\n", "name\r"):
+            with self.subTest(ssid=repr(ssid)):
+                self.assert_failure(self.run_reconcile(ssid=ssid))
+                self.assertFalse((self.root / "bootstrap-ran").exists())
+
     @unittest.skipUnless(
         os.environ.get("AX1450_TEST_WRAPPER"), "Nix-built wrapper required"
     )
@@ -592,7 +598,10 @@ smart smart_enable off
         wrapper = Path(os.environ["AX1450_TEST_WRAPPER"]).read_text()
         secret = self.root / "password"
         secret.write_text(PSK)
+        ssid_secret = self.root / "ssid"
+        ssid_secret.write_text(SSID)
         wrapper = wrapper.replace("/run/secrets/ax1450_wifi_psk", str(secret))
+        wrapper = wrapper.replace("/run/secrets/ax1450_wifi_ssid", str(ssid_secret))
         wrapper = wrapper.replace(
             "ssh -F /dev/null", f"{self.root}/bin/ssh -F /dev/null"
         )
@@ -606,6 +615,10 @@ smart smart_enable off
         self.assertNotIn(PSK, json.dumps(state["calls"]))
         self.assertNotIn(encoded, json.dumps(state["calls"]))
         self.assertTrue(state["ssh_stdin"].startswith(f"PSK_B64={encoded}\n"))
+        ssid_encoded = base64.b64encode(SSID.encode()).decode()
+        self.assertIn(f"SSID_B64={ssid_encoded}\n", state["ssh_stdin"])
+        self.assertNotIn(SSID, json.dumps(state["calls"]))
+        self.assertNotIn(ssid_encoded, json.dumps(state["calls"]))
         self.assertIn("wifi_config_matches", state["ssh_stdin"])
         self.assertIn("wl1 channel auto", state["ssh_stdin"])
         self.assertIn("wl0 channel 157", state["ssh_stdin"])
