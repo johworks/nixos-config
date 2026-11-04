@@ -14,6 +14,12 @@ lovelace:
       title: AC Costs
       icon: mdi:air-conditioner
       show_in_sidebar: true
+    lamp-managed:
+      mode: yaml
+      filename: dashboards/lamp.yaml
+      title: Lamp
+      icon: mdi:lamp
+      show_in_sidebar: true
 
 automation: !include automations.yaml
 script: !include scripts.yaml

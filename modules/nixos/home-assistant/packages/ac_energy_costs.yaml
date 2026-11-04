@@ -163,8 +163,9 @@ template:
         unit_of_measurement: W
         device_class: power
         state_class: measurement
+        # This plug now powers a lamp; retain AC history without counting it.
         state: >
-          {{ states('sensor.james_and_johns_room_kauf_plug_johns_ac_power') | float(0) | round(1) }}
+          {{ 0 }}
 
       - name: Johns Room AC Daily Energy
         unique_id: johns_room_ac_daily_energy

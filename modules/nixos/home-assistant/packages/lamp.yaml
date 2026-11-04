@@ -1,0 +1,31 @@
+homeassistant:
+  customize:
+    switch.james_and_johns_room_kauf_plug_johns_ac:
+      friendly_name: Lamp
+      icon: mdi:lamp
+
+input_boolean:
+  lamp_wake_up_enabled:
+    name: Wake-up timer
+    icon: mdi:alarm
+
+input_datetime:
+  lamp_wake_up_time:
+    name: Turn on at
+    has_date: false
+    has_time: true
+
+automation:
+  - id: lamp_wake_up
+    alias: Turn on the lamp at the wake-up time
+    triggers:
+      - trigger: time
+        at: input_datetime.lamp_wake_up_time
+    conditions:
+      - condition: state
+        entity_id: input_boolean.lamp_wake_up_enabled
+        state: "on"
+    actions:
+      - action: switch.turn_on
+        target:
+          entity_id: switch.james_and_johns_room_kauf_plug_johns_ac
