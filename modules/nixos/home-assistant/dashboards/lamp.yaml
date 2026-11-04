@@ -12,14 +12,16 @@ views:
             icon: mdi:lamp
 
       - type: entities
-        title: Wake-up timer
+        title: Daily schedule
         entities:
-          - entity: input_boolean.lamp_wake_up_enabled
-            name: Turn on automatically
-          - entity: input_datetime.lamp_wake_up_time
+          - entity: input_boolean.lamp_schedule_enabled
+            name: Schedule enabled
+          - entity: input_datetime.lamp_on_time
             name: Turn on at
+          - entity: input_datetime.lamp_off_time
+            name: Turn off at
 
       - type: markdown
         content: >-
-          When enabled, the timer turns the lamp on every day at the chosen
-          time. Turn the lamp off whenever you like.
+          When enabled, the schedule turns the lamp on and off at the chosen
+          times every day.
