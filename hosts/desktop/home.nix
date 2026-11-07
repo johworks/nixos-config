@@ -71,6 +71,12 @@ in
     Unit.PartOf = lib.mkForce [ "hyprland-session.target" ];
     Install.WantedBy = lib.mkForce [ "hyprland-session.target" ];
   };
+  # A warm focus ring stands apart from the blue ice landscape and inactive windows.
+  wayland.windowManager.hyprland.settings.general = {
+    border_size = lib.mkForce 4;
+    "col.active_border" = lib.mkForce "rgb(ffc857)";
+    "col.inactive_border" = lib.mkForce "rgb(71869f)";
+  };
   wayland.windowManager.hyprland.settings.bind = [
     "CTRL ALT, T, exec, kitty"
     "SUPER, B, exec, firefox"

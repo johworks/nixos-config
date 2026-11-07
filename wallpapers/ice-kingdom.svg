@@ -13,14 +13,6 @@
   </g>
   <path fill="#41799a" d="M0 900 230 620 395 790 630 510 865 810 1100 580 1330 815 1570 565 1830 830 2070 590 2350 820 2560 610v830H0z"/>
   <path fill="#6cabc3" d="m0 1000 255-250 180 175 290-300 240 295 210-205 250 245 300-295 245 280 250-205 340 260v440H0z"/>
-  <!-- A small, crystalline kingdom sits against the mountains. -->
-  <g stroke="#c2f9fa" stroke-width="5" stroke-linejoin="round">
-    <path fill="#448dac" d="M1020 1000V700l70-90 70 90v300zm180 0V560l80-120 80 120v440zm200 0V710l70-90 70 90v290z"/>
-    <path fill="#8cdae4" d="m1090 610 70 90h-140zm190-170 80 120h-160zm190 180 70 90h-140z"/>
-    <path fill="#61b6cc" d="M1120 1000V760h320v240z"/>
-    <path fill="#174766" d="M1240 1000V850q40-70 80 0v150z"/>
-    <path fill="none" d="M1280 440V340m-26 43 26-43 26 43m-216 227v-65m380 75v-65"/>
-  </g>
   <path fill="url(#snow)" d="M0 1090q280-140 520-10t510 5q270-120 520 5t520-5q250-110 490 0v355H0z"/>
   <path fill="#b9edf0" d="M0 1260q300-120 620 10t660-5q300-125 620 5t660-10v180H0z"/>
   <g fill="url(#ice)" stroke="#d6ffff" stroke-width="4" opacity=".9">
