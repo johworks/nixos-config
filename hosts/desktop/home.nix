@@ -37,11 +37,19 @@ in
 
   services.nixosUpdatePreparation.enable = true;
 
+  programs.kitty.enable = true;
+
   programs.plasma = {
     enable = true;
+    configFile.kdeglobals.General = {
+      TerminalApplication = "kitty";
+      TerminalService = "kitty.desktop";
+    };
     # Set the count without replacing KWin's existing desktop IDs.
     configFile.kwinrc.Desktops.Number = 10;
     shortcuts = {
+      "org.kde.konsole.desktop"._launch = [ ];
+      "kitty.desktop"._launch = "Ctrl+Alt+T";
       kwin = {
         "Switch to Desktop 1" = [
           "Ctrl+F1"
