@@ -42,7 +42,10 @@ in
   # The shared schedule requests the NUC, whose private flake is not yet supported.
   services.nixosUpdatePreparation.schedule = false;
 
-  programs.kitty.enable = true;
+  programs.kitty = {
+    enable = true;
+    settings.window_padding_width = 8;
+  };
 
   # Plasma remains available in SDDM while the new session is tested.
   desktop.hyprland = {
