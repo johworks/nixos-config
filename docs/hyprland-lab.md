@@ -176,9 +176,10 @@ there is no separate lab theme or duplicate desktop design to keep in sync.
 
 The desktop configuration offers Hyprland alongside Plasma in SDDM. Select
 Hyprland at login to try it; Plasma remains available as a fallback. The
-desktop uses automatic monitor detection and Hyprland's default wallpaper:
-the animated pixel-weather wallpaper is a Plasma plugin and does not run in
-Hyprland. The laptop's applications and wallpaper are not imported.
+desktop uses automatic monitor detection and an Ice Kingdom-inspired palette
+and wallpaper drawn in SVG and rendered by Nix. The animated pixel-weather
+wallpaper is a Plasma plugin and does not run in Hyprland. The laptop's
+applications and wallpaper are not imported.
 
 In Hyprland, Super+R opens the application launcher, Super+B opens Firefox,
 Super+Q or Ctrl+Alt+T opens Kitty, Super+E opens the file manager, and Super+L

@@ -50,7 +50,20 @@ in
   # Plasma remains available in SDDM while the new session is tested.
   desktop.hyprland = {
     enable = true;
-    wallpaper = null;
+    wallpaper = "${import ../../wallpapers/ice-kingdom.nix { inherit pkgs; }}";
+  };
+  theme = {
+    name = "ice-kingdom";
+    colors = {
+      background = "#0b2035";
+      surface = "#15354d";
+      surfaceAlt = "#28536b";
+      foreground = "#e2f8fa";
+      muted = "#9cc5d2";
+      accent = "#91e0e9";
+      accentAlt = "#b4d9f1";
+      alert = "#ff9c9c";
+    };
   };
   programs.hyprlock.enable = true;
   # Do not start the Hyprland bar in the Plasma fallback session.

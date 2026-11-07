@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="2560" height="1440" viewBox="0 0 2560 1440">
+  <defs>
+    <linearGradient id="sky" x2="0" y2="1"><stop stop-color="#081c38"/><stop offset=".55" stop-color="#285d80"/><stop offset="1" stop-color="#a3dbe4"/></linearGradient>
+    <linearGradient id="snow" x2="0" y2="1"><stop stop-color="#c5f4f5"/><stop offset="1" stop-color="#518fae"/></linearGradient>
+    <linearGradient id="ice" x2="1" y2="1"><stop stop-color="#b4f3f4"/><stop offset="1" stop-color="#337596"/></linearGradient>
+    <radialGradient id="glow"><stop stop-color="#d8ffff" stop-opacity=".48"/><stop offset="1" stop-color="#b8f9ff" stop-opacity="0"/></radialGradient>
+  </defs>
+  <path fill="url(#sky)" d="M0 0h2560v1440H0z"/>
+  <circle cx="1860" cy="350" r="340" fill="url(#glow)"/>
+  <circle cx="1860" cy="350" r="95" fill="#d8fafa" opacity=".8"/>
+  <g fill="#e4ffff" opacity=".7">
+    <circle cx="190" cy="160" r="3"/><circle cx="410" cy="290" r="4"/><circle cx="710" cy="120" r="3"/><circle cx="950" cy="250" r="3"/><circle cx="1230" cy="100" r="4"/><circle cx="1490" cy="270" r="3"/><circle cx="2200" cy="140" r="4"/><circle cx="2380" cy="360" r="3"/>
+  </g>
+  <path fill="#41799a" d="M0 900 230 620 395 790 630 510 865 810 1100 580 1330 815 1570 565 1830 830 2070 590 2350 820 2560 610v830H0z"/>
+  <path fill="#6cabc3" d="m0 1000 255-250 180 175 290-300 240 295 210-205 250 245 300-295 245 280 250-205 340 260v440H0z"/>
+  <!-- A small, crystalline kingdom sits against the mountains. -->
+  <g stroke="#c2f9fa" stroke-width="5" stroke-linejoin="round">
+    <path fill="#448dac" d="M1020 1000V700l70-90 70 90v300zm180 0V560l80-120 80 120v440zm200 0V710l70-90 70 90v290z"/>
+    <path fill="#8cdae4" d="m1090 610 70 90h-140zm190-170 80 120h-160zm190 180 70 90h-140z"/>
+    <path fill="#61b6cc" d="M1120 1000V760h320v240z"/>
+    <path fill="#174766" d="M1240 1000V850q40-70 80 0v150z"/>
+    <path fill="none" d="M1280 440V340m-26 43 26-43 26 43m-216 227v-65m380 75v-65"/>
+  </g>
+  <path fill="url(#snow)" d="M0 1090q280-140 520-10t510 5q270-120 520 5t520-5q250-110 490 0v355H0z"/>
+  <path fill="#b9edf0" d="M0 1260q300-120 620 10t660-5q300-125 620 5t660-10v180H0z"/>
+  <g fill="url(#ice)" stroke="#d6ffff" stroke-width="4" opacity=".9">
+    <path d="m90 1440 70-330 75 330z"/><path d="m195 1440 105-220 65 220z"/><path d="m2210 1440 100-300 70 300z"/><path d="m2340 1440 90-390 100 390z"/>
+  </g>
+  <g fill="none" stroke="#e6ffff" stroke-width="3" opacity=".55">
+    <path d="M280 460v45m-22-22h45m-38-16 30 32m0-32-30 32"/><path d="M2100 500v45m-22-22h45m-38-16 30 32m0-32-30 32"/>
+  </g>
+</svg>
