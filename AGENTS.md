@@ -20,6 +20,9 @@ configuration, documentation, logs, or commit history.
   `bd dolt commit`. See `docs/beads.md` for this repo's shared database and
   recovery workflow; do not run `bd dolt push`, `bd dolt pull`, or
   `bd bootstrap` here. Otherwise, proceed without Beads.
+- Record agent friction encountered in the NixOS environment in Beads, including
+  context, symptoms, and any workaround; if Beads is unavailable, create or
+  update `docs/agent-friction.md` for follow-up.
 - For new files referenced by the flake, use `git add -N <path>` so Nix can
   see them during evaluation.
 - Format changes and run checks appropriate to their scope. Use the Nix daemon
