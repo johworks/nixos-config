@@ -44,3 +44,21 @@ configuration, documentation, logs, or commit history.
 
 Use focused commits with concise summaries. Create a `feat/` branch for new
 features, keep it current with main, and merge without a PR.
+
+Follow [the worktree workflow](docs/worktrees.md) for repository changes:
+
+- One task, one owner, one worktree, one branch. Before editing, inspect all
+  outstanding Beads tasks for related work, not just `bd ready`; record overlap
+  and dependencies, and repeat the check when scope changes.
+- Create task worktrees only under `/home/john/nixos-config/.worktrees/`, named
+  `<task-id>-<slug>`, with branch `feat/<task-id>-<slug>`. Never use `/tmp`.
+  Record the absolute path, branch, scope, and owner in Beads.
+- Keep the primary checkout on `main` for integration. Edit and commit only in
+  your task worktree; do not stash, reset, clean, or switch another task's files.
+- Hold the shared integration lock while updating main, bringing the task up
+  to date, validating the combined result, and merging. Other worktrees may
+  continue development. Separate clones must coordinate a single integrator.
+- After verified integration, remove only your clean, merged worktree and
+  branch using non-force Git commands, then close the task and checkpoint Beads.
+  For paused work, record progress and why the worktree is retained. Never infer
+  abandonment from age or remove existing worktrees as incidental cleanup.

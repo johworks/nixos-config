@@ -8,6 +8,7 @@ experiments/qos-tune/
 /result-*
 /.ha-ac-analysis/
 /.beads.gate.lock
+/.worktrees/
 # Local browser sessions, router backups/keys, and imported finance data.
 /.ax1450-private/
 /.playwright-mcp/
