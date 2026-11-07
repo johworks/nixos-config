@@ -57,6 +57,7 @@ in
   };
   wayland.windowManager.hyprland.settings.bind = [
     "CTRL ALT, T, exec, kitty"
+    "SUPER, B, exec, firefox"
     "SUPER SHIFT, D, exec, voxtype record toggle"
     "SUPER, L, exec, hyprlock"
   ];

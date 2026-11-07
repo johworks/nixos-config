@@ -180,8 +180,9 @@ desktop uses automatic monitor detection and Hyprland's default wallpaper:
 the animated pixel-weather wallpaper is a Plasma plugin and does not run in
 Hyprland. The laptop's applications and wallpaper are not imported.
 
-In Hyprland, Super+R opens the application launcher, Super+Q or Ctrl+Alt+T
-opens Kitty, Super+E opens the file manager, and Super+L locks the screen.
+In Hyprland, Super+R opens the application launcher, Super+B opens Firefox,
+Super+Q or Ctrl+Alt+T opens Kitty, Super+E opens the file manager, and Super+L
+locks the screen.
 Super+1 through Super+0 select workspaces 1 through 10; add Shift to move the
 focused window and follow it. Super+Shift+D toggles voice dictation, as on
 Plasma. Super+M exits the session. Locking is manual; this profile does not
