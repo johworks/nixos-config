@@ -174,17 +174,23 @@ Keep Plasma as the working desktop until the shared Hyprland profile meets
 the desired behavior. The lab already imports the laptop's configuration;
 there is no separate lab theme or duplicate desktop design to keep in sync.
 
-After lab iterations are stable, enable the NixOS Hyprland session alongside
-Plasma on `desktop`, import the existing Wayland Home Manager profile, and
-select Hyprland once from SDDM while preserving Plasma as a fallback. Bring
-over the desired theme settings explicitly rather than importing the entire
-laptop home configuration into the desktop: it also selects laptop applications.
-Keep desktop-specific monitor, GPU and wallpaper choices local to the desktop.
+The desktop configuration offers Hyprland alongside Plasma in SDDM. Select
+Hyprland at login to try it; Plasma remains available as a fallback. The
+desktop uses automatic monitor detection and Hyprland's default wallpaper:
+the animated pixel-weather wallpaper is a Plasma plugin and does not run in
+Hyprland. The laptop's applications and wallpaper are not imported.
+
+In Hyprland, Super+R opens the application launcher, Super+Q or Ctrl+Alt+T
+opens Kitty, Super+E opens the file manager, and Super+L locks the screen.
+Super+1 through Super+0 select workspaces 1 through 10; add Shift to move the
+focused window and follow it. Super+Shift+D toggles voice dictation, as on
+Plasma. Super+M exits the session. Locking is manual; this profile does not
+configure an idle or suspend lock.
 
 Then test the physical desktop's monitors/scaling, GPU, audio, screen sharing,
 lock/unlock, suspend/resume and daily applications. Only after those checks
-should Hyprland become the default session. This feature changes no desktop
-session selection and performs no physical host switch.
+should Hyprland become the default session. Selecting the session does not
+change the physical host configuration.
 
 ## Validation and sources
 

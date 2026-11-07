@@ -11,6 +11,7 @@
     ./hardware-configuration.nix
     ../../modules/nixos/common/base.nix
     ../../modules/nixos/common/maintenance.nix
+    ../../modules/nixos/common/hyprland.nix
   ];
 
   # Lanzaboote signs the NixOS boot chain for UEFI Secure Boot.
@@ -68,6 +69,7 @@
   # Enable the KDE Plasma Desktop Environment.
   services.displayManager.sddm.enable = true;
   services.desktopManager.plasma6.enable = true;
+  programs.hyprlock.enable = true;
 
   # Keep the session bus unchanged during the security upgrade; migrate separately.
   services.dbus.implementation = "dbus";

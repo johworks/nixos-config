@@ -3,6 +3,7 @@
   pkgs,
   inputs,
   osConfig,
+  lib,
   ...
 }:
 
@@ -25,6 +26,7 @@ in
     inputs.plasma-manager.homeModules.plasma-manager
     ../../modules/home/profiles/base.nix
     ../../modules/home/profiles/desktop.nix
+    ../../modules/home/profiles/wayland.nix
     ../../modules/home/codex/playwright.nix
     ../../modules/home/codex/vm-lab.nix
     ../../modules/home/update-preparation.nix
@@ -41,6 +43,23 @@ in
   services.nixosUpdatePreparation.schedule = false;
 
   programs.kitty.enable = true;
+
+  # Plasma remains available in SDDM while the new session is tested.
+  desktop.hyprland = {
+    enable = true;
+    wallpaper = null;
+  };
+  programs.hyprlock.enable = true;
+  # Do not start the Hyprland bar in the Plasma fallback session.
+  systemd.user.services.waybar = {
+    Unit.PartOf = lib.mkForce [ "hyprland-session.target" ];
+    Install.WantedBy = lib.mkForce [ "hyprland-session.target" ];
+  };
+  wayland.windowManager.hyprland.settings.bind = [
+    "CTRL ALT, T, exec, kitty"
+    "SUPER SHIFT, D, exec, voxtype record toggle"
+    "SUPER, L, exec, hyprlock"
+  ];
 
   programs.plasma = {
     enable = true;
