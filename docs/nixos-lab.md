@@ -58,3 +58,54 @@ Hardware, secrets, services and desktop assumptions vary between flakes. A VM
 does not validate physical GPU, monitors, bootloader, suspend, or peripherals.
 The original [Hyprland lab](hyprland-lab.md) retains its compositor-specific
 input and verification tools.
+
+## Desktop agent permissions
+
+Desktop Home Manager installs `nixos-lab` and a Codex command approval rule for
+its exact immutable `/nix/store/.../bin/nixos-lab` path. Resolve it once:
+
+```sh
+readlink -f "$(command -v nixos-lab)"
+```
+
+Use the returned absolute path directly for subsequent tool calls, with normal
+selection arguments. Request execution outside the sandbox as ordinary `john`,
+not through sudo. The installed rule permits this launcher without repeatedly
+asking for approval. A separately built candidate launcher has a different path
+and intentionally does not inherit this permission. Do not add broad rules for
+Python, shells, QEMU, or mutable paths under `/tmp` or a worktree.
+
+Install the desktop Home Manager configuration once and start a new agent
+session to load its rules. Existing sessions may retain their original rules.
+The rule is in `~/.codex/rules/nixos-vm-lab.rules`; it changes with the installed
+launcher. No NixOS sudo policy is changed. If approval still prompts, compare the
+literal command path with that rule and check which rules the session loaded.
+
+Use a task-specific state directory under the writable workspace, for example
+`/home/john/nixos-config/.worktrees/lab-state/<task-id>`, and a unique SSH port.
+Keep state outside the task checkout and private (0700). Stop the VM and preserve
+useful evidence before cleaning up the worktree. Local Git flakes use explicit
+Git references so untracked sockets, disks, and private files are not copied into
+the Nix store. New source files must be added with `git add -N` before building.
+Guest `exec --root`, `deploy`, and
+`reboot` use the existing guest-only passwordless sudo policy.
+
+The current Codex Linux sandbox hides `/dev/kvm` and the render node. A direct
+write grant for these device files failed in testing with `Not a directory`
+while constructing synthetic `.git`/`.aws` mount paths. Host device permissions
+were already sufficient, so changing groups or making `/dev` broadly writable
+would not address that failure.
+
+This approval grants the launcher ordinary host-user access outside the agent
+sandbox. Only use trusted flakes and compatibility modules: they are evaluated
+on the host and can influence the VM launcher. An immutable command path prevents
+silently replacing the approved program; it does not make malicious inputs safe.
+Do not pass host credentials, sockets, or filesystem shares into guests. Public
+repository contents grant nobody execution access by themselves, but unreviewed
+changes must not be treated as trusted just because they came from this repo.
+
+Running agents inside a dedicated development VM is a separate stronger-isolation
+option. It needs guest-local source and task credentials, model authentication,
+controlled network access, and a reviewed export path for commits. The current
+test guests intentionally have restricted networking and no personal credentials;
+do not copy the host's home directory or authentication state into them.

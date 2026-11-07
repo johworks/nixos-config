@@ -18,9 +18,17 @@ limitations; use a checkout that contains `packages.x86_64-linux.nixos-lab`.
    flake root with `--hardware`. Add a small `--compat` module only for
    host-specific settings incompatible with the guest. The desktop's existing
    compatibility module disables its physical Secure Boot and Windows entry.
-2. Give each experiment its own private `--state` directory and SSH port. State
-   is bound to the selection and persists across restarts. Build the launcher
-   from the lab repository, then use `start` with the selected flake; add
+2. On the desktop, use the Nix-installed launcher: resolve
+   `readlink -f "$(command -v nixos-lab)"`, then invoke that exact store path in
+   subsequent tool calls. Home Manager installs an approval rule for that
+   immutable executable. Request execution outside the device-hiding sandbox
+   as the ordinary host user; the installed rule should approve it without a
+   per-launch prompt. Do not use host sudo. If the rule is missing or the path
+   differs, report the setup gap instead of granting broad shell/Python/QEMU
+   approvals. See `docs/nixos-lab.md` for one-time setup and trust boundaries.
+   Give each experiment its own private `--state` directory and SSH port. State
+   is bound to the selection and persists across restarts. On hosts without the
+   installed launcher, build it from the lab repository. Use `start` with the selected flake; add
    `--window` if a visible QEMU window is useful. The lab needs host KVM and a
    render node; if the agent sandbox hides them, use the normal permission
    mechanism to launch outside it as the ordinary host user.

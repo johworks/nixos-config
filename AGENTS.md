@@ -35,6 +35,10 @@ configuration, documentation, logs, or commit history.
   command to run for the intended host and checkout. Report activation as pending
   until the user runs it; verify afterward when possible. Isolated VM guest
   activation remains governed by the lab workflow.
+- For repeated VM iterations, use the installed `nixos-lab` launcher and its
+  exact immutable store-path approval rule as described in `docs/nixos-lab.md`.
+  Host sandbox escalation for that ordinary-user launcher is distinct from
+  sudo inside the guest. Do not request blanket shell, Python, or QEMU approval.
 - For Hyprland changes, follow `docs/hyprland-lab.md` and visually inspect the
   affected states in the guest, separate from the physical host session.
 - Use Nix-managed configuration for host changes, including experiments. If an

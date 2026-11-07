@@ -26,6 +26,7 @@ in
     ../../modules/home/profiles/base.nix
     ../../modules/home/profiles/desktop.nix
     ../../modules/home/codex/playwright.nix
+    ../../modules/home/codex/vm-lab.nix
     ../../modules/home/update-preparation.nix
     ../../modules/home/firefox.nix
     ../../modules/home/git.nix

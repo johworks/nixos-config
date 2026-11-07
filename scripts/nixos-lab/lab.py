@@ -10,6 +10,7 @@ import subprocess
 import sys
 import time
 from pathlib import Path
+from urllib.parse import quote
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "hyprland-lab"))
 from lab import Lab, run
@@ -17,6 +18,21 @@ from lab import Lab, run
 
 def nix_string(value):
     return json.dumps(value).replace("${", "\\${")
+
+
+def flake_reference(value):
+    if not value.startswith((".", "/")):
+        return value
+    path = Path(value).resolve()
+    # getFlake on a raw path copies untracked sockets, VM disks and local data.
+    # Explicit Git URLs retain dirty tracked edits and support linked worktrees.
+    for root in (path, *path.parents):
+        if (root / ".git").exists():
+            reference = "git+" + root.as_uri()
+            if root != path:
+                reference += "?dir=" + quote(path.relative_to(root).as_posix(), safe="/")
+            return reference
+    return "path:" + str(path)
 
 
 class NixosLab(Lab):
@@ -46,8 +62,7 @@ class NixosLab(Lab):
         flake, separator, host = self.args.flake.rpartition("#")
         if not separator or not flake or not host:
             raise RuntimeError("--flake must select a configuration, e.g. .#desktop")
-        if flake.startswith(".") or flake.startswith("/"):
-            flake = str(Path(flake).resolve())
+        flake = flake_reference(flake)
         guest = Path(__file__).resolve().parent / "guest.nix"
         compat = self.args.compat
         hardware = self.args.hardware
