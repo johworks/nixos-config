@@ -14,14 +14,13 @@
 
     home.packages = with pkgs; [
       gnumake
+      gh
       tree
       sops
       nodejs
       bubblewrap
       mcp-proxy
     ];
-
-    programs.gh.enable = true;
 
     home.username = lib.mkDefault "john";
     home.homeDirectory = lib.mkDefault "/home/john";
