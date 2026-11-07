@@ -37,6 +37,8 @@ in
   ];
 
   services.nixosUpdatePreparation.enable = true;
+  # The shared schedule requests the NUC, whose private flake is not yet supported.
+  services.nixosUpdatePreparation.schedule = false;
 
   programs.kitty.enable = true;
 

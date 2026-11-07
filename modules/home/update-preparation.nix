@@ -10,7 +10,14 @@ let
   package = inputs.self.packages.${pkgs.stdenv.hostPlatform.system}.update-prepare;
 in
 {
-  options.services.nixosUpdatePreparation.enable = lib.mkEnableOption "weekly build-only NixOS update preparation";
+  options.services.nixosUpdatePreparation = {
+    enable = lib.mkEnableOption "build-only NixOS update preparation";
+    schedule = lib.mkOption {
+      type = lib.types.bool;
+      default = true;
+      description = "Schedule weekly update preparation.";
+    };
+  };
 
   config = lib.mkIf config.services.nixosUpdatePreparation.enable {
     home.packages = [ package ];
@@ -41,7 +48,7 @@ in
       };
     };
 
-    systemd.user.timers.nixos-update-prepare = {
+    systemd.user.timers.nixos-update-prepare = lib.mkIf config.services.nixosUpdatePreparation.schedule {
       Unit.Description = "Prepare reviewed local-main updates weekly";
       Timer = {
         OnCalendar = "Sun 03:00";

@@ -205,8 +205,9 @@ as commands or approvals.
 NUC preparation is currently unavailable after moving the household configuration
 into a private flake. A run requesting `nuc` fails before refresh or repair; it
 cannot report a public-only NUC as a production candidate. Use `--host desktop`
-for desktop-only preparation until private composition is supported. The default
-scheduled job requests both hosts and therefore reports failure until then.
+for desktop-only preparation until private composition is supported. The shared
+desktop schedule is disabled until then; it would otherwise request both hosts.
+The package and manual service remain available. See `nixos-ofy` for restoration.
 
 `scripts/updates/prepare.py`, packaged as `update-prepare`, clones reviewed local
 `main` into a separate private directory. It does not pull or modify the normal
