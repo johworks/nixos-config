@@ -28,6 +28,13 @@ configuration, documentation, logs, or commit history.
 - Format changes and run checks appropriate to their scope. Use the Nix daemon
   without sudo and `--no-write-lock-file` for routine evaluation and builds.
   Run `nix --store daemon flake check --no-write-lock-file` before switching.
+- Agents currently have no sudo access. Do not probe with `sudo -n`, request a
+  sudo password, or attempt manual host activation (`nixos-rebuild switch/test/boot`
+  or `switch-to-configuration`), including through SSH or an escalation request.
+  Prepare and validate the changes without sudo, then give the user the exact
+  command to run for the intended host and checkout. Report activation as pending
+  until the user runs it; verify afterward when possible. Isolated VM guest
+  activation remains governed by the lab workflow.
 - For Hyprland changes, follow `docs/hyprland-lab.md` and visually inspect the
   affected states in the guest, separate from the physical host session.
 - Use Nix-managed configuration for host changes, including experiments. If an
