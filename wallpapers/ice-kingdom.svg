@@ -1,24 +1,296 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="2560" height="1440" viewBox="0 0 2560 1440">
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+     width="3840" height="2160" viewBox="0 0 2560 1440" role="img"
+     aria-labelledby="title description">
+  <title id="title">The Quiet Kingdom</title>
+  <desc id="description">A tiny blue knight and two penguins look across a frozen river
+    toward a crooked ice castle. Moonlight, pale aurora ribbons and snow soften the
+    jagged mountains of a whimsical winter kingdom.</desc>
   <defs>
-    <linearGradient id="sky" x2="0" y2="1"><stop stop-color="#081c38"/><stop offset=".55" stop-color="#285d80"/><stop offset="1" stop-color="#a3dbe4"/></linearGradient>
-    <linearGradient id="snow" x2="0" y2="1"><stop stop-color="#c5f4f5"/><stop offset="1" stop-color="#518fae"/></linearGradient>
-    <linearGradient id="ice" x2="1" y2="1"><stop stop-color="#b4f3f4"/><stop offset="1" stop-color="#337596"/></linearGradient>
-    <radialGradient id="glow"><stop stop-color="#d8ffff" stop-opacity=".48"/><stop offset="1" stop-color="#b8f9ff" stop-opacity="0"/></radialGradient>
+    <linearGradient id="sky" x2="0" y2="1">
+      <stop stop-color="#101e3c"/>
+      <stop offset=".52" stop-color="#254967"/>
+      <stop offset="1" stop-color="#64999e"/>
+    </linearGradient>
+    <radialGradient id="moon-halo">
+      <stop stop-color="#ace2df" stop-opacity=".16"/>
+      <stop offset="1" stop-color="#ace2df" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="aurora" x1="0" y1="1" x2=".2" y2="0">
+      <stop stop-color="#7ce4cf" stop-opacity=".16"/>
+      <stop offset="1" stop-color="#7ce4cf" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="distant-ice" x2="0" y2="1">
+      <stop stop-color="#729da9"/>
+      <stop offset="1" stop-color="#3b708c"/>
+    </linearGradient>
+    <linearGradient id="river" x1="0" y1="0" x2=".7" y2="1">
+      <stop stop-color="#69a3b4"/>
+      <stop offset=".5" stop-color="#578fae"/>
+      <stop offset="1" stop-color="#284a70"/>
+    </linearGradient>
+    <linearGradient id="ice-wall" x1="0" y1="0" x2=".8" y2="1">
+      <stop stop-color="#b6e6e4"/>
+      <stop offset=".48" stop-color="#75b8cb"/>
+      <stop offset="1" stop-color="#4686a7"/>
+    </linearGradient>
+    <linearGradient id="cliff" x2=".8" y2="1">
+      <stop stop-color="#99d4db"/>
+      <stop offset="1" stop-color="#3b698d"/>
+    </linearGradient>
+    <linearGradient id="snow" x1=".1" y1="0" x2=".6" y2="1">
+      <stop stop-color="#cae9e6"/>
+      <stop offset="1" stop-color="#8abcc9"/>
+    </linearGradient>
+    <linearGradient id="crystal" x2="1" y2=".8">
+      <stop stop-color="#b7efea"/>
+      <stop offset=".5" stop-color="#69bccd"/>
+      <stop offset="1" stop-color="#3d779e"/>
+    </linearGradient>
+    <g id="star" fill="#c2e5e2">
+      <path d="M0-7 2-2 7 0 2 2 0 7-2 2-7 0-2-2Z"/>
+    </g>
+    <g id="window" stroke="#2b5372" stroke-width="4" stroke-linejoin="round">
+      <path fill="#315772" d="M-10 15v-22q10-22 20 0v22Z"/>
+      <path fill="#f3d79b" stroke="none" d="M-5 10V-6q5-13 10 0v16Z"/>
+    </g>
+    <g id="fir" stroke="#183953" stroke-linejoin="round" stroke-linecap="round">
+      <path d="M0 0v-230" stroke-width="10"/>
+      <path fill="#28516c" stroke-width="5" d="m0-260-37 75 20-5-47 74 29-7-57 89q46 5 92-12 41 19 87 12l-54-90 27 8-43-75 19 5Z"/>
+      <path fill="#9ecbd0" stroke="none" d="m0-260-31 64 27-13 23 12Zm-19 97-34 47 33-12 17 8 29-7-27-36-4 20Zm-20 71-39 57 47-17 29 6 39-9-25-35 6 22-28 5-18-12Z"/>
+    </g>
+    <g id="shard" stroke="#244b69" stroke-width="4" stroke-linejoin="round">
+      <path fill="url(#crystal)" d="M-28 0-40-92-7-170 28-112 35-15 9 8Z"/>
+      <path fill="#b5ebe4" stroke="none" d="m-7-170-9 77 25 101 1-112Z"/>
+      <path fill="none" stroke="#e0f6e8" stroke-width="3" d="m-7-160-9 67 22 83"/>
+    </g>
+    <g id="penguin" stroke="#19364e" stroke-width="4" stroke-linejoin="round">
+      <ellipse cy="4" rx="26" ry="7" fill="#507d95" stroke="none" opacity=".45"/>
+      <path fill="#edc995" d="m-17-3-8 8 24-1 3-7m8 0 1 7 23 1-10-10"/>
+      <path fill="#203e57" d="M-22-19q-2-47 20-48 23-3 27 42l10 15-11-3Q16 5-4 0q-18 1-20-13l-10 3Z"/>
+      <path fill="#d8ede6" stroke="none" d="M-14-20q-2-28 13-29 16-2 18 29 2 18-14 18-17 0-17-18Z"/>
+      <path fill="#efc58b" stroke-width="2" d="m-6-39 10-2 3 5-9 4Z"/>
+      <path fill="none" stroke-width="3" d="M-10-45v3m16-4v3"/>
+    </g>
   </defs>
-  <path fill="url(#sky)" d="M0 0h2560v1440H0z"/>
-  <circle cx="1860" cy="350" r="340" fill="url(#glow)"/>
-  <circle cx="1860" cy="350" r="95" fill="#d8fafa" opacity=".8"/>
-  <g fill="#e4ffff" opacity=".7">
-    <circle cx="190" cy="160" r="3"/><circle cx="410" cy="290" r="4"/><circle cx="710" cy="120" r="3"/><circle cx="950" cy="250" r="3"/><circle cx="1230" cy="100" r="4"/><circle cx="1490" cy="270" r="3"/><circle cx="2200" cy="140" r="4"/><circle cx="2380" cy="360" r="3"/>
+
+  <!-- Broad quiet sky keeps the upper desktop clear. -->
+  <path fill="url(#sky)" d="M0 0h2560v1440H0Z"/>
+  <circle cx="1690" cy="310" r="480" fill="url(#moon-halo)"/>
+  <g fill="url(#aurora)">
+    <path d="M-160 287C234 434 471 69 929 122s579 188 1039-42c-342 315-681 116-1024 164S268 530-160 383Z"/>
+    <path d="M485 0c241 45 260 165 636 167S1776-67 2172 5c-327 7-618 260-1015 248S711 40 485 0Z" opacity=".6"/>
   </g>
-  <path fill="#41799a" d="M0 900 230 620 395 790 630 510 865 810 1100 580 1330 815 1570 565 1830 830 2070 590 2350 820 2560 610v830H0z"/>
-  <path fill="#6cabc3" d="m0 1000 255-250 180 175 290-300 240 295 210-205 250 245 300-295 245 280 250-205 340 260v440H0z"/>
-  <path fill="url(#snow)" d="M0 1090q280-140 520-10t510 5q270-120 520 5t520-5q250-110 490 0v355H0z"/>
-  <path fill="#b9edf0" d="M0 1260q300-120 620 10t660-5q300-125 620 5t660-10v180H0z"/>
-  <g fill="url(#ice)" stroke="#d6ffff" stroke-width="4" opacity=".9">
-    <path d="m90 1440 70-330 75 330z"/><path d="m195 1440 105-220 65 220z"/><path d="m2210 1440 100-300 70 300z"/><path d="m2340 1440 90-390 100 390z"/>
+  <path d="M-80 353C320 486 536 168 925 202s654 141 979-87" fill="none" stroke="#95dfd0" stroke-width="2" opacity=".09"/>
+  <g fill="#c2e5e2" opacity=".58">
+    <circle cx="178" cy="181" r="2"/><circle cx="342" cy="318" r="2.5"/>
+    <circle cx="521" cy="116" r="2"/><circle cx="670" cy="307" r="2"/>
+    <circle cx="833" cy="174" r="2.5"/><circle cx="1065" cy="111" r="2"/>
+    <circle cx="1195" cy="378" r="2.5"/><circle cx="1362" cy="158" r="2"/>
+    <circle cx="1503" cy="88" r="2"/><circle cx="1887" cy="135" r="2"/>
+    <circle cx="2056" cy="326" r="2"/><circle cx="2193" cy="205" r="3"/>
+    <circle cx="2381" cy="113" r="2"/><circle cx="2450" cy="416" r="2"/>
+    <circle cx="109" cy="489" r="2"/><circle cx="910" cy="405" r="2"/>
+    <circle cx="1292" cy="273" r="1.5"/><circle cx="1978" cy="469" r="2"/>
+    <circle cx="424" cy="490" r="1.5"/><circle cx="745" cy="72" r="1.5"/>
   </g>
-  <g fill="none" stroke="#e6ffff" stroke-width="3" opacity=".55">
-    <path d="M280 460v45m-22-22h45m-38-16 30 32m0-32-30 32"/><path d="M2100 500v45m-22-22h45m-38-16 30 32m0-32-30 32"/>
+  <g opacity=".75">
+    <use xlink:href="#star" x="285" y="242"/>
+    <use xlink:href="#star" x="744" y="392" transform="rotate(12 744 392)"/>
+    <use xlink:href="#star" x="1150" y="212"/>
+    <use xlink:href="#star" x="2030" y="173"/>
+    <use xlink:href="#star" x="2330" y="343"/>
+  </g>
+  <circle cx="1690" cy="310" r="107" fill="#d8ece0"/>
+  <path fill="#bcded8" d="M1731 211a107 107 0 0 1 25 184c31-53 29-133-25-184Z"/>
+  <g fill="#abcfcf" opacity=".36">
+    <ellipse cx="1651" cy="274" rx="20" ry="12" transform="rotate(-30 1651 274)"/>
+    <ellipse cx="1710" cy="353" rx="25" ry="17"/>
+    <circle cx="1637" cy="328" r="8"/>
+    <ellipse cx="1703" cy="244" rx="9" ry="6"/>
+  </g>
+  <!-- Long cloud shapes echo the snow caps below. -->
+  <g fill="#72979f" opacity=".23">
+    <path d="M1419 399q40-18 75-8 23-36 78-19 42-15 70 12 71-12 108 13 58-5 87 8h-418Z"/>
+    <path d="M209 578q57-23 107-12 22-24 64-15 31-20 75 4 82-6 115 23Z"/>
+    <path d="M2070 490q44-24 83-10 39-29 83-4 75-6 111 14Z"/>
+  </g>
+
+  <!-- Distant peaks have softer edges and quieter values. -->
+  <path fill="#365974" d="M0 765 124 647 206 688 380 450 471 536 530 510 706 738 836 632 926 693 1095 495 1170 588 1238 564 1424 768 1610 573 1761 700 1892 536 2001 632 2104 583 2267 739 2404 501 2560 688V1110H0Z"/>
+  <path fill="#517b90" d="m228 669 152-219 91 86 59-26 176 228-197-138-38 33-81-102-32 86-37-11Zm726 62 141-236 75 93 68-24 186 204-214-144-41 28-71-94-66 127Zm1270 51 180-281 156 187v107l-144-194-45 90-31-15Z"/>
+  <g fill="#86a8b2" opacity=".7">
+    <path d="m298 569 82-119 91 86 59-26 64 83-74-42-36 25-73-69-25 69-25-27Z"/>
+    <path d="m1033 599 62-104 75 93 68-24 66 73-78-31-43 25-77-83-32 58Z"/>
+    <path d="m2340 603 64-102 92 111-82-55-26 62-22-29Z"/>
+  </g>
+  <path fill="url(#distant-ice)" stroke="#355d78" stroke-width="5" stroke-linejoin="round"
+        d="M-40 986 108 800 187 846 337 660 410 712 467 695 638 910 738 833 846 925 1007 734 1101 803 1174 776 1358 988 1532 783 1636 857 1744 811 1902 988 2072 743 2145 787 2242 686 2320 803 2404 769 2601 1010V1210H-40Z"/>
+  <g fill="#a7c9ce">
+    <path d="m263 752 74-92 73 52 57-17 85 108-94-61-36 21-78-58-37 60Z"/>
+    <path d="m927 830 80-96 94 69 73-27 75 87-92-46-43 29-100-66-43 61Z"/>
+    <path d="m2145 787 97-101 78 117 84-34 78 96-106-42-60 14-66-93-37 56Z"/>
+  </g>
+  <g fill="#3a6987" opacity=".6">
+    <path d="m337 704 5 199-81 130 149-75-7-170Z"/>
+    <path d="m1007 780 20 242 95-91-49-58Z"/>
+    <path d="m2242 744-34 265 112-172Z"/>
+  </g>
+  <path fill="#6798a7" d="M0 1024q276-65 462 6t427-3q194-46 393 1t385-7q257-54 490 5t403-18v265H0Z"/>
+  <g fill="#42718a" opacity=".85">
+    <path d="m70 1024 15-45 15 45h-9v21H80v-21m46-2 23-66 23 66h-16v21h-14v-21m49 13 17-50 17 50h-11v16h-13v-16"/>
+    <path d="m2005 1037 22-65 23 65h-16v22h-14v-22m47 5 30-91 31 91h-23v24h-16v-24m58-5 20-58 19 58h-12v22h-14v-22m67-3 26-78 27 78h-18v23h-17v-23"/>
+  </g>
+
+  <!-- Frozen water leads the eye from the little travellers to the fortress. -->
+  <path fill="url(#snow)" d="M0 1110q202-96 434-47t391 6q257-65 459-21t366 13q314-44 554-2t356 0v381H0Z"/>
+  <path fill="url(#river)" d="M1536 1052c-82 66-299 82-387 116-138 55-46 88-173 135-123 46-256 68-352 137h1399c-110-53-318-67-515-101-288-50-325-63-208-109 88-35 249-69 268-140Z"/>
+  <path fill="none" stroke="#d2e9e2" stroke-width="9" stroke-linecap="round" d="M1501 1068c-115 62-264 63-352 100-138 55-46 88-173 135-123 46-256 68-352 137"/>
+  <path fill="none" stroke="#b3d9d9" stroke-width="6" stroke-linecap="round" d="M1568 1090c-19 71-180 105-268 140-117 46-80 59 208 109 197 34 405 48 515 101"/>
+  <g fill="none" stroke-linecap="round">
+    <path stroke="#a6d6d9" stroke-width="3" opacity=".55" d="m1335 1155 96-4m-232 49 95-2m-151 75 97 2m-189 65 168-4m123-133 78-3m-379 199 235-3m86-16 163 5"/>
+    <path stroke="#254f77" stroke-width="3" opacity=".5" d="m1432 1137-71 31 38 8-95 52m-225 91 73 19-24 33 92 69m368-43-65 20 26 23"/>
+    <path stroke="#b4e1e1" stroke-width="2" opacity=".4" d="m1439 1138-71 31 38 8-95 52m-225 91 73 19-24 33 92 69"/>
+  </g>
+
+  <!-- Faceted island; the castle is deliberately crooked and asymmetric. -->
+  <path fill="#4d839e" opacity=".35" d="M1259 1092q251-69 557-16l96 48q-326 39-653-32Z"/>
+  <g stroke="#284c6a" stroke-width="6" stroke-linejoin="round">
+    <path fill="url(#cliff)" d="m1228 963 92-116 173-18 75-32 175 41 82 76 118 73-96 112-121 28-158-21-144 16-116-65Z"/>
+    <path fill="#568da9" stroke="none" d="m1292 963 116 48 16 111-116-65Zm210-31 66 174 158 21 24-169-90 39Zm280-19-32 45-24 169 121-28 96-112Z"/>
+    <path fill="#a3d8dc" stroke="none" d="m1320 847-28 116 61 109 16-154 58-72Zm187 40-5 45 66 174-16-168 84-47Zm297 56-54 15-24 169 52-103Z"/>
+    <path fill="none" stroke="#376382" stroke-width="4" d="m1408 1011 56-44-11-51m207 81 21 69-22 39m188-6-31-82 29-40"/>
+    <path fill="#d1ece5" d="m1228 963 92-116 173-18 75-32 175 41 82 76 118 73-89-12-43-37-77 16-77-27-66 31-103-27-68 27-86-11-51 28Z"/>
+    <path fill="#9dcbd3" stroke="none" d="m1301 938 54-44 146-26 64-43 107 29-106-12-57 46-130 29-30 24Z"/>
+  </g>
+  <!-- Back towers. -->
+  <g stroke="#284a68" stroke-width="6" stroke-linejoin="round" stroke-linecap="round">
+    <path fill="#72adc4" d="m1393 855 6-285 84-5 20 288Z"/>
+    <path fill="#a8dce0" stroke="none" d="m1399 570 29-1 5 288-40-2Z"/>
+    <path fill="#8bd1d8" d="m1373 580 58-168 73 161-66 22Z"/>
+    <path fill="#d2eee5" stroke="none" d="m1431 412-15 142-43 26Z"/>
+    <path fill="#4a8eac" stroke="none" d="m1431 412 7 183 66-22Z"/>
+    <path fill="none" stroke="#d2eee5" stroke-width="4" d="m1431 422 52 130"/>
+    <path fill="#70aac2" d="m1700 865 5-325 72 9 25 332Z"/>
+    <path fill="#a8dbe0" stroke="none" d="m1705 540 25 3 14 329-44-7Z"/>
+    <path fill="#7fc5d3" d="m1683 550 66-187 56 196-58 19Z"/>
+    <path fill="#d0eee6" stroke="none" d="m1749 363-25 175-41 12Z"/>
+    <path fill="#4585a5" stroke="none" d="m1749 363-2 215 58-19Z"/>
+    <path fill="none" stroke="#c9eee6" stroke-width="4" d="m1750 377 38 161"/>
+    <!-- The tall central keep has a little crown of ice. -->
+    <path fill="url(#ice-wall)" d="m1490 854 15-320 130-8 44 346Z"/>
+    <path fill="#c2e7e4" stroke="none" d="m1505 534 41-2-6 320-50 2Z"/>
+    <path fill="#4c91b0" stroke="none" d="m1603 529 32-3 44 346-59-8Z"/>
+    <path fill="#8fd3dc" d="m1480 546 44-111 13 37 32-129 45 123 13-44 33 116-57 23-70-4Z"/>
+    <path fill="#d4f0e8" stroke="none" d="m1569 343-36 214 37-13 15-46Z"/>
+    <path fill="#59a0be" stroke="none" d="m1569 343 34 218 57-23-33-116-13 44Z"/>
+    <path fill="none" stroke="#d4f0e8" stroke-width="4" d="m1524 435-20 91m123-104 17 103"/>
+    <!-- Small pennants are the only warm notes high in the skyline. -->
+    <path fill="none" stroke-width="5" d="m1569 343-4-67m184 87 4-66"/>
+    <path fill="#e2bd89" stroke-width="4" d="m1565 277 62 8-21 14 16 16-56-8Z"/>
+    <path fill="#a8dcd9" stroke-width="4" d="m1753 298 48 8-18 13-31 5Z"/>
+  </g>
+  <g>
+    <use xlink:href="#window" x="1445" y="640"/>
+    <use xlink:href="#window" x="1447" y="720"/>
+    <use xlink:href="#window" x="1739" y="622"/>
+    <use xlink:href="#window" x="1745" y="705"/>
+    <use xlink:href="#window" x="1570" y="609" transform="rotate(-3 1570 609)"/>
+    <use xlink:href="#window" x="1533" y="703"/>
+    <use xlink:href="#window" x="1612" y="698"/>
+  </g>
+  <g fill="none" stroke="#437994" stroke-width="3" opacity=".55">
+    <path d="m1513 654 22-1m56 22 32-2m-82 85 21-1m-135-75 21-1m291 79 20 3m-31-86 20 2"/>
+  </g>
+  <!-- Low curtain wall and squat gatehouse give the fortress a toy-like silhouette. -->
+  <g stroke="#284a68" stroke-width="6" stroke-linejoin="round" stroke-linecap="round">
+    <path fill="url(#ice-wall)" d="m1370 914-3-144 34-3 2 24 36-1v-29l35-3 2 28 36-1-1-27 37-1 2 26 37 2v-27l34 1 2 27 37 1 1-27 36 1 2 27 36 2 1-27 34 3 1 26 35 2 1-25 33 4 10 158-185-7Z"/>
+    <path fill="#d5eee6" stroke="none" d="m1367 770 34-3 2 24 36-1v-29l35-3 2 28 36-1-1-27 37-1 2 26 37 2v-27l34 1 2 27 37 1 1-27 36 1 2 27 36 2 1-27 34 3 1 26 35 2 1-25 33 4 1 12-22-1-1 25-59-4-1-25-12-1-1 28-59-4-2-28-12 1-1 27-61-2-1-28-11-1v27l-62-2-2-26-12 1 1 27-60 1-2-28-12 2v28l-60 2-1-24-12 1Z"/>
+    <path fill="#6bacc2" d="m1520 937-7-132 67-59 74 57 16 133Z"/>
+    <path fill="#d7eee5" d="m1498 812 81-79 88 66-14 16-73-49-68 61Z"/>
+    <path fill="#315a78" d="m1542 939-3-60q-2-49 36-53 39-4 47 50l5 61Z"/>
+    <path fill="#25465f" stroke="none" d="m1557 937-3-58q0-32 24-36 23 1 29 35l7 59Z"/>
+    <path fill="none" stroke="#86b6c5" stroke-width="4" d="m1559 863 47-3m-51 24 55-3m-54 23 56-3m-42-51 5 70m11-72 5 71"/>
+    <path fill="#a9d6da" d="m1542 939-56 46 150 5-9-53Z"/>
+    <path fill="none" stroke="#588aa6" stroke-width="4" d="m1528 952 100 1m-112 11 114 3m-129 9 131 3"/>
+  </g>
+  <g stroke="#477b98" stroke-width="3" stroke-linecap="round" fill="none">
+    <path d="m1405 837 25-1m31 42 29-1m-93 16 20-1m258-42 24 2m-18 37 29 2m-38 33 17 1"/>
+    <path stroke="#c8eeea" d="m1377 798 2 27m88-36 1 27m242-9 3 29"/>
+  </g>
+  <g fill="#d1eee7">
+    <path d="m1370 790 7 50 8-50m88-8 9 39 7-39m232 23 10 44 4-44m-202 18 9 30 6-39m119-7 9 40 5-37"/>
+  </g>
+  <use xlink:href="#shard" transform="translate(1274 974) rotate(-16) scale(.46)"/>
+  <use xlink:href="#shard" transform="translate(1852 980) rotate(18) scale(.65)"/>
+  <use xlink:href="#shard" transform="translate(1820 989) rotate(-8) scale(.42)"/>
+
+  <!-- Snow banks and firs frame the scene without crowding the sky. -->
+  <path fill="#6d9aaf" d="M0 1144q268-100 520-9t492 45q-143 83-244 111L555 1440H0Z"/>
+  <path fill="url(#snow)" stroke="#305571" stroke-width="6" d="M-30 1149q167-87 318-43 95-53 231-8 114 23 211 83 77 45 239 27-88 52-200 83-145 41-214 149H-30Z"/>
+  <path fill="#6e9eaf" d="M-30 1302q190-40 361 20 170 34 352-3-81 62-128 121H-30Z"/>
+  <path fill="#d1eae4" d="M-30 1149q167-87 318-43 95-53 231-8 114 23 211 83 77 45 239 27l-34 19q-137 14-231-29-113-65-193-77-132-38-222 4-177-44-319 43Z"/>
+  <g>
+    <use xlink:href="#fir" transform="translate(135 1130) scale(1.75)"/>
+    <use xlink:href="#fir" transform="translate(310 1135) scale(1.13)"/>
+    <use xlink:href="#fir" transform="translate(-35 1182) scale(2.25)"/>
+    <use xlink:href="#fir" transform="translate(411 1112) scale(.58)"/>
+  </g>
+  <path fill="#86b7c3" stroke="#305571" stroke-width="6" d="M1904 1214q146-121 298-100 151-68 388 2v324h-567q-109-65-321-87 150-11 202-139Z"/>
+  <path fill="#c3e2df" d="M1904 1214q146-121 298-100 151-68 388 2v30q-235-70-382-12-172-17-304 80Z"/>
+  <path fill="#628fa8" d="M2017 1326q242-91 573-31v145h-567q-109-65-321-87 149 8 315-27Z"/>
+  <g>
+    <use xlink:href="#fir" transform="translate(2334 1133) scale(1.52)"/>
+    <use xlink:href="#fir" transform="translate(2500 1221) scale(2.4)"/>
+    <use xlink:href="#fir" transform="translate(2195 1151) scale(.77)"/>
+  </g>
+  <g stroke="#4e7c98" stroke-width="3" fill="none" stroke-linecap="round" opacity=".7">
+    <path d="m178 1228 62-5m91-63 39 4m-172 210 76-2m468-119 40-5m1504-44 50-3m-164 114 54-5m113 82 61 1"/>
+  </g>
+
+  <!-- A small questing knight: scarf, bucket helmet, shield and frost-blue plume. -->
+  <g transform="translate(622 1197) rotate(6)" stroke="#19364e" stroke-width="5" stroke-linecap="round" stroke-linejoin="round">
+    <ellipse cx="0" cy="5" rx="57" ry="12" fill="#56869e" stroke="none" opacity=".5"/>
+    <path fill="#234b6e" d="m-21-35-8 34 26 2 4-29m10-1 6 29 27-3-16-32"/>
+    <path fill="#679fb7" d="M-27-75q23-16 51-2l12 48q-29 16-64-2Z"/>
+    <path fill="#316689" d="m-29-72-15 23 15 32 14-12-14-23 11-17"/>
+    <path fill="#7fc5d5" d="m-25-82 9-26 35 5 10 30-8 16-39-3Z"/>
+    <path fill="#82c6db" d="m-17-117 4-26 26-18 3 28-10 22Z"/>
+    <path fill="#c3e9e9" d="M-37-115q27-19 62-8l8 51q-32 20-66-2Z"/>
+    <path fill="#6b9db9" stroke="none" d="m12-124 13 1 8 51-25 8Z"/>
+    <path fill="#284b68" stroke-width="3" d="m-18-103 35-5 2 12-34 5Z"/>
+    <path fill="none" stroke="#436d89" stroke-width="3" d="m-8-81 1 6m11-8 1 6"/>
+    <path fill="#5ab5ce" d="m-34-69 35 6 23-10 5 11-26 12-36-7Z"/>
+    <path fill="#5ab5ce" d="m-29-63-30-3-39 14 21 7-13 14 41-19 23-2Z"/>
+    <path fill="#8dd5df" stroke-width="4" d="m18-48 31-6 4 30-15 17-21-11Z"/>
+    <path fill="none" stroke="#d8efe6" stroke-width="3" d="m33-44 3 21m-11-9 20-3m-17-6 13 13m-13 2 10-17"/>
+    <path fill="none" stroke="#daeee6" stroke-width="3" d="m-29-109 2 26"/>
+  </g>
+  <use xlink:href="#penguin" transform="translate(742 1224) rotate(-7) scale(.85)"/>
+  <use xlink:href="#penguin" transform="translate(811 1241) rotate(9) scale(.62)"/>
+  <!-- Tracks give the travellers a story without adding desktop clutter. -->
+  <g fill="#507e99" opacity=".55">
+    <ellipse cx="508" cy="1229" rx="9" ry="4" transform="rotate(-16 508 1229)"/>
+    <ellipse cx="536" cy="1237" rx="9" ry="4" transform="rotate(-16 536 1237)"/>
+    <ellipse cx="451" cy="1251" rx="10" ry="4" transform="rotate(-18 451 1251)"/>
+    <ellipse cx="477" cy="1259" rx="10" ry="4" transform="rotate(-18 477 1259)"/>
+    <ellipse cx="390" cy="1273" rx="10" ry="4" transform="rotate(-20 390 1273)"/>
+    <ellipse cx="417" cy="1283" rx="10" ry="4" transform="rotate(-20 417 1283)"/>
+    <ellipse cx="694" cy="1239" rx="4" ry="3"/><ellipse cx="681" cy="1245" rx="4" ry="3"/>
+    <ellipse cx="669" cy="1242" rx="4" ry="3"/><ellipse cx="655" cy="1249" rx="4" ry="3"/>
+  </g>
+  <!-- Foreground crystals have the strongest contour in the scene. -->
+  <g>
+    <use xlink:href="#shard" transform="translate(154 1432) rotate(-22) scale(1.14)"/>
+    <use xlink:href="#shard" transform="translate(220 1442) rotate(6) scale(1.55)"/>
+    <use xlink:href="#shard" transform="translate(286 1442) rotate(32) scale(.78)"/>
+    <use xlink:href="#shard" transform="translate(2250 1428) rotate(-18) scale(.72)"/>
+    <use xlink:href="#shard" transform="translate(2306 1440) rotate(14) scale(1.25)"/>
+  </g>
+  <g fill="#cee9e4" opacity=".7">
+    <circle cx="453" cy="992" r="3"/><circle cx="575" cy="1070" r="3"/>
+    <circle cx="1105" cy="967" r="2.5"/><circle cx="1210" cy="1038" r="3"/>
+    <circle cx="1930" cy="900" r="3"/><circle cx="2077" cy="1096" r="3"/>
+    <circle cx="352" cy="1198" r="3"/><circle cx="897" cy="1135" r="2.5"/>
+    <circle cx="2166" cy="1277" r="3"/><circle cx="1787" cy="1241" r="2.5"/>
   </g>
 </svg>
