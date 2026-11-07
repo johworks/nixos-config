@@ -26,9 +26,6 @@
     ../../modules/nixos/ddns/ddns.nix
     ../../modules/nixos/ax1450
     ../../modules/nixos/esphome.nix
-    ../../modules/nixos/home-assistant-analysis.nix
-    ../../modules/nixos/home-assistant.nix
-    ../../modules/nixos/home-assistant-mcp.nix
     ../../modules/nixos/stremio/stremio.nix
     ../../modules/nixos/matrix/matrix.nix
     ../../modules/nixos/matrix-rtc/matrix-rtc.nix
@@ -91,13 +88,6 @@
   #   bindAddress = "0.0.0.0";
   #   openFirewall = true;
   # };
-
-  services.homeAssistantAnalysis = {
-    enable = true;
-    baseUrl = "http://192.168.10.1:8123";
-    bindAddress = "192.168.10.1";
-    openFirewall = false;
-  };
 
   # Keep D-Bus stable during the router's 26.05 upgrade; adopt broker separately.
   services.dbus.implementation = "dbus";

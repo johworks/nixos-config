@@ -155,7 +155,7 @@
         certificate-filter =
           let
             desktop = builtins.head self.nixosConfigurations.desktop.config.system.replaceDependencies.replacements;
-            nuc = builtins.head self.nixosConfigurations.nuc.config.system.replaceDependencies.replacements;
+            nuc = builtins.head self.nixosConfigurations.nuc-without-household.config.system.replaceDependencies.replacements;
             test = ./modules/nixos/common/test_cacert.py;
           in
           pkgsStable.runCommand "certificate-filter-tests"
@@ -203,7 +203,7 @@
           cp ${./modules/nixos/signal-updates/client.py} client.py
           cp ${./modules/nixos/signal-updates/test_client.py} test_client.py
           ${pkgsStable.python3}/bin/python3 test_client.py
-          export JAVAX_NET_SSL_TRUSTSTORE=${self.nixosConfigurations.nuc.config.system.build.signalUpdatesTrustStore}/cacerts
+          export JAVAX_NET_SSL_TRUSTSTORE=${self.nixosConfigurations.nuc-without-household.config.system.build.signalUpdatesTrustStore}/cacerts
           # Test signal-cli's actual JVM, which can differ from the default JRE.
           signalJavaHome=$(${pkgsStable.gnused}/bin/sed -n "s/^export JAVA_HOME='\([^']*\)'$/\1/p" "$SIGNAL_CLI")
           test -x "$signalJavaHome/bin/java"
@@ -221,7 +221,7 @@
             }
             ''
               export AX1450_TEST_SHELL=${pkgsStable.busybox}/bin/ash
-              export AX1450_TEST_WRAPPER=${self.nixosConfigurations.nuc.config.system.build.ax1450-reconcile}/bin/ax1450-reconcile
+              export AX1450_TEST_WRAPPER=${self.nixosConfigurations.nuc-without-household.config.system.build.ax1450-reconcile}/bin/ax1450-reconcile
               cp ${./modules/nixos/ax1450/reconcile-remote.sh} reconcile-remote.sh
               python3 ${./modules/nixos/ax1450/test_reconcile.py}
               touch "$out"
@@ -247,8 +247,8 @@
           extraModules = [ inputs.home-manager.nixosModules.home-manager ];
         };
 
-        # Intel Nuc 14
-        nuc = mkHost {
+        # Production NUC is composed by the private household flake.
+        nuc-without-household = mkHost {
           hostName = "nuc";
           nixpkgsInput = nixpkgsStable;
           extraModules = [

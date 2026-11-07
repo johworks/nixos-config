@@ -58,7 +58,6 @@ def repair_options(candidate, codex="codex"):
 def pinned_sources(candidate):
     pins = []
     for name, relative in (
-        ("Home Assistant", "modules/nixos/home-assistant.nix"),
         ("ESPHome", "modules/nixos/esphome.nix"),
         ("Stremio", "modules/nixos/stremio/stremio.nix"),
     ):
@@ -292,6 +291,8 @@ class Preparation:
             self.step("checkout", ["git", "checkout", "--detach", base], self.candidate)
             with (self.candidate / ".git/info/exclude").open("a") as exclude:
                 exclude.write("\n/.worker/\n")
+            if "nuc" in self.args.host:
+                raise StepFailed("NUC preparation requires the private household flake; automated private composition is not yet supported")
             if not self.args.no_refresh:
                 self.step("refresh", ["nix", "--store", "daemon", "flake", "update"], self.candidate)
             for attempt in range(self.args.repair_attempts + 1):

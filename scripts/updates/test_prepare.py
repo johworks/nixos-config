@@ -74,7 +74,7 @@ root=pathlib.Path(sys.argv[sys.argv.index('-C')+1]); (root/'value').write_text('
 
     def arguments(self, **updates):
         args = dict(repo=self.repo, state_dir=self.root / "state", base="main",
-                    timeout=30, host=["nuc"], no_refresh=True, repair_attempts=0, codex="codex",
+                    timeout=30, host=["desktop"], no_refresh=True, repair_attempts=0, codex="codex",
                     notify_signal=False, signal_key=self.root / "unused-test-key", vm_lab=None)
         args.update(updates)
         return argparse.Namespace(**args)
@@ -90,11 +90,18 @@ root=pathlib.Path(sys.argv[sys.argv.index('-C')+1]); (root/'value').write_text('
         self.assertEqual(result, 0)
         self.assertNotEqual(report["candidate_commit"], self.base)
         self.assertEqual(report["lock_sha256"], prepare.digest(job.candidate / "flake.lock"))
-        self.assertEqual(report["hosts"]["nuc"]["status"], "built")
+        self.assertEqual(report["hosts"]["desktop"]["status"], "built")
         self.assertEqual(self.git("rev-parse", "HEAD").strip(), self.base)
         self.assertEqual(self.git("status", "--porcelain"), "")
         self.assertNotIn("updated", (self.repo / "flake.lock").read_text())
         self.assertEqual(report["temporary_fix_review"]["status"], "inventory missing; operator review required")
+
+    def test_nuc_private_composition_fails_without_repair(self):
+        result, _, report = self.run_preparation(host=["nuc"], repair_attempts=2)
+        self.assertEqual(result, 1)
+        self.assertIn("private household flake", report["failure"])
+        self.assertEqual(report["repair_attempts"], 0)
+        self.assertEqual(report["hosts"], {})
 
     def test_temporary_fix_inventory_is_reported_as_unreviewed(self):
         (self.repo / "docs").mkdir()

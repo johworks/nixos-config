@@ -202,6 +202,12 @@ as commands or approvals.
 
 ## Running candidate preparation
 
+NUC preparation is currently unavailable after moving the household configuration
+into a private flake. A run requesting `nuc` fails before refresh or repair; it
+cannot report a public-only NUC as a production candidate. Use `--host desktop`
+for desktop-only preparation until private composition is supported. The default
+scheduled job requests both hosts and therefore reports failure until then.
+
 `scripts/updates/prepare.py`, packaged as `update-prepare`, clones reviewed local
 `main` into a separate private directory. It does not pull or modify the normal
 checkout. It refreshes the lock, commits the candidate before checking it, checks
