@@ -152,77 +152,101 @@
     <path stroke="#b4e1e1" stroke-width="2" opacity=".4" d="m1439 1138-71 31 38 8-95 52m-225 91 73 19-24 33 92 69"/>
   </g>
 
-  <!-- Faceted island; the castle is deliberately crooked and asymmetric. -->
-  <path fill="#4d839e" opacity=".35" d="M1259 1092q251-69 557-16l96 48q-326 39-653-32Z"/>
-  <g stroke="#284c6a" stroke-width="6" stroke-linejoin="round">
-    <path fill="url(#cliff)" d="m1228 963 92-116 173-18 75-32 175 41 82 76 118 73-96 112-121 28-158-21-144 16-116-65Z"/>
-    <path fill="#568da9" stroke="none" d="m1292 963 116 48 16 111-116-65Zm210-31 66 174 158 21 24-169-90 39Zm280-19-32 45-24 169 121-28 96-112Z"/>
-    <path fill="#a3d8dc" stroke="none" d="m1320 847-28 116 61 109 16-154 58-72Zm187 40-5 45 66 174-16-168 84-47Zm297 56-54 15-24 169 52-103Z"/>
-    <path fill="none" stroke="#376382" stroke-width="4" d="m1408 1011 56-44-11-51m207 81 21 69-22 39m188-6-31-82 29-40"/>
-    <path fill="#d1ece5" d="m1228 963 92-116 173-18 75-32 175 41 82 76 118 73-89-12-43-37-77 16-77-27-66 31-103-27-68 27-86-11-51 28Z"/>
-    <path fill="#9dcbd3" stroke="none" d="m1301 938 54-44 146-26 64-43 107 29-106-12-57 46-130 29-30 24Z"/>
+  <!-- The keep grows out of a continuous ridge on the river's right bank.
+       Exposed ice disappears beneath snow instead of forming an outlined plinth. -->
+  <path fill="url(#snow)" d="M1150 1133c111-53 109-149 194-207 66-45 139-42 211-21 86-30 166-21 235 13 140 12 164 91 300 120 181-4 344 31 510 91v311h-577c-110-53-318-67-515-101-288-50-325-63-208-109 88-35 143-65 148-110-109 21-202 21-298 13Z"/>
+  <path fill="#bcdfe0" d="M1150 1133c111-53 109-149 194-207 66-45 139-42 211-21 86-30 166-21 235 13 140 12 164 91 300 120 181-4 344 31 510 91v25c-207-70-357-79-508-90-154-27-164-95-307-117-85-32-153-37-226-14-94-28-158-10-201 19-81 56-97 141-208 181Z"/>
+  <!-- Only the steeper cut beside the river exposes the glacier beneath. -->
+  <path fill="url(#cliff)" d="M1339 950c-32 70-47 136-128 179 76 7 155 3 229-11l-37-47 18-84Z"/>
+  <path fill="#73aabc" d="m1339 950-26 111-102 68 107-3 85-55 18-84Z"/>
+  <path fill="#a8d8db" d="m1339 950 12 62-33 114 85-55-24-62Z"/>
+  <path fill="none" stroke="#588ba5" stroke-width="3" stroke-linejoin="round" d="m1338 1026-10 45-40 32m91-94 11 37-20 29"/>
+  <!-- Drifts overlap the ice foot and carry the slope into the riverbank. -->
+  <path fill="#c4e3df" d="M1178 1134q52-31 94-22 31-26 68-18 39-21 72-17l28 41q-142 33-262 16Z"/>
+  <path fill="none" stroke="#d1eae4" stroke-width="6" stroke-linecap="round" d="M1178 1134q52-31 94-22 31-26 68-18 39-21 72-17"/>
+  <path fill="#7caeba" opacity=".55" d="m1394 916 154-1 221 17 110 70-236-36-188-14Z"/>
+  <!-- A winding, snow-packed approach joins the gate stairs to the near bank. -->
+  <path fill="#9ac2ce" d="M1525 977c-65 33-105 51-85 84 20 31 160 57 200 94 40 35 35 60 2 83-42 42 48 82 258 142h150c-220-73-314-97-305-106 55-44 51-97-15-142-50-33-220-67-228-83-6-15 88-42 127-67Z"/>
+  <path fill="none" stroke="#deeee6" stroke-width="5" stroke-linecap="round" d="M1525 977c-65 33-105 51-85 84 20 31 160 57 200 94 40 35 35 60 2 83-42 42 48 82 258 142"/>
+  <path fill="none" stroke="#77a7ba" stroke-width="3" stroke-linecap="round" d="M1629 982c-39 25-133 52-127 67 8 16 178 50 228 83 66 45 70 98 15 142-9 9 85 33 305 106"/>
+  <g fill="none" stroke="#7faab9" stroke-width="3" stroke-linecap="round">
+    <path d="m1484 1000 83 6m-101 4 72 4m-88 5 66 4m-77 4 62 6m-19 51 18-13m9 24 23-15m113 74 43-18m-27 32 49-18"/>
   </g>
-  <!-- Back towers. -->
-  <g stroke="#284a68" stroke-width="6" stroke-linejoin="round" stroke-linecap="round">
-    <path fill="#72adc4" d="m1393 855 6-285 84-5 20 288Z"/>
-    <path fill="#a8dce0" stroke="none" d="m1399 570 29-1 5 288-40-2Z"/>
-    <path fill="#8bd1d8" d="m1373 580 58-168 73 161-66 22Z"/>
-    <path fill="#d2eee5" stroke="none" d="m1431 412-15 142-43 26Z"/>
-    <path fill="#4a8eac" stroke="none" d="m1431 412 7 183 66-22Z"/>
-    <path fill="none" stroke="#d2eee5" stroke-width="4" d="m1431 422 52 130"/>
-    <path fill="#70aac2" d="m1700 865 5-325 72 9 25 332Z"/>
-    <path fill="#a8dbe0" stroke="none" d="m1705 540 25 3 14 329-44-7Z"/>
-    <path fill="#7fc5d3" d="m1683 550 66-187 56 196-58 19Z"/>
-    <path fill="#d0eee6" stroke="none" d="m1749 363-25 175-41 12Z"/>
-    <path fill="#4585a5" stroke="none" d="m1749 363-2 215 58-19Z"/>
-    <path fill="none" stroke="#c9eee6" stroke-width="4" d="m1750 377 38 161"/>
-    <!-- The tall central keep has a little crown of ice. -->
-    <path fill="url(#ice-wall)" d="m1490 854 15-320 130-8 44 346Z"/>
-    <path fill="#c2e7e4" stroke="none" d="m1505 534 41-2-6 320-50 2Z"/>
-    <path fill="#4c91b0" stroke="none" d="m1603 529 32-3 44 346-59-8Z"/>
-    <path fill="#8fd3dc" d="m1480 546 44-111 13 37 32-129 45 123 13-44 33 116-57 23-70-4Z"/>
-    <path fill="#d4f0e8" stroke="none" d="m1569 343-36 214 37-13 15-46Z"/>
-    <path fill="#59a0be" stroke="none" d="m1569 343 34 218 57-23-33-116-13 44Z"/>
-    <path fill="none" stroke="#d4f0e8" stroke-width="4" d="m1524 435-20 91m123-104 17 103"/>
-    <!-- Small pennants are the only warm notes high in the skyline. -->
-    <path fill="none" stroke-width="5" d="m1569 343-4-67m184 87 4-66"/>
-    <path fill="#e2bd89" stroke-width="4" d="m1565 277 62 8-21 14 16 16-56-8Z"/>
-    <path fill="#a8dcd9" stroke-width="4" d="m1753 298 48 8-18 13-31 5Z"/>
+  <g fill="none" stroke="#82b1bf" stroke-width="3" stroke-linecap="round" opacity=".65">
+    <path d="m1839 1044 56 9m-30-40 34 7m-332 176 34 11m300-101 71 6"/>
   </g>
-  <g>
-    <use xlink:href="#window" x="1445" y="640"/>
-    <use xlink:href="#window" x="1447" y="720"/>
-    <use xlink:href="#window" x="1739" y="622"/>
-    <use xlink:href="#window" x="1745" y="705"/>
-    <use xlink:href="#window" x="1570" y="609" transform="rotate(-3 1570 609)"/>
-    <use xlink:href="#window" x="1533" y="703"/>
-    <use xlink:href="#window" x="1612" y="698"/>
+  <use xlink:href="#fir" transform="translate(1882 1046) scale(.37)"/>
+  <use xlink:href="#fir" transform="translate(1941 1065) scale(.49)"/>
+  <use xlink:href="#fir" transform="translate(1990 1069) scale(.28)"/>
+
+  <!-- Smaller towers share the perspective of the surrounding mountain valley. -->
+  <g transform="translate(1570 940) scale(.9) translate(-1570 -940)">
+    <!-- Back towers. -->
+    <g stroke="#284a68" stroke-width="6" stroke-linejoin="round" stroke-linecap="round">
+      <path fill="#72adc4" d="m1393 855 6-285 84-5 20 288Z"/>
+      <path fill="#a8dce0" stroke="none" d="m1399 570 29-1 5 288-40-2Z"/>
+      <path fill="#8bd1d8" d="m1373 580 58-168 73 161-66 22Z"/>
+      <path fill="#d2eee5" stroke="none" d="m1431 412-15 142-43 26Z"/>
+      <path fill="#4a8eac" stroke="none" d="m1431 412 7 183 66-22Z"/>
+      <path fill="none" stroke="#d2eee5" stroke-width="4" d="m1431 422 52 130"/>
+      <path fill="#70aac2" d="m1700 865 5-325 72 9 25 332Z"/>
+      <path fill="#a8dbe0" stroke="none" d="m1705 540 25 3 14 329-44-7Z"/>
+      <path fill="#7fc5d3" d="m1683 550 66-187 56 196-58 19Z"/>
+      <path fill="#d0eee6" stroke="none" d="m1749 363-25 175-41 12Z"/>
+      <path fill="#4585a5" stroke="none" d="m1749 363-2 215 58-19Z"/>
+      <path fill="none" stroke="#c9eee6" stroke-width="4" d="m1750 377 38 161"/>
+      <!-- The tall central keep has a little crown of ice. -->
+      <path fill="url(#ice-wall)" d="m1490 854 15-320 130-8 44 346Z"/>
+      <path fill="#c2e7e4" stroke="none" d="m1505 534 41-2-6 320-50 2Z"/>
+      <path fill="#4c91b0" stroke="none" d="m1603 529 32-3 44 346-59-8Z"/>
+      <path fill="#8fd3dc" d="m1480 546 44-111 13 37 32-129 45 123 13-44 33 116-57 23-70-4Z"/>
+      <path fill="#d4f0e8" stroke="none" d="m1569 343-36 214 37-13 15-46Z"/>
+      <path fill="#59a0be" stroke="none" d="m1569 343 34 218 57-23-33-116-13 44Z"/>
+      <path fill="none" stroke="#d4f0e8" stroke-width="4" d="m1524 435-20 91m123-104 17 103"/>
+      <!-- Small pennants are the only warm notes high in the skyline. -->
+      <path fill="none" stroke-width="5" d="m1569 343-4-67m184 87 4-66"/>
+      <path fill="#e2bd89" stroke-width="4" d="m1565 277 62 8-21 14 16 16-56-8Z"/>
+      <path fill="#a8dcd9" stroke-width="4" d="m1753 298 48 8-18 13-31 5Z"/>
+    </g>
+    <g>
+      <use xlink:href="#window" x="1445" y="640"/>
+      <use xlink:href="#window" x="1447" y="720"/>
+      <use xlink:href="#window" x="1739" y="622"/>
+      <use xlink:href="#window" x="1745" y="705"/>
+      <use xlink:href="#window" x="1570" y="609" transform="rotate(-3 1570 609)"/>
+      <use xlink:href="#window" x="1533" y="703"/>
+      <use xlink:href="#window" x="1612" y="698"/>
+    </g>
+    <g fill="none" stroke="#437994" stroke-width="3" opacity=".55">
+      <path d="m1513 654 22-1m56 22 32-2m-82 85 21-1m-135-75 21-1m291 79 20 3m-31-86 20 2"/>
+    </g>
+    <!-- Low curtain wall and squat gatehouse give the fortress a toy-like silhouette. -->
+    <g stroke="#284a68" stroke-width="6" stroke-linejoin="round" stroke-linecap="round">
+      <path fill="url(#ice-wall)" d="m1370 914-3-144 34-3 2 24 36-1v-29l35-3 2 28 36-1-1-27 37-1 2 26 37 2v-27l34 1 2 27 37 1 1-27 36 1 2 27 36 2 1-27 34 3 1 26 35 2 1-25 33 4 10 158-185-7Z"/>
+      <path fill="#d5eee6" stroke="none" d="m1367 770 34-3 2 24 36-1v-29l35-3 2 28 36-1-1-27 37-1 2 26 37 2v-27l34 1 2 27 37 1 1-27 36 1 2 27 36 2 1-27 34 3 1 26 35 2 1-25 33 4 1 12-22-1-1 25-59-4-1-25-12-1-1 28-59-4-2-28-12 1-1 27-61-2-1-28-11-1v27l-62-2-2-26-12 1 1 27-60 1-2-28-12 2v28l-60 2-1-24-12 1Z"/>
+      <path fill="#6bacc2" d="m1520 937-7-132 67-59 74 57 16 133Z"/>
+      <path fill="#d7eee5" d="m1498 812 81-79 88 66-14 16-73-49-68 61Z"/>
+      <path fill="#315a78" d="m1542 939-3-60q-2-49 36-53 39-4 47 50l5 61Z"/>
+      <path fill="#25465f" stroke="none" d="m1557 937-3-58q0-32 24-36 23 1 29 35l7 59Z"/>
+      <path fill="none" stroke="#86b6c5" stroke-width="4" d="m1559 863 47-3m-51 24 55-3m-54 23 56-3m-42-51 5 70m11-72 5 71"/>
+      <path fill="#a9d6da" d="m1542 939-56 46 150 5-9-53Z"/>
+      <path fill="none" stroke="#588aa6" stroke-width="4" d="m1528 952 100 1m-112 11 114 3m-129 9 131 3"/>
+    </g>
+    <g stroke="#477b98" stroke-width="3" stroke-linecap="round" fill="none">
+      <path d="m1405 837 25-1m31 42 29-1m-93 16 20-1m258-42 24 2m-18 37 29 2m-38 33 17 1"/>
+      <path stroke="#c8eeea" d="m1377 798 2 27m88-36 1 27m242-9 3 29"/>
+    </g>
+    <g fill="#d1eee7">
+      <path d="m1370 790 7 50 8-50m88-8 9 39 7-39m232 23 10 44 4-44m-202 18 9 30 6-39m119-7 9 40 5-37"/>
+    </g>
   </g>
-  <g fill="none" stroke="#437994" stroke-width="3" opacity=".55">
-    <path d="m1513 654 22-1m56 22 32-2m-82 85 21-1m-135-75 21-1m291 79 20 3m-31-86 20 2"/>
-  </g>
-  <!-- Low curtain wall and squat gatehouse give the fortress a toy-like silhouette. -->
-  <g stroke="#284a68" stroke-width="6" stroke-linejoin="round" stroke-linecap="round">
-    <path fill="url(#ice-wall)" d="m1370 914-3-144 34-3 2 24 36-1v-29l35-3 2 28 36-1-1-27 37-1 2 26 37 2v-27l34 1 2 27 37 1 1-27 36 1 2 27 36 2 1-27 34 3 1 26 35 2 1-25 33 4 10 158-185-7Z"/>
-    <path fill="#d5eee6" stroke="none" d="m1367 770 34-3 2 24 36-1v-29l35-3 2 28 36-1-1-27 37-1 2 26 37 2v-27l34 1 2 27 37 1 1-27 36 1 2 27 36 2 1-27 34 3 1 26 35 2 1-25 33 4 1 12-22-1-1 25-59-4-1-25-12-1-1 28-59-4-2-28-12 1-1 27-61-2-1-28-11-1v27l-62-2-2-26-12 1 1 27-60 1-2-28-12 2v28l-60 2-1-24-12 1Z"/>
-    <path fill="#6bacc2" d="m1520 937-7-132 67-59 74 57 16 133Z"/>
-    <path fill="#d7eee5" d="m1498 812 81-79 88 66-14 16-73-49-68 61Z"/>
-    <path fill="#315a78" d="m1542 939-3-60q-2-49 36-53 39-4 47 50l5 61Z"/>
-    <path fill="#25465f" stroke="none" d="m1557 937-3-58q0-32 24-36 23 1 29 35l7 59Z"/>
-    <path fill="none" stroke="#86b6c5" stroke-width="4" d="m1559 863 47-3m-51 24 55-3m-54 23 56-3m-42-51 5 70m11-72 5 71"/>
-    <path fill="#a9d6da" d="m1542 939-56 46 150 5-9-53Z"/>
-    <path fill="none" stroke="#588aa6" stroke-width="4" d="m1528 952 100 1m-112 11 114 3m-129 9 131 3"/>
-  </g>
-  <g stroke="#477b98" stroke-width="3" stroke-linecap="round" fill="none">
-    <path d="m1405 837 25-1m31 42 29-1m-93 16 20-1m258-42 24 2m-18 37 29 2m-38 33 17 1"/>
-    <path stroke="#c8eeea" d="m1377 798 2 27m88-36 1 27m242-9 3 29"/>
-  </g>
-  <g fill="#d1eee7">
-    <path d="m1370 790 7 50 8-50m88-8 9 39 7-39m232 23 10 44 4-44m-202 18 9 30 6-39m119-7 9 40 5-37"/>
-  </g>
-  <use xlink:href="#shard" transform="translate(1274 974) rotate(-16) scale(.46)"/>
-  <use xlink:href="#shard" transform="translate(1852 980) rotate(18) scale(.65)"/>
-  <use xlink:href="#shard" transform="translate(1820 989) rotate(-8) scale(.42)"/>
+  <!-- Snow laps over the wall foundations, leaving the gateway clear. -->
+  <path fill="#c4e3df" d="M1378 935q28-27 55-17 34-18 62 7l30 8-13 12-91 3Z"/>
+  <path fill="#c4e3df" d="M1645 940q25-25 53-15 27-16 53 8 28-8 48 13l-49 9-80-3Z"/>
+  <path fill="none" stroke="#deeee6" stroke-width="4" stroke-linecap="round" d="M1389 928q21-19 44-10 34-18 62 7m159 8q17-17 44-8 27-16 53 8"/>
+  <use xlink:href="#shard" transform="translate(1280 1108) rotate(-16) scale(.29)"/>
+  <use xlink:href="#shard" transform="translate(1838 1007) rotate(18) scale(.38)"/>
+  <use xlink:href="#shard" transform="translate(1816 1013) rotate(-8) scale(.25)"/>
 
   <!-- Snow banks and firs frame the scene without crowding the sky. -->
   <path fill="#6d9aaf" d="M0 1144q268-100 520-9t492 45q-143 83-244 111L555 1440H0Z"/>
