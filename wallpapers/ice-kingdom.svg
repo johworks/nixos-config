@@ -23,7 +23,7 @@
       <stop stop-color="#729da9"/>
       <stop offset="1" stop-color="#3b708c"/>
     </linearGradient>
-    <linearGradient id="river" x1="0" y1="0" x2=".7" y2="1">
+    <linearGradient id="river" gradientUnits="userSpaceOnUse" x1="0" y1="1052" x2="0" y2="1440">
       <stop stop-color="#69a3b4"/>
       <stop offset=".5" stop-color="#578fae"/>
       <stop offset="1" stop-color="#284a70"/>
@@ -46,6 +46,12 @@
       <stop offset=".5" stop-color="#69bccd"/>
       <stop offset="1" stop-color="#3d779e"/>
     </linearGradient>
+    <path id="upper-river" d="M1365 1128c150-48 255-70 375-58 150 32 290 46 430 12 140-34 260-37 390 1v45c-110-38-220-37-360-2-130 29-300 20-440-6-110-11-210 30-440 100Z"/>
+    <!-- The path stops at the banks; ice remains visible through the bridge arch. -->
+    <mask id="dry-path" maskUnits="userSpaceOnUse" x="0" y="0" width="2560" height="1440">
+      <rect width="2560" height="1440" fill="white"/>
+      <use xlink:href="#upper-river" fill="black"/>
+    </mask>
     <g id="star" fill="#c2e5e2">
       <path d="M0-7 2-2 7 0 2 2 0 7-2 2-7 0-2-2Z"/>
     </g>
@@ -165,12 +171,31 @@
   <path fill="#c4e3df" d="M1178 1134q52-31 94-22 31-26 68-18 39-21 72-17l28 41q-142 33-262 16Z"/>
   <path fill="none" stroke="#d1eae4" stroke-width="6" stroke-linecap="round" d="M1178 1134q52-31 94-22 31-26 68-18 39-21 72-17"/>
   <path fill="#7caeba" opacity=".55" d="m1394 916 154-1 221 17 110 70-236-36-188-14Z"/>
-  <!-- A winding, snow-packed approach joins the gate stairs to the near bank. -->
-  <path fill="#9ac2ce" d="M1525 977c-65 33-105 51-85 84 20 31 160 57 200 94 40 35 35 60 2 83-42 42 48 82 258 142h150c-220-73-314-97-305-106 55-44 51-97-15-142-50-33-220-67-228-83-6-15 88-42 127-67Z"/>
-  <path fill="none" stroke="#deeee6" stroke-width="5" stroke-linecap="round" d="M1525 977c-65 33-105 51-85 84 20 31 160 57 200 94 40 35 35 60 2 83-42 42 48 82 258 142"/>
-  <path fill="none" stroke="#77a7ba" stroke-width="3" stroke-linecap="round" d="M1629 982c-39 25-133 52-127 67 8 16 178 50 228 83 66 45 70 98 15 142-9 9 85 33 305 106"/>
-  <g fill="none" stroke="#7faab9" stroke-width="3" stroke-linecap="round">
-    <path d="m1484 1000 83 6m-101 4 72 4m-88 5 66 4m-77 4 62 6m-19 51 18-13m9 24 23-15m113 74 43-18m-27 32 49-18"/>
+  <!-- The river continues around the ridge and out of the valley to the right. -->
+  <use xlink:href="#upper-river" fill="url(#river)"/>
+  <g fill="none" stroke-linecap="round">
+    <path stroke="#d2e9e2" stroke-width="5" d="M1365 1128c150-48 255-70 375-58 150 32 290 46 430 12 140-34 260-37 390 1"/>
+    <path stroke="#b3d9d9" stroke-width="4" d="M2560 1128c-110-38-220-37-360-2-130 29-300 20-440-6-110-11-210 30-440 100"/>
+    <path stroke="#c0e5e2" stroke-width="2" opacity=".55" d="m1768 1093 77 13m63 14 99 2m199-25 89-12m74 2 59 2"/>
+  </g>
+  <g mask="url(#dry-path)">
+    <!-- A winding, snow-packed approach joins the gate stairs to the near bank. -->
+    <path fill="#9ac2ce" d="M1525 977c-65 33-105 51-85 84 20 31 160 57 200 94 40 35 35 60 2 83-42 42 48 82 258 142h150c-220-73-314-97-305-106 55-44 51-97-15-142-50-33-220-67-228-83-6-15 88-42 127-67Z"/>
+    <path fill="none" stroke="#deeee6" stroke-width="5" stroke-linecap="round" d="M1525 977c-65 33-105 51-85 84 20 31 160 57 200 94 40 35 35 60 2 83-42 42 48 82 258 142"/>
+    <path fill="none" stroke="#77a7ba" stroke-width="3" stroke-linecap="round" d="M1629 982c-39 25-133 52-127 67 8 16 178 50 228 83 66 45 70 98 15 142-9 9 85 33 305 106"/>
+    <g fill="none" stroke="#7faab9" stroke-width="3" stroke-linecap="round">
+      <path d="m1484 1000 83 6m-101 4 72 4m-88 5 66 4m-77 4 62 6m-19 51 18-13m9 24 23-15m113 74 43-18m-27 32 49-18"/>
+    </g>
+  </g>
+  <!-- A low stone arch carries the approach across the narrow upper river. -->
+  <path fill="#39657e" opacity=".3" d="m1498 1114 72 3 90 49-26 18-83-45-63-9Z"/>
+  <g stroke="#355b75" stroke-width="4" stroke-linejoin="round" stroke-linecap="round">
+    <!-- The curved underside leaves an open view of the water below. -->
+    <path fill="#6e9caf" d="M1490 1083q55-1 157 68l1 29-29-11c-37-50-75-66-105-49l-23-5Z"/>
+    <path fill="#a8cdd3" d="M1490 1083q55-1 157 68l69-23q-112-81-159-70Z"/>
+    <path fill="none" stroke="#d4eae3" stroke-width="7" d="M1492 1082q55-1 155 68m-88-93q47-9 155 70"/>
+    <path fill="none" stroke="#527f97" stroke-width="3" d="m1511 1086 5 20m23-11-3 13m28-1-7 12m32 4-9 11m36 5-12 12m31-2-9 13"/>
+    <path fill="#94bdc8" d="m1487 1083 10-4 3 31-11 1Zm155 65 10 3 3 29-11 1Z"/>
   </g>
   <g fill="none" stroke="#82b1bf" stroke-width="3" stroke-linecap="round" opacity=".65">
     <path d="m1839 1044 56 9m-30-40 34 7m-332 176 34 11m300-101 71 6"/>
