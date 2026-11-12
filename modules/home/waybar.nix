@@ -34,9 +34,9 @@ in
           };
 
           clock = {
-            format = "{:%a %H:%M}";
+            format = "{:%a %I:%M %p}";
             format-alt = "{:%Y-%m-%d}";
-            tooltip-format = "{:%A, %B %d %Y | %H:%M}";
+            tooltip-format = "{:%A, %B %d %Y | %I:%M %p}";
           };
 
           cpu = {
