@@ -75,6 +75,7 @@
     dig
     wireguard-tools
     openssl
+    kitty.terminfo # Recognize Kitty terminals in SSH sessions.
   ];
 
   environment.variables = {
