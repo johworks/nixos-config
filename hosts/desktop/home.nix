@@ -98,6 +98,7 @@ in
     "SUPER, B, exec, firefox"
     "SUPER SHIFT, D, exec, voxtype record toggle"
     "SUPER, L, exec, hyprlock"
+    "SUPER ALT, S, exec, systemctl suspend"
   ];
 
   programs.plasma = {
