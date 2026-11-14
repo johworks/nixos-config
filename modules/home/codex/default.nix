@@ -9,24 +9,9 @@ let
   toml = pkgs.formats.toml { };
   settings = toml.generate "codex-nix-settings.toml" {
     mcp_servers = config.codex.mcpServers;
-    default_permissions = "nix-workspace";
-    approval_policy = "on-request";
+    sandbox_mode = "danger-full-access";
+    approval_policy = "never";
     shell_environment_policy.set.NIX_REMOTE = "daemon";
-    permissions.nix-workspace = {
-      extends = ":workspace";
-      filesystem = {
-        "/nix/store" = "read";
-        "${config.home.homeDirectory}/.cache/nix" = "write";
-        "/nix/var/nix/daemon-socket" = "read";
-        # Allow Git operations without lifting the rest of the workspace sandbox.
-        ":workspace_roots".".git" = "write";
-      };
-      network = {
-        # Flake sources and dependencies may need client-side downloads.
-        enabled = true;
-        unix_sockets."/nix/var/nix/daemon-socket/socket" = "allow";
-      };
-    };
   };
 in
 {
