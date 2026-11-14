@@ -9,11 +9,25 @@ import shlex
 import subprocess
 import sys
 import time
+from contextlib import contextmanager
 from pathlib import Path
 from urllib.parse import quote
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "hyprland-lab"))
 from lab import Lab, run
+
+
+@contextmanager
+def timed(stage):
+    start = time.monotonic()
+    try:
+        yield
+    finally:
+        print(
+            f"nixos-lab timing: {stage}: {time.monotonic() - start:.2f}s",
+            file=sys.stderr,
+            flush=True,
+        )
 
 
 def nix_string(value):
@@ -102,19 +116,20 @@ class NixosLab(Lab):
             expr,
         )
         output = self.state / ("base" if target == "vm" else "candidate")
-        run(
-            [
-                "nix",
-                "--store",
-                "daemon",
-                "build",
-                "--impure",
-                "--expr",
-                expr,
-                "--out-link",
-                str(output),
-            ]
-        )
+        with timed(f"{'VM image' if target == 'vm' else 'system'} evaluation and build"):
+            run(
+                [
+                    "nix",
+                    "--store",
+                    "daemon",
+                    "build",
+                    "--impure",
+                    "--expr",
+                    expr,
+                    "--out-link",
+                    str(output),
+                ]
+            )
         return output
 
     def ssh(self, argv, *, root=False, capture=False, **kwargs):
@@ -135,30 +150,38 @@ class NixosLab(Lab):
         candidate = self.build("toplevel").resolve()
         env = os.environ.copy()
         env["NIX_SSHOPTS"] = shlex.join(self.ssh_options())
-        run(
-            [
-                "nix",
-                "--store",
-                "daemon",
-                "copy",
-                "--no-check-sigs",
-                "--to",
-                f"ssh-ng://{self.args.user}@127.0.0.1",
-                str(candidate),
-            ],
-            env=env,
-        )
-        self.ssh(
-            [
-                "nix-env",
-                "--profile",
-                "/nix/var/nix/profiles/system",
-                "--set",
-                str(candidate),
-            ],
-            root=True,
-        )
-        self.ssh([str(candidate / "bin/switch-to-configuration"), "switch"], root=True)
+        with timed("copy to guest"):
+            run(
+                [
+                    "nix",
+                    "--store",
+                    "daemon",
+                    "copy",
+                    "--no-check-sigs",
+                    "--to",
+                    f"ssh-ng://{self.args.user}@127.0.0.1",
+                    str(candidate),
+                ],
+                env=env,
+            )
+        with timed("guest profile update and activation"):
+            self.ssh(
+                [
+                    "nix-env",
+                    "--profile",
+                    "/nix/var/nix/profiles/system",
+                    "--set",
+                    str(candidate),
+                ],
+                root=True,
+            )
+            self.ssh(
+                [str(candidate / "bin/switch-to-configuration"), "switch"], root=True
+            )
+
+    def start(self):
+        with timed("start total (includes image build when needed)"):
+            super().start()
 
     def wait_ready(self, process=None):
         directory = self.current.resolve()

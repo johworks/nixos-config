@@ -1,8 +1,11 @@
 import importlib.util
+import io
 import tempfile
 import unittest
+from contextlib import redirect_stderr
 from pathlib import Path
 from types import SimpleNamespace
+from unittest.mock import patch
 
 spec = importlib.util.spec_from_file_location(
     "nixos_lab", Path(__file__).with_name("lab.py")
@@ -53,6 +56,16 @@ class SelectionTests(unittest.TestCase):
             lab.nix_string('x${builtins.abort "bad"}'),
             '"x\\${builtins.abort \\"bad\\"}"',
         )
+
+
+class TimingTests(unittest.TestCase):
+    def test_timing_is_reported_even_when_stage_fails(self):
+        output = io.StringIO()
+        with patch.object(lab.time, "monotonic", side_effect=[10.0, 12.5]):
+            with redirect_stderr(output), self.assertRaisesRegex(ValueError, "failed"):
+                with lab.timed("copy to guest"):
+                    raise ValueError("failed")
+        self.assertEqual(output.getvalue(), "nixos-lab timing: copy to guest: 2.50s\n")
 
 
 if __name__ == "__main__":

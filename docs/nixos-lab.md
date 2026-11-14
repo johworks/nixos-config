@@ -46,6 +46,19 @@ Hyprland through grim and Plasma through Spectacle; other desktops may need a
 different capture method. SSH readiness does not imply that the graphical
 session has finished starting.
 
+For repeated changes, reuse the same state directory and running guest for the
+same selection, and use `deploy` after each edit. The guest keeps its store
+and `nix copy` transfers missing paths. Use separate state directories for
+different hosts or concurrent experiments. `build` and `reset` are for a new
+base or fresh-run test, not ordinary iterations.
+
+The launcher prints elapsed times to stderr for image or system evaluation and
+build, guest copy, and profile update and activation, including on failure.
+`start` also reports its total, including any initial image build. Nix evaluates
+and builds in one command, so that timing does not separate evaluation,
+downloads, compilation, or image conversion; inspect Nix output to distinguish
+them. Compare cold starts with repeated deploys before tuning the bottleneck.
+
 Guests have separate writable disks and EFI state, no host filesystem shares,
 restricted guest-initiated networking, and per-run pinned SSH keys. Root inside
 the guest does not require host sudo. Launching QEMU needs access to `/dev/kvm`
