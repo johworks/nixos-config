@@ -59,10 +59,13 @@ in
       "desc:Microstep MPG271QX OLED,preferred,2560x0,1"
       ",preferred,auto,auto"
     ];
-    workspace = [
-      "1,monitor:desc:LG Electronics 27GL850,default:true"
-      "2,monitor:desc:Microstep MPG271QX OLED,default:true"
-    ];
+    # Keep the usual numbered workspaces on the LG even when the OLED is on.
+    workspace = lib.genList (
+      n:
+      "${toString (n + 1)},monitor:desc:LG Electronics 27GL850${
+        lib.optionalString (n == 0) ",default:true"
+      }"
+    ) 10;
     exec-once = [ "hyprctl dispatch focusmonitor 'desc:LG Electronics 27GL850'" ];
   };
   theme = {
