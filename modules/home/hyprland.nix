@@ -23,6 +23,27 @@ let
       "0xff${body}"
     else
       color;
+
+  wallpaperStartup = pkgs.writeShellScript "hyprland-wallpaper" ''
+    ${pkgs.awww}/bin/awww-daemon &
+    # awww only applies the initial image to outputs present at the time.
+    # Reapply it after Hyprland discovers a display later in the session.
+    ${pkgs.socat}/bin/socat -u "UNIX-CONNECT:$XDG_RUNTIME_DIR/hypr/$HYPRLAND_INSTANCE_SIGNATURE/.socket2.sock" - |
+      while IFS= read -r event; do
+        case "$event" in
+          monitoraddedv2\>\>*)
+            sleep 1
+            ${pkgs.awww}/bin/awww img ${
+              lib.escapeShellArg (if cfg.wallpaper == null then "" else cfg.wallpaper)
+            }
+            ;;
+        esac
+      done &
+    sleep 1
+    ${pkgs.awww}/bin/awww img ${
+      lib.escapeShellArg (if cfg.wallpaper == null then "" else cfg.wallpaper)
+    }
+  '';
 in
 {
   options.desktop.hyprland = {
@@ -366,9 +387,7 @@ in
           exec-once = [
             "${pkgs.networkmanagerapplet}/bin/nm-applet --indicator"
           ]
-          ++
-            lib.optional (cfg.wallpaper != null)
-              ''${pkgs.bash}/bin/bash -lc "${pkgs.awww}/bin/awww-daemon & sleep 1; ${pkgs.awww}/bin/awww img ${lib.escapeShellArg cfg.wallpaper}"''
+          ++ lib.optional (cfg.wallpaper != null) "${wallpaperStartup}"
           ++ cfg.extraExecOnce;
         };
       };

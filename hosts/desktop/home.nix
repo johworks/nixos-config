@@ -52,6 +52,19 @@ in
     enable = true;
     wallpaper = "${import ../../wallpapers/ice-kingdom.nix { inherit pkgs; }}";
   };
+  # Identify displays by model so connector enumeration does not swap the layout.
+  wayland.windowManager.hyprland.settings = {
+    monitor = lib.mkForce [
+      "desc:LG Electronics 27GL850,preferred,0x0,1"
+      "desc:Microstep MPG271QX OLED,preferred,2560x0,1"
+      ",preferred,auto,auto"
+    ];
+    workspace = [
+      "1,monitor:desc:LG Electronics 27GL850,default:true"
+      "2,monitor:desc:Microstep MPG271QX OLED,default:true"
+    ];
+    exec-once = [ "hyprctl dispatch focusmonitor 'desc:LG Electronics 27GL850'" ];
+  };
   theme = {
     name = "ice-kingdom";
     colors = {
