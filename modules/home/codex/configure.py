@@ -24,16 +24,15 @@ config = codex / "config.toml"
 original = config.read_text() if config.exists() else ""
 document = tomlkit.parse(original)
 
-# Legacy sandbox settings override named permission profiles.
-document.pop("sandbox_mode", None)
+# Remove the previous managed profile so it cannot override unrestricted mode.
+document.pop("default_permissions", None)
 document.pop("sandbox_workspace_write", None)
-document["default_permissions"] = defaults["default_permissions"]
+document["sandbox_mode"] = defaults["sandbox_mode"]
 document["approval_policy"] = defaults["approval_policy"]
 environment = document.setdefault("shell_environment_policy", tomlkit.table())
 environment.setdefault("set", tomlkit.table())["NIX_REMOTE"] = "daemon"
-if "permissions" not in document:
-    document["permissions"] = tomlkit.table()
-document["permissions"]["nix-workspace"] = defaults["permissions"]["nix-workspace"]
+if "permissions" in document:
+    document["permissions"].pop("nix-workspace", None)
 
 # Track field ownership, not values, so removals work without copying credentials.
 state = codex / "nix-managed-mcp-servers.json"

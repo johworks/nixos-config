@@ -1,6 +1,6 @@
 # Codex configuration and MCP servers
 
-`modules/home/codex/default.nix` owns the shared Nix permission profile and the
+`modules/home/codex/default.nix` owns the shared permission defaults and the
 `codex.mcpServers` Home Manager option. Host `home.nix` files select integrations;
 `modules/home/codex/playwright.nix` is enabled on desktop. Keep reusable
 integration declarations next to the Codex module rather than in NixOS service
@@ -14,6 +14,11 @@ those create a read-only Nix store symlink. Our activation script instead merges
 the declared settings into a regular file with mode `0600`, using an atomic
 replacement and backing up the original as `config.toml.before-nix-permissions`.
 Quit Codex before switching to avoid concurrent settings writes.
+
+The shared default is YOLO mode: commands run without the Codex sandbox or
+approval prompts (`sandbox_mode = "danger-full-access"` and
+`approval_policy = "never"`). This applies to new sessions on hosts using the shared profile.
+Explicit per-invocation settings can select a different policy.
 
 For MCP servers, Nix owns only the fields explicitly declared under
 `codex.mcpServers.<name>`. Other fields, such as Codex's saved enable/disable

@@ -25,9 +25,8 @@ class ConfigureTests(unittest.TestCase):
         defaults.write_text(
             tomlkit.dumps(
                 {
-                    "default_permissions": "nix-workspace",
-                    "approval_policy": "on-request",
-                    "permissions": {"nix-workspace": {"extends": ":workspace"}},
+                    "sandbox_mode": "danger-full-access",
+                    "approval_policy": "never",
                     "mcp_servers": servers,
                 }
             )
@@ -92,14 +91,17 @@ class ConfigureTests(unittest.TestCase):
 
     def test_migrates_symlink_without_writing_through_it(self):
         source = self.home / "old-generated-config.toml"
-        original = 'model = "chosen-model"\nsandbox_mode = "workspace-write"\n'
+        original = 'model = "chosen-model"\ndefault_permissions = "nix-workspace"\n[permissions.nix-workspace]\nextends = ":workspace"\n'
         source.write_text(original)
         source.chmod(0o444)
         self.config.symlink_to(source)
         document = self.activate({"playwright": {"command": "playwright-mcp"}})
         self.assertFalse(self.config.is_symlink())
         self.assertEqual(source.read_text(), original)
-        self.assertNotIn("sandbox_mode", document)
+        self.assertNotIn("default_permissions", document)
+        self.assertNotIn("nix-workspace", document.get("permissions", {}))
+        self.assertEqual(document["sandbox_mode"], "danger-full-access")
+        self.assertEqual(document["approval_policy"], "never")
         self.assertEqual(document["model"], "chosen-model")
 
 
