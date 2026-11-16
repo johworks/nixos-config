@@ -124,6 +124,7 @@
     vim
     git
     sbctl
+    discord
     pkgsUnstable.element-desktop
     (pkgs.callPackage ./grok-bot.nix { })
   ];

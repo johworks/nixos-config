@@ -178,7 +178,6 @@ in
   home.packages = [
     secureOpencode
     (pkgs.callPackage ./learnharness.nix { })
-    pkgs.discord
     pkgs.kdePackages.elisa
   ];
 
