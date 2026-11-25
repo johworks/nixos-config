@@ -177,7 +177,7 @@ in
 
   home.packages = [
     secureOpencode
-    pkgs.t3code
+    (pkgs.callPackage ./t3-code.nix { })
     (pkgs.callPackage ./learnharness.nix { })
     pkgs.kdePackages.elisa
   ];
