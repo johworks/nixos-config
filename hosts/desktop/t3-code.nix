@@ -1,7 +1,6 @@
 {
   lib,
   appimageTools,
-  codex,
   fetchurl,
   gh,
   git,
@@ -23,11 +22,11 @@ appimageTools.wrapType2 {
   nativeBuildInputs = [ makeWrapper ];
 
   extraInstallCommands = ''
+    # Inherit the user's npm-installed Codex so T3 and the terminal stay in sync.
     wrapProgram "$out/bin/t3code-desktop" \
       --set T3CODE_DISABLE_AUTO_UPDATE 1 \
       --prefix PATH : ${
         lib.makeBinPath [
-          codex
           gh
           git
         ]
