@@ -20,9 +20,26 @@ Window {
                 return args[i].slice(name.length + 1);
         return fallback;
     }
+    CelestialClock {
+        id: skyClock
+        automatic: (root.option("--sky-date", "") !== "" || root.option("--automatic-fixture", "") !== "") && root.option("--manual-sky", "false") !== "true"
+        manualNight: root.option("--manual-sky", "false") === "true"
+        manualPhase: Number(root.option("--moon-phase", "25"))
+        starStrength: Number(root.option("--stars", "70"))
+        moonStrength: Number(root.option("--moon", "85"))
+        // Assign after construction so the production clock's initial refresh
+        // cannot replace the capture's explicit UTC fixture.
+        Component.onCompleted: {
+            if (root.option("--sky-date", ""))
+                now = Date.parse(root.option("--sky-date", ""));
+            else if (root.option("--automatic-fixture", ""))
+                now = Fixtures.scenario(root.option("--automatic-fixture", "")).now;
+        }
+    }
     WeatherScene {
         id: landscape
         anchors.fill: parent
+        celestial: skyClock.sky
         controls: {
             var name = root.option("--automatic-fixture", "");
             if (name) {

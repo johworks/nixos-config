@@ -23,7 +23,13 @@ TestCase {
             ControlsVersion: 0,
             CellSize: 3,
             Speed: 7,
-            Paused: false
+            Paused: false,
+            StarStrength: 61,
+            MoonStrength: 73,
+            MoonX: 82,
+            MoonY: 18,
+            ManualNight: true,
+            ManualMoonPhase: 75
         };
         var saves = [];
         function load() {
@@ -57,6 +63,8 @@ TestCase {
         compare(storage.saves.length, 1);
         compare(reloaded.RainIntensity, 100);
         compare(reloaded.ControlsVersion, 1);
+        compare(reloaded.ManualNight, true, "migration preserves sky settings");
+        compare(reloaded.ManualMoonPhase, 75);
     }
     function test_context_preset_and_pause_save_once() {
         var storage = storedMap();
@@ -86,6 +94,12 @@ TestCase {
         compare(reloaded.RainIntensity, 100);
         compare(reloaded.Paused, true);
         compare(reloaded.Automatic, false);
+        compare(reloaded.StarStrength, 61);
+        compare(reloaded.MoonStrength, 73);
+        compare(reloaded.MoonX, 82);
+        compare(reloaded.MoonY, 18);
+        compare(reloaded.ManualNight, true);
+        compare(reloaded.ManualMoonPhase, 75, "preset/pause save and reload preserve sky experiments");
     }
     function test_form_edits_do_not_save_live_config() {
         var storage = storedMap();

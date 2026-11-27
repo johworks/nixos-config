@@ -5,6 +5,7 @@ import org.kde.plasma.plasmoid
 WallpaperItem {
     id: root
     property alias automaticWeather: automaticController
+    property alias celestialClock: skyClock
 
     LiveConfig {
         id: liveConfig
@@ -16,6 +17,19 @@ WallpaperItem {
         locationLabel: root.configuration.LocationLabel
         latitude: root.configuration.LocationLatitude
         longitude: root.configuration.LocationLongitude
+    }
+
+    CelestialClock {
+        id: skyClock
+        automatic: root.configuration.Automatic === true
+        latitude: root.configuration.LocationLatitude
+        longitude: root.configuration.LocationLongitude
+        manualNight: root.configuration.ManualNight === true
+        manualPhase: root.configuration.ManualMoonPhase
+        starStrength: root.configuration.StarStrength
+        moonStrength: root.configuration.MoonStrength
+        moonX: root.configuration.MoonX
+        moonY: root.configuration.MoonY
     }
 
     accentColor: "#8ba27c"
@@ -44,6 +58,7 @@ WallpaperItem {
 
     WeatherScene {
         anchors.fill: parent
+        celestial: skyClock.sky
         controls: automaticController.automatic && automaticController.output ? automaticController.output.controls : ({
                 Brightness: root.configuration.Brightness,
                 Warmth: root.configuration.Warmth,

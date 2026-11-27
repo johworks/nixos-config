@@ -3,12 +3,14 @@ import QtQuick.Window
 import "landscape.js" as Landscape
 import "controls.js" as Controls
 import "rain.js" as Rain
+import "celestial.js" as Sky
 
 Item {
     id: root
     clip: true
 
     property var controls: Controls.preset("sunny")
+    property var celestial: null
     readonly property var atmosphere: Controls.normalize(controls)
     property int cellSize: 2
     property int speed: 10
@@ -31,6 +33,7 @@ Item {
     property int skyPaintCount: 0
     readonly property int staticPaintCount: skyPaintCount + terrain.paintCount + clouds.paintCount
     property int compositePaintCount: 0
+    readonly property int celestialPaintCount: nightSky.paintCount
     readonly property int gradePaintCount: terrain.gradeCount + clouds.gradeCount
 
     function syncRain() {
@@ -49,6 +52,7 @@ Item {
     onAtmosphereChanged: syncRain()
     onTimeChanged: composition.requestPaint()
     onWindTimeChanged: composition.requestPaint()
+    onCelestialChanged: composition.requestPaint()
     onGridChanged: output.requestPaint()
     onVisibleChanged: if (visible)
         composition.requestPaint()
@@ -74,6 +78,13 @@ Item {
                 Landscape.sky(getContext("2d"), width, height, root.atmosphere);
                 root.skyPaintCount++;
             }
+            onPainted: composition.requestPaint()
+        }
+        CelestialLayer {
+            id: nightSky
+            width: root.sourceSize.columns
+            height: root.sourceSize.rows
+            sky: root.celestial
             onPainted: composition.requestPaint()
         }
         ArtworkLayer {
@@ -106,6 +117,11 @@ Item {
                 var ctx = getContext("2d");
                 ctx.reset();
                 ctx.drawImage(sky, 0, 0, width, height, 0, 0, width, height);
+                if (root.celestial && root.celestial.fade > 0) {
+                    ctx.globalAlpha = Sky.transmission(root.atmosphere.cloudAmount, root.atmosphere.cloudDarkness);
+                    ctx.drawImage(nightSky, 0, 0, width, height, 0, 0, width, height);
+                    ctx.globalAlpha = 1;
+                }
                 var layers = Landscape.cloudPlacements(width, height, root.windTime);
                 for (var i = 0; i < layers.length; i++) {
                     var layer = layers[i];

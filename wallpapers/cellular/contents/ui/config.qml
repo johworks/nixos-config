@@ -17,6 +17,7 @@ Kirigami.FormLayout {
     property var runtimeWallpaper: Plasmoid ? Plasmoid.wallpaperGraphicsObject : null
     // qmllint enable missing-property
     readonly property var liveWeather: runtimeWallpaper && runtimeWallpaper.automaticWeather !== undefined ? runtimeWallpaper.automaticWeather : null
+    readonly property var liveSky: runtimeWallpaper && runtimeWallpaper.celestialClock !== undefined ? runtimeWallpaper.celestialClock : null
     // Plasma's wallpaper settings loader supplies this context property.
     // qmllint disable unqualified
     twinFormLayouts: parentLayout
@@ -41,6 +42,12 @@ Kirigami.FormLayout {
     property alias cfg_LocationLabel: locationLabel.text
     property alias cfg_LocationLatitude: latitude.text
     property alias cfg_LocationLongitude: longitude.text
+    property alias cfg_StarStrength: starStrength.value
+    property alias cfg_MoonStrength: moonStrength.value
+    property alias cfg_MoonX: moonX.value
+    property alias cfg_MoonY: moonY.value
+    property alias cfg_ManualNight: manualNight.checked
+    property alias cfg_ManualMoonPhase: moonPhase.value
     function initializeControls() {
         Controls.migrate(root, "cfg_");
     }
@@ -227,6 +234,71 @@ Kirigami.FormLayout {
         from: 0
         to: 100
         value: 0
+        editable: true
+    }
+    Item {
+        Kirigami.FormData.isSection: true
+        Kirigami.FormData.label: "Stars and composed moon"
+    }
+    Label {
+        text: "Stars face true west using location and real time. Automatic fades the night sky with daylight and uses an approximate date phase. The moon's position is artistic. Clouds and terrain cover both."
+        Layout.fillWidth: true
+        Layout.maximumWidth: 440
+        wrapMode: Text.WordWrap
+    }
+    SpinBox {
+        id: starStrength
+        Kirigami.FormData.label: "Star strength (0 = hidden):"
+        from: 0
+        to: 100
+        value: 70
+        editable: true
+    }
+    Label {
+        objectName: "skyStatus"
+        text: root.liveSky ? "Applied sky: " + root.liveSky.statusText : "Night sky settings take effect on Apply. Manual inspection is off by default."
+        Layout.fillWidth: true
+        Layout.maximumWidth: 440
+        wrapMode: Text.WordWrap
+    }
+    SpinBox {
+        id: moonStrength
+        Kirigami.FormData.label: "Moon strength (0 = hidden):"
+        from: 0
+        to: 100
+        value: 85
+        editable: true
+    }
+    SpinBox {
+        id: moonX
+        Kirigami.FormData.label: "Moon horizontal position (%):"
+        from: 0
+        to: 100
+        value: 77
+        editable: true
+    }
+    SpinBox {
+        id: moonY
+        Kirigami.FormData.label: "Moon vertical position (0 = top):"
+        from: 0
+        to: 100
+        value: 21
+        editable: true
+    }
+    CheckBox {
+        id: manualNight
+        objectName: "manualNightControl"
+        enabled: !automatic.checked
+        text: "Manual: show night sky for inspection"
+    }
+    SpinBox {
+        id: moonPhase
+        objectName: "manualMoonPhaseControl"
+        enabled: !automatic.checked && manualNight.checked
+        Kirigami.FormData.label: "Manual phase (0 new, 25 quarter, 50 full, 75 last):"
+        from: 0
+        to: 100
+        value: 25
         editable: true
     }
     Item {

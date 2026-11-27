@@ -97,6 +97,34 @@ Item {
             compare(settings.item.wallpaperConfiguration, replacementConfiguration, "retain the host's binding when its live configuration changes");
             // qmllint enable missing-property
         }
+        function test_sky_drafts_modes_and_cancel() {
+            // qmllint disable missing-property
+            settings.item.cfg_ManualNight = true;
+            settings.item.cfg_ManualMoonPhase = 75;
+            settings.item.cfg_MoonX = 82;
+            settings.item.cfg_MoonY = 15;
+            settings.item.cfg_StarStrength = 90;
+            settings.item.cfg_MoonStrength = 63;
+            settings.item.cfg_Automatic = true;
+            compare(findChild(settings.item, "manualNightControl").enabled, false);
+            compare(findChild(settings.item, "manualMoonPhaseControl").enabled, false);
+            compare(settings.item.cfg_Brightness, 112);
+            settings.item.applyPreset("cloudy");
+            compare(settings.item.cfg_Automatic, false);
+            compare(settings.item.cfg_ManualMoonPhase, 75);
+            compare(settings.item.cfg_MoonX, 82);
+            compare(settings.item.cfg_MoonY, 15);
+            compare(settings.item.cfg_StarStrength, 90);
+            compare(settings.item.cfg_MoonStrength, 63);
+            compare(findChild(settings.item, "manualMoonPhaseControl").enabled, true);
+            compare(firstConfiguration.writes, 0, "sky edits remain drafts behind Apply");
+            init();
+            compare(settings.item.cfg_ManualNight, false, "Cancel/reopen discards unapplied sky draft");
+            compare(settings.item.cfg_ManualMoonPhase, 25);
+            compare(settings.item.cfg_MoonX, 77);
+            compare(settings.item.cfg_StarStrength, 70);
+            // qmllint enable missing-property
+        }
         function test_runtime_status_binding() {
             // qmllint disable missing-property
             settings.item.runtimeWallpaper = wallpaper;
